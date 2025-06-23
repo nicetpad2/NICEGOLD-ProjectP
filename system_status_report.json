@@ -1,0 +1,132 @@
+{
+  "timestamp": "2025-06-23T16:12:47.089153",
+  "python_version": "3.11.13",
+  "files_status": {
+    "required_files": {
+      "existing": [
+        [
+          "one_click_deploy.py",
+          "One-click deployment script"
+        ],
+        [
+          "start_production_single_user.py",
+          "Production system manager"
+        ],
+        [
+          "system_maintenance.py",
+          "System maintenance & monitoring"
+        ],
+        [
+          "final_integration_live_test.py",
+          "Integration testing"
+        ],
+        [
+          "system_demo.py",
+          "System demonstration"
+        ],
+        [
+          "ai_team_manager.py",
+          "AI team management"
+        ],
+        [
+          "ai_orchestrator.py",
+          "AI workflow orchestrator"
+        ],
+        [
+          "ai_assistant_brain.py",
+          "AI assistant brain"
+        ],
+        [
+          "src/single_user_auth.py",
+          "Single-user authentication"
+        ],
+        [
+          "src/api.py",
+          "FastAPI backend"
+        ],
+        [
+          "config.yaml",
+          "Main configuration"
+        ],
+        [
+          "ADMIN_GUIDE.md",
+          "Administrator guide"
+        ],
+        [
+          "README.md",
+          "Project documentation"
+        ]
+      ],
+      "missing": [],
+      "total": 13,
+      "completion_rate": 100.0
+    },
+    "optional_files": {
+      "existing": [
+        [
+          "dashboard_app.py",
+          "Streamlit dashboard"
+        ],
+        [
+          "src/dashboard.py",
+          "Dashboard module"
+        ],
+        [
+          "config/production.yaml",
+          "Production configuration"
+        ],
+        [
+          ".env.production",
+          "Production environment"
+        ],
+        [
+          "requirements.txt",
+          "Python dependencies"
+        ]
+      ],
+      "missing": [],
+      "total": 5,
+      "completion_rate": 100.0
+    }
+  },
+  "services_status": {
+    "API Server": {
+      "name": "API Server",
+      "status": "stopped",
+      "details": "No PID file found"
+    },
+    "Dashboard": {
+      "name": "Dashboard",
+      "status": "stopped",
+      "details": "No PID file found"
+    },
+    "Database": {
+      "name": "Database",
+      "status": "available",
+      "details": "Size: 40960 bytes"
+    }
+  },
+  "system_stats": {
+    "cpu_usage": 100.0,
+    "memory": {
+      "total_gb": 12.67,
+      "used_percent": 35.3,
+      "available_gb": 8.2
+    },
+    "disk": {
+      "total_gb": 107.72,
+      "used_percent": 48.8,
+      "free_gb": 55.1
+    },
+    "processes": 39,
+    "project": {
+      "python_files": 747,
+      "log_files": 11,
+      "config_files": 27
+    }
+  },
+  "recommendations": [
+    "\ud83d\ude80 Start stopped services: API Server, Dashboard",
+    "\u26a1 High CPU usage detected. Consider optimizing or scaling."
+  ]
+}

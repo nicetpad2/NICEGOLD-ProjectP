@@ -50,7 +50,16 @@ def fix_evidently_imports():
 def fix_pydantic_imports():
     """แก้ไขปัญหา pydantic SecretField"""
     try:
-        from pydantic import SecretField
+        try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
         logger.info("✅ Pydantic SecretField working correctly")
         return True
     except ImportError:

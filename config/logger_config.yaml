@@ -1,11 +1,53 @@
 version: 1
+disable_existing_loggers: false
+
 formatters:
-  default:
-    format: '%(asctime)s | %(levelname)-8s | %(module)s:%(lineno)d | %(message)s'
+  clean:
+    format: '%(message)s'
+  detailed:
+    format: '%(asctime)s | %(levelname)-8s | %(name)-15s | %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+  colorful:
+    format: '\033[36m%(asctime)s\033[0m | \033[1m%(levelname)-8s\033[0m | \033[35m%(name)-15s\033[0m | %(message)s'
+    datefmt: '%H:%M:%S'
+
 handlers:
   console:
     class: logging.StreamHandler
-    formatter: default
+    formatter: colorful
+    level: INFO
+    stream: ext://sys.stdout
+    
+  file:
+    class: logging.FileHandler
+    formatter: detailed
+    filename: logs/nicegold.log
+    mode: a
+    level: DEBUG
+
+  error_file:
+    class: logging.FileHandler
+    formatter: detailed
+    filename: logs/errors.log
+    mode: a
+    level: ERROR
+
+loggers:
+  src:
+    level: INFO
+    handlers: [console, file]
+    propagate: false
+  
+  NiceGold:
+    level: INFO
+    handlers: [console, file]
+    propagate: false
+    
+  main:
+    level: INFO
+    handlers: [console, file]
+    propagate: false
+
 root:
   level: INFO
-  handlers: [console]
+  handlers: [console, file, error_file]

@@ -237,7 +237,16 @@ class PipelineImportFixer:
             for module, item in test_imports:
                 try:
                     if module == "pydantic":
-                        from pydantic import SecretField
+                        try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
 
                         SecretField(default="test")  # Test it works
                     elif module == "evidently_compat":

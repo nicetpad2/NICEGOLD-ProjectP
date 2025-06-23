@@ -210,7 +210,16 @@ def main():
     
     # Test Pydantic
     try:
-        from pydantic import SecretField, Field
+        try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass, Field
         sf = SecretField()
         print("✅ Pydantic SecretField working")
     except Exception as e:

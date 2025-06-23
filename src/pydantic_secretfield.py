@@ -14,7 +14,7 @@ try:
     from pydantic import Field as PydanticField
     from pydantic import __version__ as pydantic_version
 
-    logger.info(f"📦 Using Pydantic {pydantic_version}")
+    logger.info(f"Using Pydantic {pydantic_version}")
 
     def SecretField(
         default: Any = None,
@@ -52,7 +52,7 @@ try:
     Field = PydanticField
     BaseModel = PydanticBaseModel
 
-    logger.info("✅ Pydantic v2 SecretField replacement ready")
+    logger.info("Pydantic v2 SecretField replacement ready")
 
 except ImportError:
     logger.warning("⚠️ Pydantic not available, using fallback")

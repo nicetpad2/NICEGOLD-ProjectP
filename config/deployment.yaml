@@ -1,0 +1,91 @@
+version: "1.1.0"
+
+# การตั้งค่า Git Repository
+git:
+  auto_push: true
+  branch: "main"
+  commit_prefix: "🚀 NICEGOLD"
+  ignore_patterns:
+    - "*.pyc"
+    - "__pycache__"
+    - "*.log"
+    - "*.tmp"
+    - ".env.local"
+    - "node_modules"
+    - ".DS_Store"
+    - "*.swp"
+    - "*.swo"
+    - ".vscode/settings.json"
+
+# การตั้งค่า Backup
+backup:
+  enabled: true
+  keep_backups: 5
+  backup_dir: "backups"
+  exclude_patterns:
+    - "logs/*"
+    - "backups/*" 
+    - "__pycache__/*"
+    - "*.pyc"
+    - "node_modules/*"
+
+# การตั้งค่า Validation
+validation:
+  run_tests: true
+  check_syntax: true
+  check_dependencies: true
+  required_files:
+    - "ADMIN_GUIDE.md"
+    - "requirements.txt"
+    - "README.md"
+
+# การตั้งค่า Notifications
+notifications:
+  enabled: true
+  on_success: true
+  on_failure: true
+  save_to_file: true
+  log_file: "logs/deployment/notifications.log"
+
+# การตั้งค่า Security
+security:
+  scan_secrets: true
+  check_permissions: true
+  allowed_extensions:
+    - ".py"
+    - ".md"
+    - ".txt"
+    - ".yaml"
+    - ".yml"
+    - ".json"
+    - ".csv"
+    - ".parquet"
+    - ".sh"
+    - ".bat"
+
+# การตั้งค่า Performance
+performance:
+  max_file_size_mb: 100
+  max_total_size_gb: 1
+  compress_backups: true
+  cleanup_temp_files: true
+
+# การตั้งค่า Monitoring
+monitoring:
+  track_deployment_time: true
+  save_metrics: true
+  alert_on_failure: true
+  webhook_url: null  # เพิ่ม URL สำหรับ webhook notifications
+
+# การตั้งค่า Environment
+environment:
+  development:
+    auto_push: false
+    run_tests: true
+    backup_enabled: true
+  
+  production:
+    auto_push: true
+    run_tests: true
+    backup_enabled: true
+    notifications_enabled: true

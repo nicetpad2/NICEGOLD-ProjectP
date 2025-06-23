@@ -17,7 +17,7 @@ try:
     from src.pydantic_secretfield import BaseModel, Field, SecretField
 
     logger = logging.getLogger(__name__)
-    logger.info("✅ Professional Pydantic v2 compatibility loaded")
+    logger.info("Professional Pydantic v2 compatibility loaded")
 except ImportError:
     # Fallback if the compatibility module is not available
     try:
@@ -234,12 +234,12 @@ def initialize_evidently():
         import evidently
 
         evidently_version = getattr(evidently, "__version__", "unknown")
-        logger.info(f"📊 Evidently version detected: {evidently_version}")
+        logger.info(f"Evidently version detected: {evidently_version}")
 
         # Use professional implementation regardless of version
         # This avoids the hanging import issues with v0.4.30
         evidently_available = True
-        logger.info("✅ Professional Evidently compatibility initialized")
+        logger.info("Professional Evidently compatibility initialized")
         return True
 
     except ImportError:

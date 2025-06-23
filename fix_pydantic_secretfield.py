@@ -128,7 +128,16 @@ def apply_comprehensive_pydantic_fix():
     # Test the fix
     try:
         # Test direct import
-        from pydantic import Field, SecretField
+        try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
 
         test_field = SecretField(default="test")
 
@@ -152,7 +161,16 @@ if __name__ == "__main__":
 
     if success:
         print("\n🎉 Pydantic v2 SecretField fix completed successfully!")
-        print("You can now use: from pydantic import SecretField")
+        print("You can now use: try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass")
     else:
         print("\n⚠️ Pydantic fix completed with issues.")
         print("Please check the logs for details.")

@@ -1,17 +1,34 @@
-# Phiradon168 Enterprise Trading System
+# 🚀 NICEGOLD Enterprise - Single User Production System
 
-[![CI](https://github.com/Phiradon168/Phiradon168/actions/workflows/ci.yml/badge.svg)](https://github.com/Phiradon168/Phiradon168/actions) [![Coverage](https://codecov.io/gh/Phiradon168/Phiradon168/branch/main/graph/badge.svg)](https://codecov.io/gh/Phiradon168/Phiradon168) [![PyPI version](https://img.shields.io/pypi/v/phiradon168.svg)](https://pypi.org/project/phiradon168/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🌟 Overview
-ระบบ NICEGOLD Enterprise เป็นแพลตฟอร์มเทรดและวิเคราะห์ XAUUSD ระดับองค์กรที่มีระบบ **Experiment Tracking แบบมืออาชีพ** พร้อมการรองรับ MLflow, WandB, และ Production Monitoring
+**NICEGOLD Enterprise** เป็นระบบ trading platform แบบ single-user ที่ออกแบบมาเพื่อให้ผู้ดูแลระบบคนเดียวสามารถบริหารจัดการได้ทั้งหมด โดยใช้ AI เป็นทีมงานช่วยเหลือในการทำงานต่างๆ
 
-### ✨ Key Features
-- 🚀 **Enterprise Experiment Tracking** - MLflow, WandB, Local Storage
-- 📊 **Production Monitoring** - Real-time tracking & alerting
-- 🔧 **Auto Data Pipeline** - Data quality monitoring & auto-fix
-- 📈 **Model Management** - Version control, deployment, rollback
-- 🔒 **Security & Compliance** - Authentication, encryption, audit logs
-- 🌐 **Cloud Ready** - Docker, Kubernetes, Multi-cloud support
+## ✨ ฟีเจอร์หลัก
+
+- 🔐 **Single-User Authentication** - ระบบควบคุมโดยผู้ดูแลคนเดียว
+- 🤖 **AI Team System** - ทีม AI ที่ช่วยในการวิเคราะห์และตัดสินใจ  
+- 🎯 **AI Orchestrator** - ระบบประสานงาน AI แบบอัตโนมัติ
+- � **Production Ready** - พร้อมใช้งานจริงด้วยระบบรักษาความปลอดภัยที่แข็งแกร่ง
+- 📊 **Real-time Monitoring** - ติดตามระบบแบบเรียลไทม์
+- 🔧 **Automated Maintenance** - ระบบบำรุงรักษาอัตโนมัติ
+
+## 🏗️ สถาปัตยกรรมระบบ
+
+```
+NICEGOLD Enterprise
+├── 🔐 Authentication Layer (PBKDF2 + JWT)
+├── 🚀 FastAPI Backend (REST API)
+├── � Streamlit Dashboard (Web Interface)
+├── 🤖 AI Team System (5 Specialized Agents)
+├── 🎯 AI Orchestrator (Workflow Management)
+├── � SQLite Database (Production Data)
+├── 📈 Monitoring & Logging
+└── 🔒 Security & Backup Systems
+```
 
 ## 📋 Table of Contents
 - [🚀 Quick Start](#-quick-start)

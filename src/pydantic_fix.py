@@ -1,137 +1,96 @@
 """
-Pydantic Compatibility Fix for SecretField
-แก้ไขปัญหา SecretField ในทุกเวอร์ชันของ pydantic
+Pydantic Compatibility Fix
+=========================
+แก้ไขปัญหา SecretField ใน Pydantic v2
 """
 
 import logging
 import warnings
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 warnings.filterwarnings('ignore')
 
-# Global variables for pydantic compatibility
-PYDANTIC_V1 = False
-PYDANTIC_V2 = False
-FALLBACK_MODE = False
+# ตัวแปรสำหรับเก็บ compatibility objects
+SecretField = None
+Field = None
+BaseModel = None
 
-def detect_pydantic_version():
-    """ตรวจสอบเวอร์ชันของ pydantic"""
-    global PYDANTIC_V1, PYDANTIC_V2, FALLBACK_MODE
+def initialize_pydantic():
+    """เริ่มต้น pydantic compatibility"""
+    global SecretField, Field, BaseModel
     
     try:
+        # ลอง import Pydantic
         import pydantic
-        version = pydantic.VERSION
+        version = pydantic.__version__
+        logger.info(f"📦 Pydantic {version} detected")
         
-        if version.startswith('1.'):
-            PYDANTIC_V1 = True
-            logger.info(f"✅ Pydantic v1 detected: {version}")
-        elif version.startswith('2.'):
-            PYDANTIC_V2 = True
-            logger.info(f"✅ Pydantic v2 detected: {version}")
+        if version.startswith('2.'):
+            # Pydantic v2
+            from pydantic import Field as PydanticField, BaseModel as PydanticBaseModel
+            
+            def SecretFieldV2(default=None, **kwargs):
+                """SecretField สำหรับ Pydantic v2"""
+                # ลบ parameters ที่ไม่มีใน v2
+                kwargs.pop('secret', None)
+                kwargs.pop('repr', None)
+                return PydanticField(default=default, **kwargs)
+            
+            SecretField = SecretFieldV2
+            Field = PydanticField
+            BaseModel = PydanticBaseModel
+            
+            logger.info("✅ Pydantic v2 compatibility ready")
+            
         else:
-            logger.warning(f"⚠️ Unknown pydantic version: {version}")
-            FALLBACK_MODE = True
-    except ImportError:
-        logger.warning("⚠️ Pydantic not available")
-        FALLBACK_MODE = True
-
-def get_secret_field():
-    """ได้ SecretField ที่เข้ากันได้กับทุกเวอร์ชัน"""
-    global PYDANTIC_V1, PYDANTIC_V2, FALLBACK_MODE
-    
-    if PYDANTIC_V1:
-        try:
-            from pydantic import SecretStr
-            from pydantic.fields import Field
-            
-            def SecretField(default=None, **kwargs):
-                return Field(default=default, **kwargs)
-            
-            logger.info("✅ Using Pydantic v1 compatibility")
-            return SecretField, Field, SecretStr
-            
-        except ImportError:
+            # Pydantic v1
             try:
-                from pydantic import Field
-                def SecretField(default=None, **kwargs):
-                    return Field(default=default, **kwargs)
-                logger.info("✅ Using Pydantic v1 Field only")
-                return SecretField, Field, str
-            except ImportError:
-                pass
-    
-    elif PYDANTIC_V2:
-        try:
-            from pydantic import Field, SecretStr
-            
-            def SecretField(default=None, **kwargs):
-                return Field(default=default, **kwargs)
-            
-            logger.info("✅ Using Pydantic v2 compatibility")
-            return SecretField, Field, SecretStr
-            
-        except ImportError:
-            pass
-    
-    # Fallback mode
-    logger.warning("⚠️ Using pydantic fallback mode")
-    
-    def FallbackSecretField(default=None, **kwargs):
-        return default
-    
-    def FallbackField(default=None, **kwargs):
-        return default
-    
-    class FallbackSecretStr:
-        def __init__(self, value):
-            self._value = str(value)
-        
-        def get_secret_value(self):
-            return self._value
-        
-        def __str__(self):
-            return '***'
-    
-    return FallbackSecretField, FallbackField, FallbackSecretStr
-
-def get_base_model():
-    """ได้ BaseModel ที่เข้ากันได้"""
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
     try:
-        from pydantic import BaseModel
-        return BaseModel
+        from src.pydantic_fix import SecretField, Field, BaseModel
     except ImportError:
-        logger.warning("⚠️ Using BaseModel fallback")
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass as PydanticSecretField
+            from pydantic import Field as PydanticField
+            from pydantic import BaseModel as PydanticBaseModel
+            
+            SecretField = PydanticSecretField
+            Field = PydanticField
+            BaseModel = PydanticBaseModel
+            
+            logger.info("✅ Pydantic v1 ready")
+            
+    except ImportError:
+        # ไม่มี Pydantic - ใช้ fallback
+        logger.warning("⚠️ No Pydantic found, using fallback")
         
+        def FallbackSecretField(default=None, **kwargs):
+            return default
+            
+        def FallbackField(default=None, **kwargs):
+            return default
+            
         class FallbackBaseModel:
             def __init__(self, **kwargs):
-                for key, value in kwargs.items():
-                    setattr(self, key, value)
+                for k, v in kwargs.items():
+                    setattr(self, k, v)
             
-            def dict(self, **kwargs):
+            def dict(self):
                 return {k: v for k, v in self.__dict__.items() 
                        if not k.startswith('_')}
-            
-            def json(self, **kwargs):
-                import json
-                return json.dumps(self.dict())
-            
-            class Config:
-                arbitrary_types_allowed = True
-                extra = 'allow'
         
-        return FallbackBaseModel
+        SecretField = FallbackSecretField
+        Field = FallbackField
+        BaseModel = FallbackBaseModel
+        
+        logger.info("✅ Fallback mode ready")
 
-# Initialize
-detect_pydantic_version()
-SecretField, Field, SecretStr = get_secret_field()
-BaseModel = get_base_model()
+# เริ่มต้นเมื่อ import
+initialize_pydantic()
 
-# Make them available globally
-import builtins
-builtins.SecretField = SecretField
-builtins.PydanticField = Field
-builtins.PydanticSecretStr = SecretStr
-builtins.PydanticBaseModel = BaseModel
-
-logger.info("✅ Pydantic compatibility layer ready")
+# Export
+__all__ = ['SecretField', 'Field', 'BaseModel']

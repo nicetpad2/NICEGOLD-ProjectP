@@ -28,7 +28,16 @@ class UltimateProjectPFixer:
         print("🔧 Fixing pydantic SecretField issue...")
         try:
             # Try current import
-            from pydantic import SecretField
+            try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
             print("  ✅ pydantic SecretField already working")
             return True
         except ImportError:

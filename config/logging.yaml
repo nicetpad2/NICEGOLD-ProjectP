@@ -1,0 +1,22 @@
+disable_existing_loggers: false
+formatters:
+  detailed:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
+  standard:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: standard
+  file:
+    backupCount: 5
+    class: logging.handlers.RotatingFileHandler
+    filename: /content/drive/MyDrive/NICEGOLD-ProjectP/logs/application/nicegold.log
+    formatter: detailed
+    maxBytes: 104857600
+root:
+  handlers:
+  - file
+  - console
+  level: INFO
+version: 1

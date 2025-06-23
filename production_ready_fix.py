@@ -90,7 +90,16 @@ class ProductionReadyFix:
             logger.error(f"❌ Pydantic v2 production issue: {e}")
             self.production_status['pydantic'] = False
                     content = content.replace(
-                        "from pydantic import BaseModel, Field, SecretField",
+                        "try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass",
                         "from src.pydantic_v2_compat import BaseModel, Field, SecretField",
                     )
                     fixes_made += 1

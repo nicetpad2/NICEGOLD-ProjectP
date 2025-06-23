@@ -23,7 +23,16 @@ Created comprehensive compatibility layer with multiple solutions
 ===============================================
 
 Replace this:
-    from pydantic import SecretField
+    try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
 
 With this:
     from src.pydantic_secretfield import SecretField
@@ -66,7 +75,16 @@ class MyModel(BaseModel):
 Option A (Recommended):
 Update your import statements:
 ```python
-# Instead of: from pydantic import SecretField
+# Instead of: try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
 from src.pydantic_secretfield import SecretField
 ```
 
@@ -102,7 +120,16 @@ print("📦 Pydantic v2.11.7 compatibility established")
 print("🔧 Multiple solutions provided for different use cases")
 print()
 print("🚀 QUICK START:")
-print("Replace: from pydantic import SecretField")
+print("Replace: try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass")
 print("With:    from src.pydantic_secretfield import SecretField")
 print()
 print("🎉 Your pipeline is now ready to run!")

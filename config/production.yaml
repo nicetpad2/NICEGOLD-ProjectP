@@ -1,0 +1,84 @@
+application:
+  name: NICEGOLD Enterprise
+  version: 1.0.0
+  environment: production
+  debug: false
+  single_user_mode: true
+  admin_email: admin@nicegold.local
+  maintenance_mode: false
+  
+security:
+  auth_enabled: true
+  jwt_expiry_hours: 24
+  max_login_attempts: 5
+  lockout_duration_minutes: 30
+  session_timeout_hours: 8
+  password_min_length: 12
+  require_https: true
+  security_headers: true
+  rate_limiting: true
+  max_requests_per_minute: 100
+  cors_enabled: false
+  allowed_origins: []
+  
+database:
+  type: sqlite
+  file: database/production.db
+  backup_enabled: true
+  backup_interval_hours: 6
+  backup_retention_days: 30
+  max_connections: 20
+  connection_timeout: 30
+  
+api:
+  host: 127.0.0.1
+  port: 8000
+  workers: 4
+  reload: false
+  access_log: true
+  request_timeout: 30
+  max_request_size: 16777216  # 16MB
+  
+dashboard:
+  enabled: true
+  host: 127.0.0.1
+  port: 8501
+  auto_refresh_seconds: 30
+  page_title: "NICEGOLD Enterprise Dashboard"
+  
+ai_system:
+  enabled: true
+  orchestrator_enabled: true
+  team_size: 5
+  response_timeout: 30
+  max_concurrent_requests: 10
+  
+monitoring:
+  enabled: true
+  health_check_interval: 60
+  metrics_enabled: true
+  alerting_enabled: true
+  disk_usage_threshold: 85
+  memory_usage_threshold: 90
+  cpu_usage_threshold: 95
+  
+logging:
+  level: INFO
+  max_size_mb: 100
+  backup_count: 5
+  rotation: daily
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+performance:
+  enable_caching: true
+  cache_ttl_seconds: 300
+  max_cache_size_mb: 256
+  enable_compression: true
+  
+backup:
+  enabled: true
+  interval_hours: 6
+  retention_days: 30
+  include_logs: true
+  include_models: true
+  compression: true

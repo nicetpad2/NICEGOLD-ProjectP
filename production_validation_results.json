@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-06-23T16:19:35.663147",
+  "overall_status": "FAILED",
+  "validation_results": {
+    "configuration": "PASS",
+    "database": "PASS",
+    "scripts": "PASS",
+    "permissions": "PASS"
+  },
+  "critical_issues": [
+    "Python version 3.11 not supported. Use Python 3.8-3.10"
+  ],
+  "warnings": [],
+  "recommendations": []
+}

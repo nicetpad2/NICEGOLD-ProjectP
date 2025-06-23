@@ -8,6 +8,13 @@ catboost==1.2.8
 xgboost==2.0.3
 lightgbm==4.3.0
 
+# GPU Acceleration & Monitoring
+torch>=2.0.0
+torchvision>=0.15.0
+pynvml>=11.4.1
+GPUtil>=1.4.0
+nvidia-ml-py3>=7.352.0
+
 # Technical Analysis
 ta==0.11.0
 
@@ -24,6 +31,10 @@ imbalanced-learn>=0.11.0
 rich>=13.4.0
 tqdm>=4.65.0
 colorama>=0.4.6
+
+# Logging & Configuration
+PyYAML>=6.0
+logging-config>=1.0.3
 
 # System Monitoring
 psutil==5.9.0

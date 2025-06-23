@@ -1,0 +1,17 @@
+api:
+  enabled: true
+  host: 127.0.0.1
+  log_level: info
+  port: 8000
+  reload: false
+  workers: 4
+dashboard:
+  auto_refresh: true
+  enabled: true
+  host: 127.0.0.1
+  port: 8501
+  refresh_interval: 30
+scheduler:
+  enabled: true
+  job_interval_minutes: 5
+  max_concurrent_jobs: 2

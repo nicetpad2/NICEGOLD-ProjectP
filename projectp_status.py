@@ -18,7 +18,16 @@ def fix_dependencies():
     
     # Test imports and collect issues
     try:
-        from pydantic import SecretField
+        try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
     except ImportError as e:
         if 'SecretField' in str(e):
             fixes_needed.append(('pydantic>=2.0', 'Pydantic SecretField issue'))

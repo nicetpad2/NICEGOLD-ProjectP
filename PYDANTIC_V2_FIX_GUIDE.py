@@ -10,7 +10,16 @@ The issue occurs because Pydantic v2 removed SecretField. Here's the professiona
 
 1. USE THE COMPATIBILITY MODULE:
    Instead of:
-       from pydantic import SecretField
+       try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
 
    Use:
        from src.pydantic_secretfield import SecretField

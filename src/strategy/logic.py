@@ -1,64 +1,70 @@
 """Main strategy logic, ML, training, entry/exit, risk management, etc."""
+
 # TODO: ย้ายฟังก์ชันหลักเกี่ยวกับกลยุทธ์, ML, train, backtest, entry/exit, risk management มาที่นี่
+
+import json
 
 # ======================================================================
 # === Model Training Function (moved from strategy.py) ===
 # ======================================================================
 import logging
+import math
 import os
 import time
-from tqdm import tqdm
-import json
-import pandas as pd
-import numpy as np
-import math
-from typing import Dict, List, Tuple
-from src.utils.model_utils import predict_with_time_check
-from src.cooldown_utils import (
-    is_soft_cooldown_triggered,
-    step_soft_cooldown,
-    CooldownState,
-    update_losses,
-    update_drawdown,
-    should_enter_cooldown,
-    enter_cooldown,
-    should_warn_drawdown,
-    should_warn_losses,
-)
 from itertools import product
-from src.utils.sessions import get_session_tag
-from src.utils import get_env_float, load_json_with_comments
-from src.log_analysis import summarize_block_reasons
-from src.utils.leakage import assert_no_overlap
-from src.features import reset_indicator_caches
+from typing import Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
 from src.config import (
-    print_gpu_utilization,
-    USE_MACD_SIGNALS,
-    USE_RSI_SIGNALS,
-    OUTPUT_DIR as CFG_OUTPUT_DIR,
+    ENABLE_KILL_SWITCH,
     ENABLE_PARTIAL_TP,
+    ENABLE_SPIKE_GUARD,
+    KILL_SWITCH_CONSECUTIVE_LOSSES_THRESHOLD,
+    KILL_SWITCH_MAX_DD_THRESHOLD,
+    M15_TREND_ALLOWED,
+    MIN_SIGNAL_SCORE_ENTRY,
+)
+from src.config import OUTPUT_DIR as CFG_OUTPUT_DIR
+from src.config import (
     PARTIAL_TP_LEVELS,
     PARTIAL_TP_MOVE_SL_TO_ENTRY,
-    ENABLE_KILL_SWITCH,
-    KILL_SWITCH_MAX_DD_THRESHOLD,
-    KILL_SWITCH_CONSECUTIVE_LOSSES_THRESHOLD,
     RECOVERY_MODE_CONSECUTIVE_LOSSES,
+    USE_MACD_SIGNALS,
+    USE_RSI_SIGNALS,
     min_equity_threshold_pct,
-    MIN_SIGNAL_SCORE_ENTRY,
-    M15_TREND_ALLOWED,
-    ENABLE_SPIKE_GUARD,
 )
+from src.cooldown_utils import (
+    CooldownState,
+    enter_cooldown,
+    is_soft_cooldown_triggered,
+    should_enter_cooldown,
+    should_warn_drawdown,
+    should_warn_losses,
+    step_soft_cooldown,
+    update_drawdown,
+    update_losses,
+)
+from src.features import reset_indicator_caches
+from src.log_analysis import summarize_block_reasons
+from src.utils import get_env_float, load_json_with_comments
+from src.utils.leakage import assert_no_overlap
+from src.utils.model_utils import predict_with_time_check
+from src.utils.sessions import get_session_tag
+
 
 def train_and_export_meta_model(
     trade_log_path="trade_log_v32_walkforward.csv",
     m1_data_path="final_data_m1_v32_walkforward.csv",
     output_dir=None,
-    model_purpose='main',
+    model_purpose="main",
     trade_log_df_override=None,
     model_type_to_train="catboost",
     link_model_as_default="catboost",
     enable_dynamic_feature_selection=True,
-    feature_selection_method='shap',
+    feature_selection_method="shap",
     shap_importance_threshold=0.01,
     permutation_importance_threshold=0.001,
     prelim_model_params=None,
@@ -85,9 +91,13 @@ def train_and_export_meta_model(
     # ...function body moved from strategy.py...
     pass
 
+
 def run_hyperparameter_sweep(base_params: dict, grid: dict, train_func):
     """รันการค้นหา Hyperparameter แบบ grid search และพิมพ์ผลลัพธ์ทันที"""
-    import itertools, os, logging
+    import itertools
+    import logging
+    import os
+
     keys = list(grid.keys())
     values = list(grid.values())
     combinations = list(itertools.product(*values))
@@ -101,7 +111,11 @@ def run_hyperparameter_sweep(base_params: dict, grid: dict, train_func):
             params[k] = v
         logging.info("เริ่มพารามิเตอร์ run %s: %s", idx, params)
         model_path, feature_list = train_func(**params)
-        result_entry = {"params": params, "model_path": model_path, "features": feature_list}
+        result_entry = {
+            "params": params,
+            "model_path": model_path,
+            "features": feature_list,
+        }
         logging.info("Run %s: %s", idx, result_entry)
         results.append(result_entry)
     return results
@@ -117,7 +131,9 @@ def spike_guard_london(row: pd.Series, session: str, consecutive_losses: int) ->
         logging.debug("      (Spike Guard) Not London session - skipping.")
         return True
 
-    spike_score_val = pd.to_numeric(getattr(row, "spike_score", np.nan), errors="coerce")
+    spike_score_val = pd.to_numeric(
+        getattr(row, "spike_score", np.nan), errors="coerce"
+    )
     if pd.notna(spike_score_val) and spike_score_val > 0.85:
         logging.debug(
             "      (Spike Guard Filtered) Reason: London Session & High Spike Score (%.2f > 0.85)",
@@ -127,13 +143,30 @@ def spike_guard_london(row: pd.Series, session: str, consecutive_losses: int) ->
 
     adx_val = pd.to_numeric(getattr(row, "ADX", np.nan), errors="coerce")
     wick_ratio_val = pd.to_numeric(getattr(row, "Wick_Ratio", np.nan), errors="coerce")
-    vol_index_val = pd.to_numeric(getattr(row, "Volatility_Index", np.nan), errors="coerce")
-    candle_body_val = pd.to_numeric(getattr(row, "Candle_Body", np.nan), errors="coerce")
-    candle_range_val = pd.to_numeric(getattr(row, "Candle_Range", np.nan), errors="coerce")
+    vol_index_val = pd.to_numeric(
+        getattr(row, "Volatility_Index", np.nan), errors="coerce"
+    )
+    candle_body_val = pd.to_numeric(
+        getattr(row, "Candle_Body", np.nan), errors="coerce"
+    )
+    candle_range_val = pd.to_numeric(
+        getattr(row, "Candle_Range", np.nan), errors="coerce"
+    )
     gain_val = pd.to_numeric(getattr(row, "Gain", np.nan), errors="coerce")
     atr_val = pd.to_numeric(getattr(row, "ATR_14", np.nan), errors="coerce")
 
-    if any(pd.isna(v) for v in [adx_val, wick_ratio_val, vol_index_val, candle_body_val, candle_range_val, gain_val, atr_val]):
+    if any(
+        pd.isna(v)
+        for v in [
+            adx_val,
+            wick_ratio_val,
+            vol_index_val,
+            candle_body_val,
+            candle_range_val,
+            gain_val,
+            atr_val,
+        ]
+    ):
         logging.debug("      (Spike Guard) Missing values - skip filter.")
         return True
 
@@ -151,14 +184,18 @@ def spike_guard_london(row: pd.Series, session: str, consecutive_losses: int) ->
     try:
         body_ratio = candle_body_val / safe_candle_range_val
         if body_ratio < 0.07:
-            logging.debug("      (Spike Guard Filtered) Reason: Low Body Ratio(%.3f)", body_ratio)
+            logging.debug(
+                "      (Spike Guard Filtered) Reason: Low Body Ratio(%.3f)", body_ratio
+            )
             return False
     except ZeroDivisionError:
         logging.warning("      (Spike Guard) ZeroDivisionError calculating body_ratio.")
         return False
 
     if gain_val > 3 and atr_val > 4 and (candle_body_val / safe_candle_range_val) > 0.3:
-        logging.debug("      (Spike Guard Allowed) Reason: Strong directional move override.")
+        logging.debug(
+            "      (Spike Guard Allowed) Reason: Strong directional move override."
+        )
         return True
 
     logging.debug("      (Spike Guard) Passed all checks.")
@@ -205,7 +242,9 @@ def is_entry_allowed(
         logging.debug("      Entry blocked by M15 Trend filter.")
         return False, f"M15_TREND_{str(m15_trend).upper()}"
 
-    vol_index_val = pd.to_numeric(getattr(row, "Volatility_Index", np.nan), errors="coerce")
+    vol_index_val = pd.to_numeric(
+        getattr(row, "Volatility_Index", np.nan), errors="coerce"
+    )
     if not passes_volatility_filter(vol_index_val):
         logging.debug("      Entry blocked by Low Volatility (%s)", vol_index_val)
         return False, f"LOW_VOLATILITY({vol_index_val})"
@@ -224,6 +263,7 @@ def is_entry_allowed(
 
     logging.debug("      Entry allowed by filters.")
     return True, "ALLOWED"
+
 
 def adjust_sl_tp_oms(
     entry_price: float,
@@ -248,15 +288,11 @@ def adjust_sl_tp_oms(
 
     if sl_dist > max_pips:
         sl_price = entry_price - atr if side == "BUY" else entry_price + atr
-        logging.info(
-            "[OMS_Guardian] SL distance too wide. Adjusted to %.5f", sl_price
-        )
+        logging.info("[OMS_Guardian] SL distance too wide. Adjusted to %.5f", sl_price)
 
     if tp_dist > max_pips:
         tp_price = entry_price + atr if side == "BUY" else entry_price - atr
-        logging.info(
-            "[OMS_Guardian] TP distance too wide. Adjusted to %.5f", tp_price
-        )
+        logging.info("[OMS_Guardian] TP distance too wide. Adjusted to %.5f", tp_price)
 
     return sl_price, tp_price
 
@@ -280,8 +316,8 @@ def update_breakeven_half_tp(
     if any(pd.isna(v) for v in [side, entry, tp1, sl]):
         return order, False
 
-    trigger = entry + 0.5 * (tp1 - entry) if side == "BUY" else entry - 0.5 * (
-        entry - tp1
+    trigger = (
+        entry + 0.5 * (tp1 - entry) if side == "BUY" else entry - 0.5 * (entry - tp1)
     )
     hit = (side == "BUY" and current_high >= trigger) or (
         side == "SELL" and current_low <= trigger
@@ -297,6 +333,7 @@ def update_breakeven_half_tp(
             return order, True
 
     return order, False
+
 
 def run_backtest_simulation_v34(
     df_m1_segment_pd,

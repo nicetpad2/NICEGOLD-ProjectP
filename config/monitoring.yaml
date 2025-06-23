@@ -1,0 +1,23 @@
+alerts:
+  email_notifications: false
+  enabled: true
+  thresholds:
+    cpu_usage: 80
+    disk_usage: 90
+    error_rate: 5
+    memory_usage: 80
+health_checks:
+  enabled: true
+  endpoints:
+  - http://127.0.0.1:8000/health
+  - http://127.0.0.1:8501
+  interval_seconds: 60
+logging:
+  backup_count: 5
+  level: INFO
+  log_rotation: daily
+  max_file_size_mb: 100
+metrics:
+  collection_interval: 30
+  enabled: true
+  retention_days: 30

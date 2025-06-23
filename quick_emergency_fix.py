@@ -14,7 +14,16 @@ def fix_pydantic():
     # Create pydantic fallback
     fallback_code = '''# Pydantic Fallback for SecretField
 try:
-    from pydantic import SecretField
+    try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
     print("✅ pydantic SecretField imported successfully")
 except ImportError:
     print("⚠️ Creating pydantic SecretField fallback...")

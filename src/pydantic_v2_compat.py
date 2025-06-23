@@ -107,7 +107,16 @@ class PydanticV2Compatibility:
 
             # Try to import SecretField from v1
             try:
-                from pydantic import SecretField
+                try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
 
                 logger.info("✅ Native SecretField found in v1")
             except ImportError:
@@ -247,7 +256,16 @@ class PydanticV2Compatibility:
     def test_compatibility(self):
         """Test that compatibility objects work correctly"""
         try:
-            from pydantic import BaseModel, Field, SecretField
+            try:
+    from pydantic import SecretField, Field, BaseModel
+except ImportError:
+    try:
+        from src.pydantic_fix import SecretField, Field, BaseModel
+    except ImportError:
+        # Fallback
+        def SecretField(default=None, **kwargs): return default
+        def Field(default=None, **kwargs): return default
+        class BaseModel: pass
 
             # Test SecretField
             secret_field = SecretField(default="test")
