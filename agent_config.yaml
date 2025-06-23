@@ -1,0 +1,262 @@
+# AI Agent System Configuration
+# =============================
+
+# Analysis Configuration
+analysis:
+  # Maximum file size to analyze (bytes)
+  max_file_size: 1048576  # 1MB
+  
+  # File patterns to skip during analysis
+  skip_patterns:
+    - "test_*"
+    - "*.min.js"
+    - "*.min.css"
+    - "__pycache__"
+    - ".git"
+    - "node_modules"
+    - "*.pyc"
+    - "*.pyo"
+    - ".pytest_cache"
+    - ".coverage"
+    - "htmlcov"
+  
+  # Analysis depth level
+  depth_level: "comprehensive"  # basic, standard, comprehensive, deep
+  
+  # Include code snippets in reports
+  include_code_snippets: true
+  
+  # Maximum issues to report per category
+  max_issues_per_category: 50
+
+# Auto-Fix Configuration
+auto_fix:
+  # Enable automated fixes
+  enabled: true
+  
+  # Always create backup before applying fixes
+  backup_before_fix: true
+  
+  # Maximum fixes to apply per file
+  max_fixes_per_file: 10
+  
+  # Fix categories to enable
+  enabled_categories:
+    - syntax_fixes
+    - import_fixes
+    - formatting_fixes
+    - ml_specific_fixes
+  
+  # Aggressive mode (more comprehensive fixes)
+  aggressive_mode: false
+  
+  # Timeout for individual fix operations (seconds)
+  fix_timeout: 30
+
+# Optimization Configuration
+optimization:
+  # Memory usage threshold for warnings (MB)
+  memory_threshold: 512
+  
+  # Performance threshold for warnings (seconds)
+  performance_threshold: 0.1
+  
+  # Enable different optimization categories
+  enabled_optimizations:
+    - performance
+    - memory
+    - imports
+    - algorithms
+    - ml_pipeline
+  
+  # Optimization aggressiveness level
+  aggressiveness: "moderate"  # conservative, moderate, aggressive
+  
+  # Parallel processing for optimizations
+  parallel_processing: true
+  
+  # Number of worker processes (auto-detect if null)
+  worker_processes: null
+
+# Reporting Configuration
+reporting:
+  # Output formats to generate
+  output_formats:
+    - "json"
+    - "markdown"
+    - "html"
+  
+  # Report detail level
+  detail_level: "detailed"  # summary, standard, detailed, comprehensive
+  
+  # Include code snippets in reports
+  include_code_snippets: true
+  
+  # Maximum recommendations to show
+  max_recommendations: 20
+  
+  # Report storage location
+  output_directory: "./agent_reports"
+  
+  # Automatically open reports after generation
+  auto_open_reports: false
+
+# Health Scoring Configuration
+health_scoring:
+  # Weight factors for health score calculation
+  weights:
+    code_quality: 0.25
+    structure: 0.25
+    performance: 0.25
+    documentation: 0.25
+  
+  # Thresholds for health status levels
+  thresholds:
+    excellent: 80
+    good: 60
+    needs_improvement: 40
+    critical: 20
+  
+  # Penalty factors
+  penalties:
+    critical_issue: -10
+    high_issue: -5
+    medium_issue: -2
+    low_issue: -1
+
+# ML-Specific Configuration
+ml_specific:
+  # Target AUC score for optimization
+  target_auc: 0.70
+  
+  # ML pipeline optimization focus areas
+  optimization_focus:
+    - "auc_improvement"
+    - "data_quality"
+    - "model_performance"
+    - "feature_engineering"
+  
+  # Data quality thresholds
+  data_quality:
+    max_missing_percentage: 30
+    min_samples_per_class: 10
+    max_class_imbalance_ratio: 10
+  
+  # Model performance thresholds
+  model_performance:
+    min_accuracy: 0.60
+    min_precision: 0.60
+    min_recall: 0.60
+    min_f1_score: 0.60
+
+# Integration Configuration
+integration:
+  # Enable ProjectP-specific optimizations
+  projectp_integration: true
+  
+  # Enable real-time monitoring
+  realtime_monitoring: false
+  
+  # Monitoring interval (seconds)
+  monitoring_interval: 300  # 5 minutes
+  
+  # Alert thresholds
+  alert_thresholds:
+    health_score_drop: 10
+    critical_issues_increase: 5
+    memory_usage_spike: 200  # MB
+  
+  # Notification methods
+  notifications:
+    console: true
+    file_log: true
+    email: false
+    slack: false
+
+# Performance Configuration
+performance:
+  # Enable caching for analysis results
+  enable_caching: true
+  
+  # Cache expiration time (seconds)
+  cache_expiration: 3600  # 1 hour
+  
+  # Maximum memory usage for analysis (MB)
+  max_memory_usage: 1024  # 1GB
+  
+  # Timeout for long-running operations (seconds)
+  operation_timeout: 1800  # 30 minutes
+  
+  # Enable parallel processing
+  parallel_processing: true
+  
+  # Thread pool size
+  thread_pool_size: 4
+
+# Logging Configuration
+logging:
+  # Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  level: "INFO"
+  
+  # Log file location
+  log_file: "./agent_reports/agent_system.log"
+  
+  # Maximum log file size (MB)
+  max_log_size: 10
+  
+  # Number of backup log files to keep
+  backup_count: 5
+  
+  # Log format
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Enable console logging
+  console_logging: true
+
+# Development Configuration
+development:
+  # Enable debug mode
+  debug_mode: false
+  
+  # Enable verbose output
+  verbose: false
+  
+  # Enable profiling
+  enable_profiling: false
+  
+  # Profile output directory
+  profile_output_dir: "./agent_reports/profiles"
+  
+  # Enable experimental features
+  experimental_features: false
+
+# Security Configuration
+security:
+  # Enable security analysis
+  enable_security_analysis: true
+  
+  # Security analysis depth
+  security_analysis_depth: "standard"  # basic, standard, comprehensive
+  
+  # Check for common vulnerabilities
+  check_vulnerabilities: true
+  
+  # Security issue severity threshold
+  min_security_severity: "medium"  # low, medium, high, critical
+
+# Customization
+customization:
+  # Custom analysis rules file
+  custom_rules_file: null
+  
+  # Custom optimization strategies file
+  custom_optimizations_file: null
+  
+  # Project-specific configuration overrides
+  project_overrides: {}
+  
+  # Plugin directories
+  plugin_directories: []
+  
+  # Enable third-party integrations
+  third_party_integrations: []

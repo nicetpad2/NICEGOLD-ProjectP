@@ -1,0 +1,245 @@
+# 🛡️ ML Protection System Configuration
+# Advanced configuration for noise, leakage, and overfitting protection
+
+# Global Protection Settings
+protection:
+  level: "enterprise"  # basic, standard, aggressive, enterprise
+  enable_tracking: true
+  auto_fix_issues: true
+  generate_reports: true
+  
+# Noise Detection and Removal Configuration
+noise:
+  # Statistical Noise Detection
+  outlier_detection_method: "isolation_forest"  # isolation_forest, z_score, iqr
+  contamination_rate: 0.1  # Expected percentage of outliers (0.0-0.5)
+  noise_threshold: 0.95    # Threshold for noise classification (0.0-1.0)
+  volatility_threshold: 3.0  # Z-score threshold for volatility spikes
+  
+  # Temporal Noise Filtering
+  rolling_window_size: 20
+  enable_adaptive_filtering: true
+  adaptive_window_multiplier: 1.5
+  
+  # Feature Noise Detection
+  feature_noise_detection: true
+  mutual_info_threshold: 0.01
+  correlation_stability_threshold: 0.5
+  
+  # Advanced Filtering
+  enable_fourier_filtering: false
+  fourier_cutoff_freq: 0.1
+  enable_kalman_filtering: false
+  
+  # Missing Data Handling
+  missing_value_strategy: "intelligent"  # drop, fill, interpolate, intelligent
+  max_missing_percentage: 0.3
+  missing_run_threshold: 5
+
+# Data Leakage Prevention Configuration
+leakage:
+  # Temporal Leakage Detection
+  temporal_gap_hours: 24
+  strict_time_validation: true
+  future_data_tolerance_minutes: 0
+  
+  # Feature Leakage Detection
+  feature_leakage_detection: true
+  target_leakage_threshold: 0.8
+  perfect_correlation_threshold: 0.95
+  
+  # Time Series Validation
+  cross_validation_method: "time_series"  # time_series, blocked, purged
+  validation_gap_periods: 1
+  purge_gap_periods: 1
+  
+  # Feature Timing Validation
+  enable_feature_timing_check: true
+  feature_availability_buffer_hours: 1
+  check_market_hours: true
+  
+  # Advanced Leakage Detection
+  enable_information_leakage_detection: true
+  information_coefficient_threshold: 0.1
+  enable_target_encoding_detection: true
+  statistical_similarity_threshold: 0.01
+
+# Overfitting Prevention Configuration
+overfitting:
+  # Sample and Feature Constraints
+  max_features_ratio: 0.3
+  min_samples_per_feature: 10
+  feature_selection_method: "rfe"  # rfe, importance, lasso, mutual_info
+  
+  # Regularization
+  regularization_strength: 0.01
+  enable_elastic_net: true
+  l1_ratio: 0.5
+  
+  # Cross-Validation
+  cross_validation_folds: 5
+  validation_score_threshold: 0.1
+  enable_nested_cv: true
+  
+  # Early Stopping
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.001
+  monitor_metric: "val_loss"
+  
+  # Feature Importance Analysis
+  feature_importance_threshold: 0.001
+  enable_permutation_importance: true
+  importance_stability_check: true
+  
+  # Ensemble Validation
+  enable_ensemble_validation: true
+  ensemble_methods: ["bagging", "boosting", "stacking"]
+  ensemble_diversity_threshold: 0.1
+  
+  # Model Complexity Control
+  max_depth: 10
+  min_samples_leaf: 5
+  max_leaf_nodes: 100
+
+# Advanced Protection Features
+advanced:
+  # Drift Detection
+  enable_drift_detection: true
+  drift_detection_method: "ks_test"  # ks_test, psi, js_divergence
+  drift_threshold: 0.05
+  drift_window_size: 1000
+  
+  # Adversarial Detection
+  enable_adversarial_detection: false
+  adversarial_epsilon: 0.1
+  adversarial_method: "fgsm"
+  
+  # Fairness Checking
+  enable_fairness_checking: false
+  protected_attributes: []
+  fairness_metrics: ["demographic_parity", "equalized_odds"]
+  
+  # Robustness Testing
+  enable_robustness_testing: true
+  robustness_test_samples: 100
+  noise_injection_std: 0.1
+
+# Monitoring and Alerting
+monitoring:
+  enable_realtime_monitoring: true
+  monitoring_interval_minutes: 5
+  
+  # Alert Thresholds
+  alert_thresholds:
+    noise_score: 0.2
+    leakage_score: 0.1
+    overfitting_score: 0.3
+    drift_score: 0.1
+  
+  # Alert Actions
+  alert_actions:
+    email_notification: false
+    log_alert: true
+    stop_training: false
+    trigger_retraining: false
+  
+  # Dashboard
+  enable_dashboard: true
+  dashboard_port: 8503
+  dashboard_refresh_seconds: 30
+
+# Reporting Configuration
+reporting:
+  generate_html_report: true
+  generate_pdf_report: false
+  report_template: "enterprise"  # basic, standard, enterprise
+  
+  # Report Content
+  include_visualizations: true
+  include_feature_analysis: true
+  include_recommendations: true
+  include_technical_details: true
+  
+  # Report Storage
+  report_output_dir: "./reports/protection"
+  archive_reports: true
+  max_report_age_days: 30
+
+# Integration Settings
+integration:
+  # MLflow Integration
+  mlflow:
+    log_protection_metrics: true
+    log_protection_artifacts: true
+    protection_experiment_prefix: "protection_"
+  
+  # WandB Integration
+  wandb:
+    log_protection_dashboard: true
+    protection_project_suffix: "_protection"
+  
+  # Custom Hooks
+  custom_hooks:
+    pre_protection: null
+    post_protection: null
+    on_issue_detected: null
+    on_clean_result: null
+
+# Performance Optimization
+performance:
+  # Parallel Processing
+  enable_parallel_processing: true
+  max_workers: 4
+  chunk_size: 1000
+  
+  # Memory Management
+  enable_memory_optimization: true
+  max_memory_usage_gb: 8
+  enable_disk_caching: true
+  cache_dir: "./cache/protection"
+  
+  # GPU Acceleration
+  enable_gpu_acceleration: false
+  gpu_device_id: 0
+
+# Development and Testing
+development:
+  debug_mode: false
+  verbose_logging: false
+  enable_profiling: false
+  profile_output_dir: "./profiles"
+  
+  # Testing
+  enable_unit_tests: true
+  test_data_percentage: 0.1
+  synthetic_data_generation: false
+
+# Environment-Specific Overrides
+environments:
+  development:
+    protection:
+      level: "standard"
+    monitoring:
+      enable_realtime_monitoring: false
+    performance:
+      max_workers: 2
+  
+  staging:
+    protection:
+      level: "aggressive"
+    monitoring:
+      alert_actions:
+        email_notification: true
+  
+  production:
+    protection:
+      level: "enterprise"
+    monitoring:
+      enable_realtime_monitoring: true
+      alert_actions:
+        email_notification: true
+        stop_training: true
+        trigger_retraining: true
+    performance:
+      enable_parallel_processing: true
+      max_workers: 8

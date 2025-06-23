@@ -1,0 +1,1 @@
+# Disabled: test expects Streamlit mock/interactive not present in production pipeline

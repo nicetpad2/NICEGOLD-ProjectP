@@ -1,0 +1,31 @@
+{
+    "folders": [
+        {
+            "name": "ProjectP - Core ML Pipeline",
+            "path": "./projectp"
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "./projectp/.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "files.exclude": {
+            "**/__pycache__": true,
+            "**/*.pyc": true,
+            "**/.pytest_cache": true,
+            "**/logs": true,
+            "**/*.log": true,
+            "**/mlruns": true,
+            "**/artifacts": true,
+            "**/backups": true,
+            "**/output": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.pylint",
+            "ms-python.black-formatter",
+            "ms-python.isort"
+        ]
+    }
+}

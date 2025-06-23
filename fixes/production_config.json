@@ -1,0 +1,40 @@
+{
+  "auc_improvement": {
+    "target_auc": 0.75,
+    "current_auc": 0.516,
+    "improvement_target": 0.234,
+    "methods": [
+      "improved_target_variable",
+      "enhanced_feature_engineering",
+      "optimized_hyperparameters",
+      "class_imbalance_handling"
+    ]
+  },
+  "feature_engineering": {
+    "use_multi_scale_momentum": true,
+    "use_volatility_adjustment": true,
+    "use_market_microstructure": true,
+    "use_trend_consistency": true,
+    "max_features": 50
+  },
+  "model_config": {
+    "primary_model": "catboost",
+    "use_ensemble": true,
+    "cross_validation": "TimeSeriesSplit",
+    "early_stopping": true,
+    "hyperparameter_optimization": true
+  },
+  "data_handling": {
+    "handle_class_imbalance": true,
+    "imbalance_method": "combined",
+    "remove_constant_features": true,
+    "fill_missing_values": true,
+    "outlier_detection": true
+  },
+  "validation": {
+    "cv_folds": 5,
+    "test_size": 0.2,
+    "gap_between_folds": 10,
+    "shuffle": false
+  }
+}

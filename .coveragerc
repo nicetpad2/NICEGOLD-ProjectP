@@ -1,0 +1,16 @@
+[run]
+source =
+    src
+    main
+omit =
+    */tests/*
+    */logs/*
+    */ta/*
+    */__init__.py
+
+[report]
+omit =
+    */tests/*
+    */logs/*
+    */ta/*
+    */__init__.py

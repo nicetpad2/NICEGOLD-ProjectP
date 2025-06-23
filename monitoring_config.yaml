@@ -1,0 +1,91 @@
+# Monitoring Configuration for Enterprise Tracking System
+monitoring:
+  enabled: true
+  interval_seconds: 60
+  
+  # System metrics
+  system_metrics:
+    enabled: true
+    collect_interval: 30
+    metrics:
+      - cpu_percent
+      - memory_percent
+      - disk_usage
+      - network_io
+      - gpu_usage
+  
+  # Application metrics
+  application_metrics:
+    enabled: true
+    collect_interval: 60
+    metrics:
+      - experiment_count
+      - active_runs
+      - failed_runs
+      - model_predictions
+      - data_pipeline_health
+  
+  # Alerting
+  alerts:
+    enabled: true
+    channels:
+      - email
+      - slack
+      - webhook
+    
+    rules:
+      - name: High CPU Usage
+        condition: cpu_percent > 85
+        severity: warning
+        cooldown_minutes: 5
+      
+      - name: High Memory Usage
+        condition: memory_percent > 80
+        severity: warning
+        cooldown_minutes: 5
+      
+      - name: Disk Space Low
+        condition: disk_usage > 90
+        severity: critical
+        cooldown_minutes: 1
+      
+      - name: Experiment Failures
+        condition: failed_runs > 3
+        severity: warning
+        cooldown_minutes: 10
+      
+      - name: Model Performance Degradation
+        condition: model_accuracy < 0.8
+        severity: critical
+        cooldown_minutes: 1
+
+  # Dashboard configuration
+  dashboard:
+    enabled: true
+    port: 8501
+    auto_refresh_seconds: 30
+    charts:
+      - system_metrics
+      - experiment_metrics
+      - model_performance
+      - alerts_history
+
+# Notification settings
+notifications:
+  email:
+    enabled: false
+    smtp_server: smtp.gmail.com
+    smtp_port: 587
+    username: ""
+    password: ""
+    recipients: []
+  
+  slack:
+    enabled: false
+    webhook_url: ""
+    channel: "#ml-alerts"
+  
+  webhook:
+    enabled: false
+    url: ""
+    headers: {}

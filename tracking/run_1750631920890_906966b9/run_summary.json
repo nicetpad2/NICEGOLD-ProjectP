@@ -1,0 +1,39 @@
+{
+  "run_id": "run_1750631920890_906966b9",
+  "start_time": "2025-06-23T05:38:40.890918",
+  "end_time": "2025-06-23T05:38:53.062866",
+  "duration_seconds": 12.171948,
+  "parameters": {
+    "system_platform": "Windows-10-10.0.26100-SP0",
+    "system_python_version": "3.11.0",
+    "system_cpu_count": 12,
+    "system_memory_gb": 31.31,
+    "system_disk_free_gb": 262.54,
+    "dataset_size": 1000,
+    "n_features": 10,
+    "n_classes": 2,
+    "train_size": 800,
+    "test_size": 200,
+    "random_state": 42,
+    "n_estimators": 100,
+    "max_depth": null,
+    "min_samples_split": 2,
+    "min_samples_leaf": 1
+  },
+  "metrics": {
+    "accuracy": 0.975,
+    "training_time_seconds": 0.21346306800842285,
+    "model_size_features": 10,
+    "prediction_confidence_mean": 0.8560499999999999,
+    "duration_seconds": 12.171948
+  },
+  "tags": {
+    "start_time": "2025-06-23T05:38:40.890918",
+    "run_id": "run_1750631920890_906966b9",
+    "experiment_name": "basic_classification",
+    "description": "Trading ML Experiment"
+  },
+  "artifacts": {
+    "classification_report.json": "classification_report.json"
+  }
+}

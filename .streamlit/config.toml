@@ -1,0 +1,25 @@
+[server]
+# List of folders that should not be watched for changes.
+# This can be used to reduce the number of files watched by Streamlit,
+# which can help with the "inotify watch limit reached" error.
+folderWatchBlacklist = [
+    "venv310", 
+    "venv310_py10", 
+    "mlruns", 
+    "output", 
+    "output_default", 
+    "data", 
+    "logs", 
+    "tmp_logs",
+    "tmp_logs (1)",
+    "catboost_info",
+    "__pycache__",
+    "models",
+    "notebooks",
+    ".git"
+]
+
+# Set the file watcher type to "none" to completely disable it.
+# This is the most robust way to avoid "inotify watch limit reached" errors.
+# The tradeoff is that you will need to manually refresh the browser to see changes.
+fileWatcherType = "none"

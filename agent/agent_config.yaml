@@ -1,0 +1,155 @@
+# Agent Configuration for ProjectP
+# การตั้งค่าสำหรับ Agent System
+
+# Basic settings
+project:
+  name: "ProjectP"
+  version: "2.0.0"
+  description: "ML Pipeline with Agent System"
+
+# Analysis settings
+analysis:
+  enabled: true
+  deep_analysis: true
+  code_quality_checks: true
+  performance_analysis: true
+  dependency_analysis: true
+
+# Monitoring settings
+monitoring:
+  enabled: true
+  interval: 10.0  # seconds
+  real_time: true
+  
+  # Threshold settings
+  thresholds:
+    cpu_usage: 90.0      # percentage
+    memory_usage: 85.0   # percentage
+    disk_usage: 80.0     # percentage
+    execution_time: 3600 # seconds (1 hour)
+    error_rate: 0.1      # 10%
+  
+  # Alert settings
+  alerts:
+    enabled: true
+    severity_levels: ["critical", "high", "medium", "low"]
+    max_alerts: 100
+
+# Auto improvement settings
+improvement:
+  enabled: true
+  auto_fix: true
+  max_improvements_per_run: 3
+  
+  # Performance targets
+  targets:
+    auc_score: 0.75      # target AUC ≥ 75%
+    f1_score: 0.70       # target F1 ≥ 70%
+    accuracy: 0.75       # target accuracy ≥ 75%
+    
+  # Improvement strategies
+  strategies:
+    hyperparameter_tuning: true
+    feature_selection: true
+    data_preprocessing: true
+    model_selection: true
+    threshold_optimization: true
+
+# Integration settings
+integration:
+  projectp_integration: true
+  projectp_path: "ProjectP.py"
+  enable_hooks: true
+  monitoring_injection: true
+  auto_restart: false
+
+# Optimization settings
+optimization:
+  enabled: true
+  memory_optimization: true
+  cpu_optimization: true
+  code_optimization: true
+  
+  # Resource limits
+  limits:
+    max_memory_gb: 8
+    max_cpu_cores: 4
+    max_execution_time: 7200  # 2 hours
+
+# Logging settings
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file_logging: true
+  console_logging: true
+  log_file: "agent.log"
+  max_log_size_mb: 10
+  backup_count: 5
+
+# Reporting settings
+reporting:
+  enabled: true
+  auto_generate: true
+  report_formats: ["json", "html"]
+  save_reports: true
+  reports_directory: "agent/reports"
+  
+  # Report types
+  types:
+    analysis_report: true
+    monitoring_report: true
+    improvement_report: true
+    performance_report: true
+
+# Deep understanding settings
+deep_understanding:
+  ml_pipeline_analysis: true
+  dependency_mapping: true
+  performance_profiling: true
+  business_logic_analysis: true
+  
+  # Analysis depth
+  analysis_depth: "comprehensive"  # basic, detailed, comprehensive
+  include_external_dependencies: true
+  analyze_data_flow: true
+
+# Smart monitoring settings
+smart_monitoring:
+  real_time_monitoring: true
+  performance_tracking: true
+  trend_analysis: true
+  anomaly_detection: true
+  
+  # Monitoring components
+  components:
+    system_metrics: true
+    application_metrics: true
+    ml_metrics: true
+    business_metrics: true
+
+# Recommendations settings
+recommendations:
+  enabled: true
+  intelligent_recommendations: true
+  improvement_planning: true
+  priority_based: true
+  
+  # Recommendation types
+  types:
+    performance_improvements: true
+    code_quality_improvements: true
+    architecture_improvements: true
+    best_practices: true
+
+# Security settings
+security:
+  enabled: true
+  safe_mode: true
+  validate_inputs: true
+  sanitize_outputs: true
+  
+# Advanced features
+advanced:
+  experimental_features: false
+  beta_features: false
+  debug_mode: false
+  profiling_mode: false

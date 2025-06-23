@@ -1,0 +1,74 @@
+data_quality:
+  max_missing_percentage: 0.02
+  min_variance_threshold: 1.0e-06
+  max_correlation_threshold: 0.9
+  outlier_detection_method: isolation_forest
+  outlier_contamination: 0.05
+temporal_validation:
+  enabled: true
+  min_temporal_window: 50
+  max_lookback_days: 252
+  temporal_split_ratio: 0.2
+leakage_protection:
+  future_data_check: true
+  target_leakage_check: true
+  temporal_leakage_check: true
+  feature_stability_check: true
+  correlation_threshold: 0.95
+overfitting_protection:
+  cross_validation_folds: 15
+  max_model_complexity: 0.8
+  early_stopping_patience: 10
+  regularization_strength: 0.01
+  feature_selection_enabled: true
+  max_features_ratio: 0.3
+  ensemble_validation: true
+noise_reduction:
+  enabled: true
+  signal_to_noise_threshold: 2.5
+  smoothing_window: 5
+  denoising_method: robust_scaler
+advanced_features:
+  ensemble_validation: true
+  market_regime_detection: true
+  volatility_clustering_check: true
+  trend_consistency_check: true
+  adaptive_thresholds: true
+monitoring:
+  performance_tracking: true
+  alert_threshold_auc: 0.6
+  alert_threshold_stability: 0.1
+  monitoring_window_days: 30
+  memory_limit_mb: 4096
+  processing_timeout_seconds: 3600
+storage:
+  backup_enabled: true
+  backup_frequency: daily
+  max_backup_files: 30
+  compression_enabled: true
+  report_retention_days: 90
+  reports_path: protection_reports
+  backups_path: protection_backups
+  cache_path: protection_cache
+  models_path: protection_models
+  logs_path: protection_logs
+trading_specific:
+  market_hours_only: false
+  handle_weekends: true
+  volatility_regime_detection: true
+  trend_following_bias_check: true
+  tick_size_normalization: false
+  volume_profile_analysis: true
+  market_impact_consideration: true
+logging:
+  level: INFO
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file_handler: true
+  console_handler: true
+  max_log_size_mb: 100
+  backup_count: 5
+metadata:
+  config_version: 2.0.0
+  last_updated: '2025-06-23T07:28:21.553346'
+  author: Advanced ML Protection System Auto Setup
+  description: Auto-generated configuration for enterprise ML protection

@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-06-22 11:19:03",
+  "pipeline_status": "\u26a0\ufe0f POOR - Major improvements needed",
+  "auc_results": {
+    "fixes/emergency_auc_fix_results.json": {
+      "original_auc": 0.516,
+      "improved_auc": 0.5108592869675675,
+      "improvement_pct": -0.9962622155876869,
+      "cv_scores": [
+        0.4984984994996665,
+        0.5175309270895618,
+        0.5165484343134743
+      ],
+      "status": "\u26a0\ufe0f LIMITED: Minimal improvement",
+      "recommendation": "Consider deep learning or different approach",
+      "dataset_info": {
+        "rows": 20000,
+        "features": 46,
+        "target_distribution": {
+          "0": 12010,
+          "1": 7990
+        }
+      }
+    }
+  },
+  "data_status": {
+    "rows": 337362,
+    "columns": 13,
+    "numeric_columns": 12,
+    "missing_pct": 0.0,
+    "target_distribution": {
+      "0": 

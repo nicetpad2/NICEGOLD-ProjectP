@@ -1,0 +1,25 @@
+{
+  "run_id": "run_1750631896228_b13baea6",
+  "start_time": "2025-06-23T05:38:16.228649",
+  "end_time": "2025-06-23T05:38:18.834523",
+  "duration_seconds": 2.605874,
+  "parameters": {
+    "system_platform": "Windows-10-10.0.26100-SP0",
+    "system_python_version": "3.11.0",
+    "system_cpu_count": 12,
+    "system_memory_gb": 31.31,
+    "system_disk_free_gb": 262.54,
+    "test_param": "setup_test"
+  },
+  "metrics": {
+    "test_metric": 1.0,
+    "duration_seconds": 2.605874
+  },
+  "tags": {
+    "start_time": "2025-06-23T05:38:16.228649",
+    "run_id": "run_1750631896228_b13baea6",
+    "experiment_name": "setup_test",
+    "description": "Trading ML Experiment"
+  },
+  "artifacts": {}
+}

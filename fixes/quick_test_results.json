@@ -1,0 +1,15 @@
+{
+  "quick_test_auc": 0.48680426369020885,
+  "data_shape": [
+    5000,
+    13
+  ],
+  "features_count": 12,
+  "target_distribution": {
+    "0": 2522,
+    "1": 2478
+  },
+  "imbalance_ratio": 1.0177562550443906,
+  "status": "\u26a0\ufe0f POOR",
+  "recommendation": "Major improvements needed"
+}

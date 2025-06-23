@@ -1,0 +1,166 @@
+# Advanced ML Protection Configuration
+# This file contains all configuration settings for the Advanced ML Protection System
+
+# Data Quality Settings
+data_quality:
+  max_missing_percentage: 0.05          # Maximum allowed missing data percentage per feature
+  min_variance_threshold: 1e-6          # Minimum variance threshold for feature filtering
+  max_correlation_threshold: 0.9        # Maximum correlation between features before flagging
+  outlier_detection_method: 'isolation_forest'  # Method for outlier detection
+  outlier_contamination: 0.05           # Expected contamination ratio for outlier detection
+
+# Temporal Validation Settings
+temporal_validation:
+  enabled: true                         # Enable temporal validation for time series data
+  min_temporal_window: 50               # Minimum number of samples for temporal analysis
+  max_lookback_days: 252                # Maximum lookback period in days (trading year)
+  temporal_split_ratio: 0.2             # Ratio for temporal validation split
+  stability_check_enabled: true         # Enable feature stability checks over time
+
+# Data Leakage Protection
+leakage_protection:
+  future_data_check: true               # Check for future data leakage
+  target_leakage_check: true            # Check for target leakage
+  temporal_leakage_check: true          # Check for temporal data leakage
+  feature_stability_check: true        # Check feature stability over time
+  correlation_threshold: 0.95           # Correlation threshold for target leakage detection
+
+# Overfitting Protection
+overfitting_protection:
+  cross_validation_folds: 10            # Number of cross-validation folds
+  max_model_complexity: 0.8             # Maximum allowed model complexity score
+  early_stopping_patience: 10          # Early stopping patience for training
+  regularization_strength: 0.01        # Default regularization strength
+  feature_selection_enabled: true      # Enable automatic feature selection
+  max_features_ratio: 0.2               # Maximum ratio of features to samples
+  ensemble_validation: true            # Use ensemble methods for validation
+
+# Noise Reduction and Signal Enhancement
+noise_reduction:
+  enabled: true                         # Enable noise detection and reduction
+  signal_to_noise_threshold: 3.0       # Minimum signal-to-noise ratio
+  smoothing_window: 5                   # Window size for smoothing operations
+  denoising_method: 'robust_scaler'    # Denoising method (robust_scaler, standard_scaler)
+  noise_level_thresholds:
+    low: 3.0                           # SNR threshold for low noise
+    medium: 1.5                        # SNR threshold for medium noise
+    high: 0.5                          # SNR threshold for high noise (below this is high)
+
+# Advanced Protection Features
+advanced_features:
+  ensemble_validation: true            # Use ensemble methods for validation
+  market_regime_detection: true        # Enable market regime detection (for trading data)
+  volatility_clustering_check: true    # Check for volatility clustering
+  trend_consistency_check: true        # Check for trend consistency
+  adaptive_thresholds: true            # Use adaptive thresholds based on data characteristics
+
+# Performance Monitoring and Alerting
+monitoring:
+  performance_tracking: true           # Enable performance tracking
+  alert_threshold_auc: 0.6             # AUC threshold for performance alerts
+  alert_threshold_stability: 0.1       # Stability threshold for alerts
+  monitoring_window_days: 30           # Monitoring window in days
+  memory_limit_mb: 4096               # Memory limit for processing (MB)
+  processing_timeout_seconds: 3600     # Processing timeout in seconds
+
+# Storage and Backup Configuration
+storage:
+  backup_enabled: true                 # Enable automatic backups
+  backup_frequency: 'daily'            # Backup frequency (daily, weekly, monthly)
+  max_backup_files: 30                 # Maximum number of backup files to keep
+  compression_enabled: true            # Enable compression for backups
+  report_retention_days: 90            # Days to retain protection reports
+  
+  # Paths
+  reports_path: 'protection_reports'    # Path for protection reports
+  backups_path: 'protection_backups'   # Path for backups
+  cache_path: 'protection_cache'       # Path for cache files
+  models_path: 'protection_models'     # Path for saved models
+  logs_path: 'protection_logs'         # Path for log files
+
+# Feature Engineering Protection
+feature_engineering:
+  max_engineered_features: 100         # Maximum number of engineered features
+  feature_importance_threshold: 0.01   # Minimum feature importance for inclusion
+  polynomial_degree_limit: 2           # Maximum polynomial degree for feature engineering
+  interaction_terms_limit: 50          # Maximum number of interaction terms
+  
+# Model Validation Settings
+model_validation:
+  validation_methods:
+    - 'cross_validation'
+    - 'temporal_split'
+    - 'bootstrap'
+    - 'holdout'
+  
+  metrics:
+    primary: 'auc'                     # Primary metric for evaluation
+    secondary: ['accuracy', 'precision', 'recall', 'f1']
+  
+  stability_tests:
+    - 'feature_importance_stability'
+    - 'prediction_consistency'
+    - 'performance_degradation'
+
+# Risk Assessment Thresholds
+risk_thresholds:
+  overall_protection_score:
+    low_risk: 0.8                      # Threshold for low risk classification
+    medium_risk: 0.6                   # Threshold for medium risk classification
+    # Below medium_risk is high risk
+  
+  data_quality_score:
+    acceptable: 0.7                    # Minimum acceptable data quality score
+    excellent: 0.9                     # Excellent data quality score
+  
+  overfitting_risk:
+    cv_std_threshold: 0.1              # CV standard deviation threshold for overfitting
+    complexity_ratio_threshold: 0.05   # Features/samples ratio threshold
+
+# Trading-Specific Settings (for financial data)
+trading_specific:
+  market_hours_only: false             # Filter data to market hours only
+  handle_weekends: true                # Handle weekend data appropriately
+  volatility_regime_detection: true    # Detect volatility regimes
+  trend_following_bias_check: true     # Check for trend-following bias
+  
+  # Market microstructure considerations
+  tick_size_normalization: false       # Normalize by tick size
+  volume_profile_analysis: true        # Analyze volume profiles
+  market_impact_consideration: true    # Consider market impact in features
+
+# Logging Configuration
+logging:
+  level: 'INFO'                        # Logging level (DEBUG, INFO, WARNING, ERROR)
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file_handler: true                   # Enable file logging
+  console_handler: true                # Enable console logging
+  max_log_size_mb: 100                 # Maximum log file size in MB
+  backup_count: 5                      # Number of backup log files to keep
+
+# Notification Settings
+notifications:
+  enabled: false                       # Enable notifications (requires setup)
+  email_alerts: false                  # Send email alerts for critical issues
+  webhook_url: null                    # Webhook URL for notifications
+  alert_levels: ['ERROR', 'CRITICAL']  # Alert levels to notify
+  
+# Integration Settings
+integrations:
+  mlflow_tracking: false               # Integrate with MLflow tracking
+  wandb_tracking: false                # Integrate with Weights & Biases
+  custom_tracking: true                # Use custom tracking system
+  
+# Experimental Features (use with caution)
+experimental:
+  automated_feature_engineering: false # Automated feature engineering
+  adaptive_model_selection: false     # Adaptive model selection based on data characteristics
+  real_time_monitoring: false         # Real-time monitoring (resource intensive)
+  quantum_resistant_validation: false # Quantum-resistant validation methods
+  
+# Version and Metadata
+metadata:
+  config_version: '2.0.0'
+  last_updated: '2024-01-01'
+  author: 'Advanced ML Protection System'
+  description: 'Enterprise-grade configuration for ML protection system'

@@ -1,0 +1,126 @@
+# Logs and temporary files
+logs/
+tmp_logs/
+tmp_logs*/
+*.log
+*.txt
+!requirements*.txt
+!README*.txt
+
+# Output directories
+output_default/
+output/
+dummy_output/
+*_thai.csv
+
+# Python
+__pycache__/
+__pycache__*/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+venv310/
+venv310_py10/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# ML/Data Science
+mlruns/
+enterprise_mlruns/
+catboost_info/
+*.prof
+artifacts/
+models/
+.wandb/
+
+# Backups
+backups/
+.backups/
+protection_backups/
+
+# Protection system files
+protection_cache/
+protection_logs/
+protection_models/
+protection_reports/
+protection_tests/
+enterprise_tracking/
+
+# Archives
+*.tar.gz
+*.zip
+*.rar
+
+# IDE
+.vscode/launch.json
+.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Reports and test results
+*_test_report_*.json
+agent_integration_test_report_*.json
+last_failure.json
+test_failures.json
+system_info.json
+classification_report.json
+coverage.json
+
+# Specific project files
+commit_message_*.txt
+*_commit_message.txt

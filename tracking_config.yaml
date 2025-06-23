@@ -1,0 +1,228 @@
+# Enterprise ML Tracking Configuration
+# Last updated: 2025-06-23
+# Professional-grade tracking system for production ML pipelines
+
+# MLflow Configuration
+mlflow:
+  enabled: true
+  tracking_uri: "./enterprise_mlruns"
+  experiment_name: "phiradon_trading_ml_production"
+  registry_uri: null  # Set for model registry in production
+  artifact_location: null  # S3/Azure/GCS for production
+  default_artifact_root: "./enterprise_mlruns/artifacts"
+  auto_log: true
+  log_model_signatures: true
+  log_input_examples: true
+
+# Weights & Biases Configuration  
+wandb:
+  enabled: false  # Set to true when you have WandB account
+  project: "phiradon_trading_ml"
+  entity: null  # Your WandB username/organization
+  api_key: null  # Set environment variable WANDB_API_KEY
+  mode: "online"  # online, offline, disabled
+  save_code: true
+  log_model: true
+  log_system_metrics: true
+  log_gpu_metrics: true
+
+# Local Tracking Configuration
+local:
+  enabled: true
+  save_models: true
+  save_plots: true
+  save_data: true
+  save_code: true
+  save_configs: true
+  compression: true
+  versioning: true
+  backup_enabled: true
+  retention_days: 90
+
+# Directory Configuration
+tracking_dir: "./enterprise_tracking"
+models_dir: "./models"
+artifacts_dir: "./artifacts"
+logs_dir: "./logs"
+data_dir: "./data"
+notebooks_dir: "./notebooks"
+scripts_dir: "./scripts"
+reports_dir: "./reports"
+backup_dir: "./backups"
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_logging: true
+  console_logging: true
+  max_log_size_mb: 100
+  backup_count: 5
+  log_to_file: true
+  log_file: "./logs/tracking.log"
+
+# Auto-logging Configuration
+auto_log:
+  enabled: true
+  log_system_info: true
+  log_git_info: true
+  log_environment: true
+  log_code_snapshot: true
+  log_dependencies: true
+  log_conda_env: true
+  log_pip_requirements: true
+
+# Performance Configuration
+performance:
+  batch_logging: true
+  async_logging: false
+  cache_size_mb: 512
+  cleanup_old_runs: true
+  max_concurrent_runs: 10
+  timeout_seconds: 300
+  retry_attempts: 3
+  buffer_size: 1000
+
+# Production Monitoring Configuration
+monitoring:
+  enabled: true
+  alert_on_failure: true
+  performance_tracking: true
+  resource_monitoring: true
+  prediction_logging: true
+  trade_logging: true
+  system_metrics_interval: 60  # seconds
+  alert_thresholds:
+    cpu_percent: 85
+    memory_percent: 80
+    disk_percent: 90
+    latency_ms: 1000
+    error_rate: 0.05
+    low_accuracy: 0.7
+
+# Database Configuration (for enterprise deployments)
+database:
+  enabled: false
+  type: "sqlite"  # sqlite, postgresql, mysql
+  host: "localhost"
+  port: 5432
+  database: "ml_tracking"
+  username: null
+  password: null
+  connection_pool_size: 10
+  ssl_mode: "prefer"
+
+# Cloud Storage Configuration
+storage:
+  enabled: false
+  provider: "local"  # local, s3, azure, gcs
+  bucket: null
+  prefix: "experiments/"
+  access_key: null
+  secret_key: null
+  region: null
+
+# Security Configuration
+security:
+  encrypt_artifacts: false
+  encrypt_logs: false
+  access_control: false
+  audit_logging: true
+  secure_random: true
+  token_expiry_hours: 24
+
+# Notification Configuration
+notifications:
+  enabled: false
+  email:
+    enabled: false
+    smtp_host: null
+    smtp_port: 587
+    use_tls: true
+    username: null
+    password: null
+    from_email: null
+    recipients: []
+  slack:
+    enabled: false
+    webhook_url: null
+    channel: "#ml-experiments"
+    username: "ML-Tracker"
+  discord:
+    enabled: false
+    webhook_url: null
+  teams:
+    enabled: false
+    webhook_url: null
+
+# Integration Configuration
+integrations:
+  tensorboard:
+    enabled: false
+    log_dir: "./tensorboard_logs"
+    port: 6006
+  prometheus:
+    enabled: false
+    port: 8000
+    metrics_endpoint: "/metrics"
+  grafana:
+    enabled: false
+    dashboard_url: null
+  jupyter:
+    enabled: true
+    auto_log_notebooks: true
+  vscode:
+    enabled: true
+    auto_log_experiments: true
+
+# Data Pipeline Configuration
+data_pipeline:
+  enabled: true
+  track_data_quality: true
+  track_data_lineage: true
+  validate_schema: true
+  profile_data: true
+  auto_fix_issues: true
+  quality_thresholds:
+    completeness: 0.95
+    accuracy: 0.90
+    consistency: 0.85
+    timeliness: 0.90
+
+# Model Deployment Configuration
+deployment:
+  enabled: true
+  track_deployments: true
+  track_model_versions: true
+  canary_deployment: false
+  a_b_testing: false
+  rollback_enabled: true
+  health_check_interval: 300  # seconds
+
+# Experiment Management
+experiments:
+  auto_tag: true
+  auto_version: true
+  compare_experiments: true
+  archive_old_experiments: true
+  export_experiments: true
+  import_experiments: true
+  experiment_templates: true
+
+# Advanced Features
+advanced:
+  distributed_tracking: false
+  multi_tenant: false
+  custom_backends: []
+  plugins: []
+  hooks: []
+  custom_metrics: []
+  feature_flags: {}
+
+# Development Configuration
+development:
+  debug_mode: false
+  verbose_logging: false
+  dry_run: false
+  test_mode: false
+  mock_backends: false

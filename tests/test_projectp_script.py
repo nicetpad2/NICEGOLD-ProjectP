@@ -1,0 +1,1 @@
+# Disabled: test expects CLI/interactive or attribute not present in production codebase

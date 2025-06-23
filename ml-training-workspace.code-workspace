@@ -1,0 +1,33 @@
+{
+    "folders": [
+        {
+            "name": "ML Training Steps",
+            "path": "./projectp/steps"
+        },
+        {
+            "name": "ProjectP Core",
+            "path": "./projectp"
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "../.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "files.exclude": {
+            "**/__pycache__": true,
+            "**/*.pyc": true,
+            "**/.pytest_cache": true
+        },
+        "search.exclude": {
+            "**/__pycache__": true,
+            "**/*.pyc": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.pylint",
+            "ms-python.black-formatter",
+            "ms-python.isort"
+        ]
+    }
+}
