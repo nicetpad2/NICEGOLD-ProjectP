@@ -160,7 +160,7 @@ def read_csv_with_date_parse(path):
     if not os.path.exists(path):
         return pd.DataFrame()
     df = pd.read_csv(path, parse_dates=True)
-    
+
     # Use delayed import to avoid circular imports
     try:
         map_standard_columns, assert_no_lowercase_columns = (
@@ -170,13 +170,13 @@ def read_csv_with_date_parse(path):
         assert_no_lowercase_columns(df)
     except Exception:
         pass  # Continue without column mapping if functions not available
-    
+
     return df
 
 
 def load_data_from_csv(file_path: str, nrows: int = None, auto_convert: bool = True):
     temp_df = pd.read_csv(file_path, nrows=nrows)
-    
+
     # Use delayed import to avoid circular imports
     try:
         map_standard_columns, assert_no_lowercase_columns = (
@@ -186,7 +186,7 @@ def load_data_from_csv(file_path: str, nrows: int = None, auto_convert: bool = T
         assert_no_lowercase_columns(temp_df)
     except Exception:
         pass  # Continue without column mapping if functions not available
-    
+
     # ...existing code...
     return temp_df
 

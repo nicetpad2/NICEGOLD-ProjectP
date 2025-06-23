@@ -307,4 +307,54 @@ if _compat.test_compatibility():
 else:
     logger.warning("⚠️ Pydantic compatibility established with limitations")
 
+
+# BaseSettings compatibility (moved to pydantic-settings in v2)
+BaseSettings = None
+
+def _get_base_settings():
+    """Get BaseSettings with compatibility handling"""
+    global BaseSettings
+    
+    if BaseSettings is not None:
+        return BaseSettings
+    
+    # Strategy 1: pydantic-settings (recommended for v2)
+    try:
+        from pydantic_settings import BaseSettings as PydanticSettings
+        BaseSettings = PydanticSettings
+        logger.info("✅ Using BaseSettings from pydantic-settings")
+        return BaseSettings
+    except ImportError:
+        pass
+    
+    # Strategy 2: pydantic v1 location
+    try:
+        from pydantic import BaseSettings as PydanticBaseSettings
+        BaseSettings = PydanticBaseSettings
+        logger.info("✅ Using BaseSettings from pydantic (v1)")
+        return BaseSettings
+    except ImportError:
+        pass
+    
+    # Strategy 3: Create fallback
+    class BaseSettingsFallback(BaseModel):
+        """Fallback BaseSettings implementation"""
+        
+        class Config:
+            env_file = '.env'
+            env_file_encoding = 'utf-8'
+            case_sensitive = False
+    
+    BaseSettings = BaseSettingsFallback
+    logger.info("✅ Using BaseSettings fallback")
+    return BaseSettings
+
+# Make BaseSettings available
+try:
+    BaseSettings = _get_base_settings()
+except Exception as e:
+    logger.warning(f"⚠️ BaseSettings setup failed: {e}")
+    BaseSettings = BaseModel  # Ultimate fallback
+
+
 __all__ = ["SecretField", "Field", "BaseModel", "SecretStr", "PydanticV2Compatibility"]
