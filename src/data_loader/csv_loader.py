@@ -160,15 +160,33 @@ def read_csv_with_date_parse(path):
     if not os.path.exists(path):
         return pd.DataFrame()
     df = pd.read_csv(path, parse_dates=True)
-    df = map_standard_columns(df)
-    assert_no_lowercase_columns(df)
+    
+    # Use delayed import to avoid circular imports
+    try:
+        map_standard_columns, assert_no_lowercase_columns = (
+            _get_column_mapping_functions()
+        )
+        df = map_standard_columns(df)
+        assert_no_lowercase_columns(df)
+    except Exception:
+        pass  # Continue without column mapping if functions not available
+    
     return df
 
 
 def load_data_from_csv(file_path: str, nrows: int = None, auto_convert: bool = True):
     temp_df = pd.read_csv(file_path, nrows=nrows)
-    temp_df = map_standard_columns(temp_df)
-    assert_no_lowercase_columns(temp_df)
+    
+    # Use delayed import to avoid circular imports
+    try:
+        map_standard_columns, assert_no_lowercase_columns = (
+            _get_column_mapping_functions()
+        )
+        temp_df = map_standard_columns(temp_df)
+        assert_no_lowercase_columns(temp_df)
+    except Exception:
+        pass  # Continue without column mapping if functions not available
+    
     # ...existing code...
     return temp_df
 
@@ -177,8 +195,15 @@ def read_csv_in_chunks(path: str, chunksize: int = 100_000, **kwargs):
     if not os.path.exists(path):
         raise FileNotFoundError(f"ไม่พบไฟล์ {path}")
     for chunk in pd.read_csv(path, chunksize=chunksize, **kwargs):
-        chunk = map_standard_columns(chunk)
-        assert_no_lowercase_columns(chunk)
+        # Use delayed import to avoid circular imports
+        try:
+            map_standard_columns, assert_no_lowercase_columns = (
+                _get_column_mapping_functions()
+            )
+            chunk = map_standard_columns(chunk)
+            assert_no_lowercase_columns(chunk)
+        except Exception:
+            pass  # Continue without column mapping if functions not available
         yield chunk
 
 

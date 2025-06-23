@@ -39,7 +39,7 @@ class ImportManager:
         
         # Check Pydantic SecretField
         try:
-            from pydantic import SecretField
+            from src.pydantic_v2_compat import SecretField
             self.available_modules['pydantic_secretfield'] = True
             logger.info("✅ Pydantic SecretField available")
         except ImportError:
@@ -93,7 +93,7 @@ class ImportManager:
         """Get Pydantic field with fallback"""
         if self.available_modules.get('pydantic_secretfield', False):
             try:
-                from pydantic import SecretField
+                from src.pydantic_v2_compat import SecretField
                 return SecretField
             except ImportError:
                 pass

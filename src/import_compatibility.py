@@ -47,7 +47,7 @@ class ImportFixer:
     def fix_pydantic(self):
         """แก้ไขปัญหา pydantic SecretField"""
         try:
-            from pydantic import SecretField
+            from src.pydantic_v2_compat import SecretField
             logger.info("✅ Pydantic SecretField available")
             return True
         except ImportError:
