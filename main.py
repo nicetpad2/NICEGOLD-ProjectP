@@ -1,14 +1,18 @@
 import argparse
-import subprocess
-import os
-import sys
 import logging
 import logging.config
-import yaml
+import os
+import subprocess
+import sys
+
 import pandas as pd
-from src.data_loader import auto_convert_gold_csv
+import yaml
+
 from src import csv_validator
+from src.data_loader import auto_convert_gold_csv
+from src.real_data_loader import RealDataLoader, load_real_data
 from src.state_manager import StateManager
+
 
 # [Patch v6.8.17] CSV to Parquet helper for preprocess stage
 def auto_convert_csv_to_parquet(source_path: str, dest_folder) -> None:
@@ -38,14 +42,11 @@ def auto_convert_csv_to_parquet(source_path: str, dest_folder) -> None:
         )
         df.to_csv(dest_file.with_suffix(".csv"), index=False)
 
-from src.utils.pipeline_config import (
-    load_config,
-    PipelineConfig,
-    DEFAULT_CONFIG_FILE,
-)
+
 from src.utils.errors import PipelineError
 from src.utils.hardware import has_gpu
 from src.utils.model_utils import get_latest_model_and_threshold
+from src.utils.pipeline_config import DEFAULT_CONFIG_FILE, PipelineConfig, load_config
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,15 @@ def parse_args(args=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Pipeline controller")
     parser.add_argument(
         "--mode",
-        choices=["preprocess", "sweep", "threshold", "backtest", "report", "all", "full_pipeline"],
+        choices=[
+            "preprocess",
+            "sweep",
+            "threshold",
+            "backtest",
+            "report",
+            "all",
+            "full_pipeline",
+        ],
         default="all",
         help="Stage of the pipeline to run",
     )
@@ -106,14 +115,28 @@ def parse_args(args=None) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
-
-
-
 def run_preprocess(config: PipelineConfig, runner=subprocess.run) -> None:
-    """Run data preprocessing stage."""
-    logger.info("[Stage] preprocess")
+    """Run data preprocessing stage using real data from datacsv folder."""
+    logger.info("[Stage] preprocess - Using real data from datacsv")
 
     from pathlib import Path
+
+    # Initialize real data loader
+    try:
+        real_loader = RealDataLoader()
+        data_info = real_loader.get_data_info()
+        logger.info("Real data info: %s", data_info)
+
+        # Load real data to validate it's accessible
+        logger.info("Validating real data access...")
+        test_df = real_loader.load_m1_data(
+            limit_rows=1000
+        )  # Load sample for validation
+        logger.info("✅ Real data validation successful: %d rows loaded", len(test_df))
+
+    except Exception as exc:
+        logger.error("❌ Failed to access real data from datacsv: %s", exc)
+        raise PipelineError("Real data access failed") from exc
 
     parquet_output_dir_str = getattr(config, "parquet_dir", None)
     if not parquet_output_dir_str:
@@ -126,45 +149,53 @@ def run_preprocess(config: PipelineConfig, runner=subprocess.run) -> None:
     else:
         parquet_output_dir = Path(parquet_output_dir_str)
 
-    source_csv_path = getattr(config, "data_path", None) or getattr(
-        config, "raw_m1_filename", None
-    )
-    if source_csv_path:
-        auto_convert_csv_to_parquet(source_path=source_csv_path, dest_folder=parquet_output_dir)
-    else:
-        logger.error(
-            "[AutoConvert] 'data.path' is not defined in config. Skipping conversion."
-        )
+    # Use real data paths from datacsv
+    m1_real_path = "datacsv/XAUUSD_M1.csv"
+    m15_real_path = "datacsv/XAUUSD_M15.csv"
 
-    m1_path = config.raw_m1_filename
-    if os.path.exists(m1_path):
+    logger.info("Converting real M1 data to parquet...")
+    auto_convert_csv_to_parquet(
+        source_path=m1_real_path, dest_folder=parquet_output_dir
+    )
+
+    logger.info("Converting real M15 data to parquet...")
+    auto_convert_csv_to_parquet(
+        source_path=m15_real_path, dest_folder=parquet_output_dir
+    )
+
+    # Validate real M1 data
+    if os.path.exists(m1_real_path):
         try:
-            csv_validator.validate_and_convert_csv(m1_path)
+            csv_validator.validate_and_convert_csv(m1_real_path)
+            logger.info("✅ Real M1 data validation successful")
         except FileNotFoundError as exc:
-            logger.error("[Validation] CSV file not found: %s", exc)
+            logger.error("[Validation] Real M1 CSV file not found: %s", exc)
         except ValueError as exc:
-            logger.error("[Validation] CSV validation error: %s", exc)
+            logger.error("[Validation] Real M1 CSV validation error: %s", exc)
         except Exception as exc:
-            logger.error("[Validation] CSV validation failed: %s", exc)
+            logger.error("[Validation] Real M1 CSV validation failed: %s", exc)
     else:
-        logger.warning("[Validation] CSV file not found: %s", m1_path)
-    auto_convert_gold_csv(os.path.dirname(m1_path), output_path=m1_path)
+        logger.error("[Validation] Real M1 CSV file not found: %s", m1_real_path)
+        raise PipelineError(f"Real M1 data file not found: {m1_real_path}")
+
+    # Clean real data
     fill_method = getattr(config, "cleaning_fill_method", "drop")
     try:
-        # [Patch v6.9.47] Removed recursive subprocess call to ProjectP
+        logger.info("Cleaning real M1 data...")
         runner(
             [
                 os.environ.get("PYTHON", "python"),
                 "src/data_cleaner.py",
-                m1_path,
+                m1_real_path,
                 "--fill",
                 fill_method,
             ],
             check=True,
         )
+        logger.info("✅ Real data preprocessing completed successfully")
     except subprocess.CalledProcessError as exc:
-        logger.error("Preprocess failed", exc_info=True)
-        raise PipelineError("preprocess stage failed") from exc
+        logger.error("❌ Real data preprocessing failed", exc_info=True)
+        raise PipelineError("Real data preprocess stage failed") from exc
 
 
 def run_sweep(config: PipelineConfig, runner=subprocess.run) -> None:
@@ -198,6 +229,7 @@ def run_backtest_pipeline(features_df, price_df, model_path, threshold) -> None:
     logger.info("Running backtest with model=%s threshold=%s", model_path, threshold)
     try:
         from src.main import run_pipeline_stage
+
         run_pipeline_stage("backtest")
     except Exception:
         logger.exception("Internal backtest error")
@@ -208,11 +240,13 @@ def run_backtest(config: PipelineConfig, pipeline_func=run_backtest_pipeline) ->
     """Run backtest stage."""
     logger.info("[Stage] backtest")
     from config import config as cfg
+
     try:
         # เดิม: from ProjectP import load_trade_log
         # ย้ายฟังก์ชัน load_trade_log ไปไว้ในไฟล์ utils หรือไฟล์ใหม่ แล้ว import จากตรงนั้นแทน
         from utils import load_trade_log
     except Exception:  # pragma: no cover - fallback for tests
+
         def load_trade_log(*_a, **_kw):
             return pd.DataFrame()
 
@@ -252,6 +286,7 @@ def run_report(config: PipelineConfig) -> None:
     logger.info("[Stage] report")
     try:
         from src.main import run_pipeline_stage
+
         run_pipeline_stage("report")
     except Exception as exc:
         logger.error("Report failed", exc_info=True)
@@ -280,7 +315,7 @@ def main(args=None) -> int:
     parsed = parse_args(args)
     config = load_config(parsed.config)
     setup_logging(parsed.log_level or config.log_level)
-    state_manager = StateManager(state_file_path='output/system_state.json')
+    state_manager = StateManager(state_file_path="output/system_state.json")
 
     DEBUG_DEFAULT_ROWS = 2000
     if parsed.rows is not None:
@@ -289,14 +324,24 @@ def main(args=None) -> int:
         max_rows = DEBUG_DEFAULT_ROWS
     else:
         max_rows = None
+
     if max_rows:
-        print(f"--- [DEBUG MODE] \u0e43\u0e0a\u0e49\u0e07\u0e32\u0e19 max_rows={max_rows} ---")
-        import src.main as pipeline
-        import src.strategy as strategy
-        pipeline.sample_size = max_rows
-        strategy.sample_size = max_rows
+        print(f"--- [DEBUG MODE] ใช้ข้อมูลจริงจาก datacsv แต่จำกัด max_rows={max_rows} ---")
+        logger.info(
+            "🔧 Debug mode: Using real data from datacsv with row limit=%d", max_rows
+        )
+        # Set global variable for real data loader to use row limit
+        import os
+
+        os.environ["NICEGOLD_ROW_LIMIT"] = str(max_rows)
     else:
-        print("--- [FULL PIPELINE] \u0e43\u0e0a\u0e49\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14 ---")
+        print("--- [FULL PIPELINE] ใช้ข้อมูลจริงจาก datacsv ทั้งหมด ---")
+        logger.info("🚀 Full pipeline: Using complete real data from datacsv")
+        # Remove any row limit
+        import os
+
+        if "NICEGOLD_ROW_LIMIT" in os.environ:
+            del os.environ["NICEGOLD_ROW_LIMIT"]
 
     if has_gpu():
         logger.info("GPU detected")
@@ -331,6 +376,7 @@ def main(args=None) -> int:
 
         if parsed.live_loop > 0:
             import src.main as src_main
+
             src_main.run_live_trading_loop(parsed.live_loop)
     except PipelineError as exc:
         logger.error("Pipeline error: %s", exc, exc_info=True)
@@ -342,7 +388,9 @@ def main(args=None) -> int:
         logger.error("Invalid value: %s", exc, exc_info=True)
         return 1
     except KeyboardInterrupt:
-        logger.warning("\u0e1c\u0e39\u0e49\u0e43\u0e0a\u0e49\u0e22\u0e01\u0e40\u0e25\u0e34\u0e01\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19")
+        logger.warning(
+            "\u0e1c\u0e39\u0e49\u0e43\u0e0a\u0e49\u0e22\u0e01\u0e40\u0e25\u0e34\u0e01\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19"
+        )
         return 1
     except Exception as exc:  # pragma: no cover - unexpected errors
         logger.error("Unexpected error: %s", exc, exc_info=True)

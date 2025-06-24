@@ -1,7 +1,9 @@
 """
 config_defaults.py: กำหนดค่าตัวแปร default ต่างๆ ที่ใช้ใน pipeline/main
 """
+
 import os
+
 from src.utils import get_env_float
 
 # กำหนดค่าตัวแปร default ต่างๆ ที่เดิมอยู่ใน main.py
@@ -27,8 +29,9 @@ DEFAULT_N_WALK_FORWARD_SPLITS = 5
 _BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DEFAULT_OUTPUT_BASE_DIR = os.path.join(_BASE_DIR, "logs")
 DEFAULT_OUTPUT_DIR_NAME = "outputgpt_v4.8.4"
-DEFAULT_DATA_FILE_PATH_M15 = os.path.join(_BASE_DIR, "XAUUSD_M15.csv")
-DEFAULT_DATA_FILE_PATH_M1 = os.path.join(_BASE_DIR, "XAUUSD_M1.csv")
+# Updated to use real data from datacsv folder
+DEFAULT_DATA_FILE_PATH_M15 = os.path.join(_BASE_DIR, "datacsv", "XAUUSD_M15.csv")
+DEFAULT_DATA_FILE_PATH_M1 = os.path.join(_BASE_DIR, "datacsv", "XAUUSD_M1.csv")
 DEFAULT_META_META_CLASSIFIER_PATH = "meta_meta_classifier.pkl"
 DEFAULT_USE_META_CLASSIFIER = True
 DEFAULT_META_MIN_PROBA_THRESH = 0.25

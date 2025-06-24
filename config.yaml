@@ -4,8 +4,13 @@
 
 # ───────────────────────────────── Data Configuration ─────────────────────────────────
 data:
-  source: dummy_m1.csv
+  source: datacsv/XAUUSD_M1.csv
+  m15_source: datacsv/XAUUSD_M15.csv
   target_column: target
+  date_column: Date
+  timestamp_column: Timestamp
+  use_real_data: true
+  limit_rows: false  # ไม่จำกัดจำนวนแถว
   features:
     - Open
     - High
