@@ -26,13 +26,10 @@ def run_threshold(config=None):
             pro_log(f"[Threshold] Loaded and prepared CSV: {df.shape}", tag="Threshold")
             progress.update(task, advance=30, description="[green]Loaded test predictions")
         else:
-            pro_log(f"[Threshold] Test predictions not found: {pred_path}", level="error", tag="Threshold")
-            # Create dummy output for production robustness
-            dummy = pd.DataFrame({"pred_proba": [0.5], "target": [0]})
-            dummy.to_csv(os.path.join(model_dir, "test_pred.csv"), index=False)
-            pro_log(f"[Threshold] Dummy test_pred.csv created for robustness.", tag="Threshold")
-            progress.update(task, completed=100, description="[red]Test predictions not found")
-            return 0.5
+            error_msg = f"❌ CRITICAL: Test predictions not found: {pred_path}. Pipeline cannot proceed without real prediction data."
+            pro_log(error_msg, level="error", tag="Threshold")
+            progress.update(task, completed=100, description="[red]Test predictions not found - HALTING")
+            raise FileNotFoundError(error_msg)
         best_threshold = 0.5
         best_auc = 0
         best_acc = 0

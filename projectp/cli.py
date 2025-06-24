@@ -78,23 +78,28 @@ def main_cli():
     parser = argparse.ArgumentParser(description="ProjectP CLI")
     parser.add_argument("--mode", choices=["full_pipeline", "debug_full_pipeline", "preprocess", "realistic_backtest", "realistic_backtest_live"], default=None, help="เลือกโหมด pipeline")
     parser.add_argument("--env", choices=["dev", "prod"], default="dev", help="Environment config")
+    parser.add_argument("--auto", action="store_true", help="Run in auto mode without interactive menu")
     args, unknown = parser.parse_known_args()
 
-    print("\n==============================")
-    print("  ProjectP Professional Mode")
-    print("==============================")
-    print(" 1. full_pipeline          - รันทุกขั้นตอนแบบอัตโนมัติ (เทพ ครบระบบ) <== แนะนำ")
-    print(" 2. debug_full_pipeline    - ดีบัค: ตรวจสอบทุกจุดของ full_pipeline (log ละเอียด, ไม่หยุดเมื่อ error)")
-    print(" 3. preprocess              - เตรียมข้อมูล features (สร้างไฟล์ features_main.json/preprocessed_super.parquet)")
-    print(" 4. realistic_backtest      - แบลคเทสเสมือนจริง (เทพ, ใช้ข้อมูลจาก full pipeline, walk-forward)")
-    print(" 5. robust_backtest          - แบลคเทสเทพ (walk-forward, parallel, เลือกโมเดลได้)")
-    print(" 6. realistic_backtest_live  - แบลคเทสเหมือนเทรดจริง (train เฉพาะอดีต, test อนาคต, save model)")
-    print("------------------------------")
-    print("[Tip] กด Enter เพื่อเลือกโหมดแนะนำ: full_pipeline")
-    print("[Tip] พิมพ์เลข หรือชื่อโหมดก็ได้ เช่น 1 หรือ full_pipeline")
+    # Check for auto mode from environment variable (for python -m projectp)
+    auto_mode = args.auto or os.environ.get('PROJECTP_AUTO_MODE') == '1'
+    
+    if not auto_mode:
+        print("\n==============================")
+        print("  ProjectP Professional Mode")
+        print("==============================")
+        print(" 1. full_pipeline          - รันทุกขั้นตอนแบบอัตโนมัติ (เทพ ครบระบบ) <== แนะนำ")
+        print(" 2. debug_full_pipeline    - ดีบัค: ตรวจสอบทุกจุดของ full_pipeline (log ละเอียด, ไม่หยุดเมื่อ error)")
+        print(" 3. preprocess              - เตรียมข้อมูล features (สร้างไฟล์ features_main.json/preprocessed_super.parquet)")
+        print(" 4. realistic_backtest      - แบลคเทสเสมือนจริง (เทพ, ใช้ข้อมูลจาก full pipeline, walk-forward)")
+        print(" 5. robust_backtest          - แบลคเทสเทพ (walk-forward, parallel, เลือกโมเดลได้)")
+        print(" 6. realistic_backtest_live  - แบลคเทสเหมือนเทรดจริง (train เฉพาะอดีต, test อนาคต, save model)")
+        print("------------------------------")
+        print("[Tip] กด Enter เพื่อเลือกโหมดแนะนำ: full_pipeline")
+        print("[Tip] พิมพ์เลข หรือชื่อโหมดก็ได้ เช่น 1 หรือ full_pipeline")
 
     mode = args.mode
-    if not mode:
+    if not mode and not auto_mode:
         while True:
             user_input = input("เลือกโหมด (1-6 หรือชื่อโหมด): ").strip()
             if user_input == "" or user_input == "1" or user_input.lower() == "full_pipeline":
@@ -117,6 +122,9 @@ def main_cli():
                 break
             else:
                 print("[Error] ไม่พบโหมด กรุณาเลือกใหม่ (1-6 หรือชื่อโหมด)")
+    elif not mode and auto_mode:
+        # Default to full_pipeline in auto mode
+        mode = "full_pipeline"
 
     print(f"[Info] เลือกโหมด: {mode}")
     if mode == "full_pipeline":

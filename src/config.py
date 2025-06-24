@@ -543,3 +543,51 @@ def setup_gpu_acceleration():
 setup_gpu_acceleration()
 
 logger.info("Configuration loaded successfully")
+
+def print_gpu_utilization(stage=""):
+    """Print GPU and memory utilization information"""
+    try:
+        import psutil
+        
+        # Get system RAM usage
+        ram = psutil.virtual_memory()
+        ram_used = ram.used / (1024**3)  # Convert to GB
+        ram_total = ram.total / (1024**3)  # Convert to GB
+        
+        message = f"[Resource] System RAM: {ram_used:.1f} / {ram_total:.1f} GB available"
+        if stage:
+            message = f"[Resource - {stage}] System RAM: {ram_used:.1f} / {ram_total:.1f} GB available"
+        
+        print(message)
+        logger.info(message)
+        
+        # Try to get GPU info
+        try:
+            import GPUtil
+            gpus = GPUtil.getGPUs()
+            if gpus:
+                for i, gpu in enumerate(gpus):
+                    gpu_message = f"[Resource] GPU {i}: {gpu.memoryUsed}MB / {gpu.memoryTotal}MB ({gpu.memoryUtil*100:.1f}%)"
+                    print(gpu_message)
+                    logger.info(gpu_message)
+            else:
+                no_gpu_message = "[Resource] No GPU detected."
+                print(no_gpu_message)
+                logger.info(no_gpu_message)
+        except ImportError:
+            no_gpu_message = "[Resource] GPU not detected or pynvml not available."
+            print(no_gpu_message)
+            logger.info(no_gpu_message)
+        except Exception as e:
+            error_message = f"[Resource] Error getting GPU info: {e}"
+            print(error_message)
+            logger.warning(error_message)
+            
+    except ImportError:
+        fallback_message = "[Resource] psutil not available, cannot show resource usage."
+        print(fallback_message)
+        logger.warning(fallback_message)
+    except Exception as e:
+        error_message = f"[Resource] Error getting system info: {e}"
+        print(error_message)
+        logger.warning(error_message)

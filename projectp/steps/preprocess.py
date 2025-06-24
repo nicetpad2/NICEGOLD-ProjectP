@@ -11,6 +11,9 @@ import numpy as np
 import pandas as pd
 import psutil
 
+# Import the data validator to enforce real data usage
+from projectp.data_validator import RealDataValidator, enforce_real_data_only, prevent_dummy_data_creation
+
 # Enhanced evidently compatibility check with production-ready fallbacks
 EVIDENTLY_AVAILABLE = False
 EVIDENTLY_ERROR = None
@@ -314,6 +317,7 @@ def run_drift_monitor(ref_df, new_df, out_html="output_default/drift_report.html
 def run_preprocess(config=None, mode="default"):
     """
     Production-grade preprocessing with comprehensive multi-mode support
+    ENFORCES REAL DATA ONLY from datacsv folder - no dummy/synthetic data allowed
 
     Args:
         config: Configuration dictionary
@@ -325,6 +329,15 @@ def run_preprocess(config=None, mode="default"):
     console = Console()
     trace_id = str(uuid.uuid4())
     set_log_context(trace_id=trace_id, pipeline_step="preprocess")
+
+    # ENFORCE REAL DATA ONLY - Critical validation
+    try:
+        data_validator = enforce_real_data_only()
+        pro_log("🛡️ Real data enforcement activated - only datacsv data allowed", tag="Preprocess")
+    except Exception as e:
+        error_msg = f"❌ CRITICAL: Real data validation failed: {e}"
+        pro_log(error_msg, level="error", tag="Preprocess")
+        raise ValueError(error_msg)
 
     # Enhanced production-grade mode configuration
     mode_config = {
@@ -455,85 +468,65 @@ def run_preprocess(config=None, mode="default"):
                 candidate3 = os.path.join(base_dir, "projectp", filename)
                 if os.path.exists(candidate3):
                     return candidate3
-                return filename
-
-            multi_paths = [
-                get_abs_path("XAUUSD_M1.csv"),
-                get_abs_path("XAUUSD_M15.csv"),
-            ]
-
-            def load_csv(path: str):
+                return filename            # REMOVED: Old hardcoded paths - now using only datacsv folder
+            # All data must come from the validated datacsv folder            def load_csv(path: str):
                 """Load CSV with Dask or pandas based on availability"""
                 if use_dask:
                     return dd.read_csv(path)
                 else:
                     return pd.read_csv(path)
 
-            # --- Data Loading Logic ---
+            # --- ENFORCED REAL DATA LOADING FROM DATACSV ONLY ---
             progress.update(
-                task, advance=10, description="[cyan]Checking config and data paths..."
+                task, advance=10, description="[cyan]Loading REAL DATA from datacsv folder..."
             )
 
+            # Get available data files from datacsv folder
+            available_files = data_validator.get_available_data_files()
+            if not available_files:
+                error_msg = "❌ CRITICAL: No valid data files found in datacsv folder"
+                pro_log(error_msg, level="error", tag="Preprocess")
+                raise ValueError(error_msg)
+            
             df = None
-            if config and "data" in config and config["data"].get("auto_thai_csv"):
-                csv_path = config["data"].get("auto_thai_csv")
-                if os.path.exists(csv_path):
-                    df = load_and_prepare_main_csv(csv_path, add_target=True)
-                    df.columns = [c.lower() for c in df.columns]
-                    pro_log(
-                        f"[Preprocess] Loaded and prepared Thai CSV: {df.shape}",
-                        tag="Preprocess",
-                    )
-                    progress.update(
-                        task, advance=40, description="[green]Loaded Thai CSV"
-                    )
+            
+            # Check if specific file is requested in config
+            if config and "data" in config and "file" in config["data"]:
+                requested_file = config["data"]["file"]
+                if requested_file in available_files:
+                    df = data_validator.load_real_data(requested_file)
+                    pro_log(f"[Preprocess] Loaded requested real data file: {requested_file} {df.shape}", tag="Preprocess")
                 else:
-                    pro_log(
-                        f"[Preprocess] Thai CSV not found: {csv_path}",
-                        level="error",
-                        tag="Preprocess",
-                    )
-                    progress.update(
-                        task, completed=100, description="[red]Thai CSV not found"
-                    )
-                    return None
-            elif (
-                config
-                and "data" in config
-                and (config["data"].get("multi") or config["data"].get("path") == "all")
-            ):
+                    error_msg = f"❌ CRITICAL: Requested data file {requested_file} not found in datacsv"
+                    pro_log(error_msg, level="error", tag="Preprocess")
+                    raise FileNotFoundError(error_msg)
+            
+            # Multi-timeframe mode - load all available files from datacsv
+            elif config and "data" in config and (config["data"].get("multi") or config["data"].get("path") == "all"):
                 dfs = []
-                for p in multi_paths:
-                    if os.path.exists(p):
-                        df_tmp = load_csv(p)
-                        if use_dask:
-                            df_tmp = df_tmp.compute()
-                        df_tmp.columns = [c.lower() for c in df_tmp.columns]
-                        df_tmp["__src_timeframe"] = os.path.basename(p)
-                        dfs.append(df_tmp)
-                        progress.update(
-                            task,
-                            advance=20,
-                            description=f"[cyan]Loaded {os.path.basename(p)}",
-                        )
-                    else:
-                        pro_log(
-                            f"[Preprocess] Data file not found: {p}",
-                            level="error",
-                            tag="Preprocess",
-                        )
+                for data_file in available_files:
+                    df_tmp = data_validator.load_real_data(data_file)
+                    df_tmp.columns = [c.lower() for c in df_tmp.columns]
+                    df_tmp["__src_timeframe"] = data_file
+                    dfs.append(df_tmp)
+                    progress.update(
+                        task,
+                        advance=20,
+                        description=f"[cyan]Loaded real data: {data_file}",
+                    )
                 if not dfs:
                     pro_log(
                         f"[Preprocess] No data files found for multi timeframe",
                         level="error",
-                        tag="Preprocess",
+                        tag="Preprocess"
                     )
-                    progress.update(
-                        task, completed=100, description="[red]No data files found"
-                    )
-                    return None
+                
+                if not dfs:
+                    error_msg = "❌ CRITICAL: No valid data files loaded from datacsv folder"
+                    pro_log(error_msg, level="error", tag="Preprocess")
+                    raise ValueError(error_msg)
 
-                # Merge multi-timeframe data
+                # Merge multi-timeframe data from real datacsv files
                 time_keys = [
                     c
                     for c in dfs[0].columns
@@ -547,32 +540,35 @@ def run_preprocess(config=None, mode="default"):
                     )
                 df = df_merged
                 progress.update(
-                    task, advance=20, description="[green]Merged multi-timeframe data"
+                    task, advance=20, description="[green]Merged real multi-timeframe data"
                 )
+            # Default: Load first available file from datacsv
             else:
-                data_path = (
-                    get_abs_path(config["data"]["path"])
-                    if config and "data" in config and "path" in config["data"]
-                    else get_abs_path("XAUUSD_M1.csv")
-                )
-                if not os.path.exists(data_path):
-                    pro_log(
-                        f"[Preprocess] Data file not found: {data_path}",
-                        level="error",
-                        tag="Preprocess",
-                    )
-                    return None
+                # Use first available real data file
+                default_file = available_files[0]
+                df = data_validator.load_real_data(default_file)
+                df.columns = [c.lower() for c in df.columns]
+                
+                # Create backup of real data for safety
                 backup_dir = os.path.abspath(
                     os.path.join("output_default", "backup_preprocess")
                 )
                 os.makedirs(backup_dir, exist_ok=True)
-                shutil.copy2(
-                    data_path, os.path.join(backup_dir, os.path.basename(data_path))
+                backup_path = os.path.join(backup_dir, default_file)
+                shutil.copy2(data_validator.get_data_file_path(default_file), backup_path)
+                
+                pro_log(f"[Preprocess] Loaded default real data: {default_file} {df.shape}", tag="Preprocess")
+                progress.update(
+                    task, advance=30, description=f"[green]Loaded real data: {default_file}"
                 )
-                df = load_csv(data_path)
-                if use_dask:
-                    df = df.compute()
-                df.columns = [c.lower() for c in df.columns]
+
+            # Validate that we have real data loaded
+            if df is None or len(df) == 0:
+                error_msg = "❌ CRITICAL: No real data loaded - pipeline cannot proceed"
+                pro_log(error_msg, level="error", tag="Preprocess")
+                raise ValueError(error_msg)
+            
+            pro_log(f"✅ Real data loaded successfully: {df.shape} rows, {len(df.columns)} columns", tag="Preprocess")
 
             # --- Normalize & map columns to standard names ---
             progress.update(

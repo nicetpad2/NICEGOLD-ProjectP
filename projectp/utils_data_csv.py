@@ -1,18 +1,37 @@
 from utils import prepare_csv_auto
 from src.utils.data_utils import convert_thai_datetime
 import pandas as pd
+import os
+from projectp.data_validator import RealDataValidator
 
 def load_and_prepare_main_csv(path, add_target=False, target_func=None, rename_timestamp=True):
     """
     Load CSV with Thai Buddhist Timestamp, convert to datetime, add target column if needed, and rename column for pipeline compatibility.
+    ENFORCES REAL DATA ONLY - validates data comes from datacsv folder.
+    
     Args:
-        path: str, path to CSV
+        path: str, path to CSV (must be in datacsv folder)
         add_target: bool, whether to add a 'target' column
         target_func: callable, function to generate target (df) -> Series
         rename_timestamp: bool, rename 'Timestamp' to 'timestamp'
     Returns:
         df: pd.DataFrame (ready for pipeline)
     """
+    # Validate that path is from datacsv folder or validate the data
+    validator = RealDataValidator()
+    
+    # Check if this is a path to datacsv folder file
+    datacsv_folder = validator.datacsv_path
+    if not path.startswith(datacsv_folder):
+        # If not a direct datacsv path, validate it's real data
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"❌ CRITICAL: Data file not found: {path}")
+        
+        # Load and validate it's real data
+        df_test = pd.read_csv(path)
+        if len(df_test) < 100:  # Basic check for real data
+            raise ValueError(f"❌ CRITICAL: File {path} appears to be dummy data (too few rows)")
+    
     df = prepare_csv_auto(path)
     # แปลง Timestamp พ.ศ. เป็น datetime ค.ศ. (inplace)
     df = convert_thai_datetime(df, "Timestamp")

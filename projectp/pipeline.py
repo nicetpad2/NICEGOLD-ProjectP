@@ -1,4 +1,3 @@
-
 # 🔧 GLOBAL_FALLBACK_APPLIED: Comprehensive error handling
 import warnings
 warnings.filterwarnings('ignore', category=UserWarning)
@@ -232,8 +231,18 @@ def show_progress(tasks):
 
 def run_full_pipeline():
     """Execute the complete end-to-end pipeline sequence with AUC improvements"""
+    # ENFORCE REAL DATA ONLY - Critical validation at pipeline start
+    try:
+        from projectp.data_validator import enforce_real_data_only
+        data_validator = enforce_real_data_only()
+        console.print(Panel("[bold green]🛡️ Real data enforcement activated - only datacsv data allowed", border_style="green"))
+    except Exception as e:
+        error_msg = f"❌ CRITICAL: Real data validation failed: {e}"
+        console.print(Panel(f"[bold red]{error_msg}", title="Critical Error", border_style="red"))
+        raise ValueError(error_msg)
+    
     console.print(Panel(
-        "[bold green]🚀 Starting FULL PIPELINE with AUC Improvements",
+        "[bold green]🚀 Starting FULL PIPELINE with AUC Improvements\n🛡️ REAL DATA ONLY - No dummy/synthetic data allowed",
         title="🎯 Enhanced Pipeline",
         border_style="green"
     ))
@@ -251,8 +260,18 @@ def run_full_pipeline():
 
 def run_debug_full_pipeline():
     """Execute the complete end-to-end pipeline in debug mode with AUC improvements"""
+    # ENFORCE REAL DATA ONLY - Critical validation at pipeline start
+    try:
+        from projectp.data_validator import enforce_real_data_only
+        data_validator = enforce_real_data_only()
+        console.print(Panel("[bold cyan]🛡️ Real data enforcement activated - only datacsv data allowed", border_style="cyan"))
+    except Exception as e:
+        error_msg = f"❌ CRITICAL: Real data validation failed: {e}"
+        console.print(Panel(f"[bold red]{error_msg}", title="Critical Error", border_style="red"))
+        raise ValueError(error_msg)
+    
     console.print(Panel(
-        "[bold cyan]🐞 Starting DEBUG PIPELINE with AUC Improvements",
+        "[bold cyan]🐞 Starting DEBUG PIPELINE with AUC Improvements\n🛡️ REAL DATA ONLY - No dummy/synthetic data allowed",
         title="🔍 Debug Mode",
         border_style="cyan"
     ))
@@ -261,8 +280,18 @@ def run_debug_full_pipeline():
 
 def run_ultimate_pipeline():
     """Execute the ULTIMATE pipeline - เทพสุดทุกส่วน (สำหรับ Production)"""
+    # ENFORCE REAL DATA ONLY - Critical validation at pipeline start
+    try:
+        from projectp.data_validator import enforce_real_data_only
+        data_validator = enforce_real_data_only()
+        console.print(Panel("[bold magenta]🛡️ Real data enforcement activated - only datacsv data allowed", border_style="magenta"))
+    except Exception as e:
+        error_msg = f"❌ CRITICAL: Real data validation failed: {e}"
+        console.print(Panel(f"[bold red]{error_msg}", title="Critical Error", border_style="red"))
+        raise ValueError(error_msg)
+    
     console.print(Panel(
-        "[bold magenta]🔥 Starting ULTIMATE PIPELINE - เทพสุดทุกส่วน!",
+        "[bold magenta]🔥 Starting ULTIMATE PIPELINE - เทพสุดทุกส่วน!\n🛡️ REAL DATA ONLY - No dummy/synthetic data allowed",
         title="🏆 Production Mode",
         border_style="magenta"
     ))
