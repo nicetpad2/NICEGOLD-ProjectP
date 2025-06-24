@@ -116,13 +116,47 @@ class RealDataLoader:
         """
         Process raw data and add required columns
         """
-        logger.info(f"Processing {timeframe} data...")
+        logger.info("Processing %s data...", timeframe)
 
-        # Create datetime column
-        df["datetime"] = pd.to_datetime(
-            df["Date"].astype(str) + " " + df["Timestamp"].astype(str),
-            format="%Y%m%d %H:%M:%S",
-        )
+        # Convert Buddhist calendar date to Gregorian
+        def convert_buddhist_date(date_str):
+            """Convert Buddhist calendar date (YYYYMMDD) to Gregorian"""
+            date_str = str(date_str)
+            if len(date_str) == 8:
+                year = int(date_str[:4])
+                month = date_str[4:6]
+                day = date_str[6:8]
+
+                # Convert from Buddhist year to Gregorian year
+                gregorian_year = year - 543
+
+                return f"{gregorian_year}-{month}-{day}"
+            return date_str
+
+        # Apply Buddhist to Gregorian conversion
+        df["gregorian_date"] = df["Date"].apply(convert_buddhist_date)
+
+        # Create datetime column with proper format
+        try:
+            df["datetime"] = pd.to_datetime(
+                df["gregorian_date"] + " " + df["Timestamp"].astype(str),
+                format="%Y-%m-%d %H:%M:%S",
+                errors="coerce",
+            )
+            logger.info("Successfully converted Buddhist dates to Gregorian")
+        except Exception as e:
+            logger.warning("Date conversion failed, trying alternative method: %s", e)
+            # Fallback method
+            df["datetime"] = pd.to_datetime(
+                df["gregorian_date"] + " " + df["Timestamp"].astype(str),
+                errors="coerce",
+            )
+
+        # Drop rows with invalid dates
+        initial_len = len(df)
+        df = df.dropna(subset=["datetime"])
+        if len(df) < initial_len:
+            logger.info("Dropped %d rows with invalid dates", initial_len - len(df))
 
         # Sort by datetime
         df = df.sort_values("datetime").reset_index(drop=True)
@@ -130,10 +164,10 @@ class RealDataLoader:
         # Add basic features
         df = self._add_basic_features(df)
 
-        # Remove any invalid data
+        # Remove any remaining invalid data
         df = df.dropna()
 
-        logger.info(f"Processed {timeframe} data: {len(df):,} rows after cleaning")
+        logger.info("Processed %s data: %d rows after cleaning", timeframe, len(df))
 
         return df
 
