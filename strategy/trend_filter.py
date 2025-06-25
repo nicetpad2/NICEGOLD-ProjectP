@@ -1,10 +1,9 @@
-import logging
+
+
 from typing import Tuple
-
-import pandas as pd
+import logging
 import numpy as np
-
-
+import pandas as pd
 def apply_trend_filter(df: pd.DataFrame) -> pd.DataFrame:
     """Filter entry signals using M15 Trend_Zone.
 
@@ -23,5 +22,5 @@ def apply_trend_filter(df: pd.DataFrame) -> pd.DataFrame:
 
 
 __all__ = [
-    "apply_trend_filter",
+    "apply_trend_filter", 
 ]

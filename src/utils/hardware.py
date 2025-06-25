@@ -1,17 +1,20 @@
+# [Patch v5.5.14] GPU detection helper
 import logging
 
-# [Patch v5.5.14] GPU detection helper
+import psutil
+import torch
+
 
 def has_gpu() -> bool:
-    """Return True if a CUDA-capable GPU is available."""
+    """Return True if a CUDA - capable GPU is available."""
     try:
-        import torch
         return torch.cuda.is_available()
     except Exception as e:
         logging.debug("GPU detection failed: %s", e)
         return False
 
-# [Patch v5.7.3] Estimate resource-based parameters with safe fallbacks
+
+# [Patch v5.7.3] Estimate resource - based parameters with safe fallbacks
 def estimate_resource_plan(default_folds=5, default_batch=32):
     """Return a simple plan of ``n_folds`` and ``batch_size``.
 
@@ -20,13 +23,11 @@ def estimate_resource_plan(default_folds=5, default_batch=32):
     gpu_name = "Unknown"
     if has_gpu():
         try:
-            import torch
             gpu_name = torch.cuda.get_device_name(0)
         except Exception as e:
             logging.debug("GPU name lookup failed: %s", e)
     try:
-        import psutil
-        total_gb = psutil.virtual_memory().total / 1024 ** 3
+        total_gb = psutil.virtual_memory().total / 1024**3
     except Exception as e:
         logging.warning("psutil unavailable; using default resource plan: %s", e)
         return {

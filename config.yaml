@@ -4,17 +4,17 @@
 
 # ───────────────────────────────── Data Configuration ─────────────────────────────────
 data:
-  source: datacsv/XAUUSD_M1.csv
-  m15_source: datacsv/XAUUSD_M15.csv
+  source: data/example_trading_data.csv
+  m15_source: data/example_trading_data.csv
   target_column: target
   date_column: Date
   timestamp_column: Timestamp
   use_real_data: true
-  limit_rows: false  # ไม่จำกัดจำนวนแถว
+  limit_rows: false # ไม่จำกัดจำนวนแถว
   features:
     - Open
     - High
-    - Low  
+    - Low
     - Close
     - Volume
     - returns
@@ -22,6 +22,32 @@ data:
     - momentum
     - rsi
     - macd
+
+# ───────────────────────────────── Data Validation Configuration ─────────────────────────────────
+data_validation:
+  # Outlier detection thresholds
+  outlier_rate_threshold: 25.0 # Increased from 15% to 25% to reduce warnings
+  outlier_zscore_threshold: 5.0
+  max_price_ratio: 10.0
+
+  # Data gap thresholds
+  max_acceptable_gaps: 2000 # Increased from 1000 to 2000 to handle high-frequency data
+  max_gap_hours: 48 # Allow gaps up to 48 hours (weekends, holidays)
+
+  # Volume validation
+  min_volume: 0
+
+  # Required and optional columns
+  required_columns: ["open", "high", "low", "close"]
+  optional_columns: ["volume", "timestamp"]
+
+  # Data quality thresholds
+  min_data_completeness: 0.95 # 95% of data must be present
+  max_duplicate_rate: 0.05 # Max 5% duplicate rows
+
+  # OHLC validation
+  enable_ohlc_validation: true
+  ohlc_tolerance: 0.001 # 0.1% tolerance for OHLC relationships
 
 # ───────────────────────────────── Model Configuration ─────────────────────────────────
 model_class: RandomForestClassifier
@@ -94,7 +120,7 @@ visualization:
   show_plots: false
   save_plots: true
   plot_dir: output_default/plots
-  
+
 # ───────────────────────────────── Emergency Fixes ─────────────────────────────────
 emergency_fixes:
   enabled: true

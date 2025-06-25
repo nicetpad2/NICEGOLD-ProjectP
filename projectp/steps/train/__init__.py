@@ -1,7 +1,20 @@
+    from .advanced_trainer import (
+    from .data_processor import DataProcessor
+    from .evaluator import ModelEvaluator
+    from .feature_engineer import FeatureEngineer
+    from .main_trainer import run_train, MainTrainer
+    from .model_trainer import ModelTrainer
+    from .monitor import (
+    from .saver import ModelSaver
+    from .utils import TrainingUtils, ConfigValidator
+    from projectp.steps.train import DataProcessor, ModelTrainer
+    from projectp.steps.train import run_train
+from typing import Dict, Any, Optional
+import warnings
 """
 Training Module - Modular Structure
-=====================================
-Sub-modules for better maintainability and future development
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
+Sub - modules for better maintainability and future development
 
 Modules:
 - data_processor: Data loading, cleaning, and preprocessing
@@ -24,51 +37,41 @@ Structure:
     └── main_trainer.py     # Main training pipeline
 
 Usage:
-    from projectp.steps.train import run_train
-    results = run_train(config={'model_type': 'catboost', 'target_auc': 70.0})
-    
+    results = run_train(config = {'model_type': 'catboost', 'target_auc': 70.0})
+
     # Or use individual components
-    from projectp.steps.train import DataProcessor, ModelTrainer
     processor = DataProcessor()
     trainer = ModelTrainer()
 """
 
 # Import with error handling for better debugging
-import warnings
-from typing import Dict, Any, Optional
 
 try:
-    from .data_processor import DataProcessor
 except ImportError as e:
     warnings.warn(f"Could not import DataProcessor: {e}")
     DataProcessor = None
 
 try:
-    from .feature_engineer import FeatureEngineer
 except ImportError as e:
     warnings.warn(f"Could not import FeatureEngineer: {e}")
     FeatureEngineer = None
 
 try:
-    from .model_trainer import ModelTrainer
 except ImportError as e:
     warnings.warn(f"Could not import ModelTrainer: {e}")
     ModelTrainer = None
 
 try:
-    from .evaluator import ModelEvaluator
 except ImportError as e:
     warnings.warn(f"Could not import ModelEvaluator: {e}")
     ModelEvaluator = None
 
 try:
-    from .saver import ModelSaver
 except ImportError as e:
     warnings.warn(f"Could not import ModelSaver: {e}")
     ModelSaver = None
 
 try:
-    from .utils import TrainingUtils, ConfigValidator
 except ImportError as e:
     warnings.warn(f"Could not import utils: {e}")
     TrainingUtils = None
@@ -76,25 +79,23 @@ except ImportError as e:
 
 # Main training function (backward compatibility)
 try:
-    from .main_trainer import run_train, MainTrainer
 except ImportError as e:
     warnings.warn(f"Could not import main_trainer: {e}")
-    
+
     # Fallback function
     def run_train(config: Optional[Dict[str, Any]] = None, **kwargs) -> Dict[str, Any]:
         """Fallback training function when main_trainer is unavailable"""
         return {
-            'success': False,
-            'error': 'Main trainer module not available',
-            'best_auc': 0.0,
+            'success': False, 
+            'error': 'Main trainer module not available', 
+            'best_auc': 0.0, 
             'target_achieved': False
         }
-    
+
     MainTrainer = None
 
 # Advanced training capabilities
 try:
-    from .advanced_trainer import (
         AdvancedTrainer, 
         run_ensemble_train, 
         run_hyperopt_train, 
@@ -111,10 +112,9 @@ except ImportError as e:
 
 # Performance monitoring
 try:
-    from .monitor import (
         PerformanceMonitor, 
         TrainingDashboard, 
-        TrainingReporter,
+        TrainingReporter, 
         TrainingMetrics
     )
 except ImportError as e:
@@ -126,23 +126,23 @@ except ImportError as e:
 
 # Export all available components
 __all__ = [
-    'DataProcessor',
+    'DataProcessor', 
     'FeatureEngineer', 
-    'ModelTrainer',
-    'ModelEvaluator',
-    'ModelSaver',
-    'TrainingUtils',
-    'ConfigValidator',
-    'MainTrainer',
-    'run_train',
-    'AdvancedTrainer',
-    'run_ensemble_train',
-    'run_hyperopt_train',
-    'run_cv_train',
-    'run_automl_train',
+    'ModelTrainer', 
+    'ModelEvaluator', 
+    'ModelSaver', 
+    'TrainingUtils', 
+    'ConfigValidator', 
+    'MainTrainer', 
+    'run_train', 
+    'AdvancedTrainer', 
+    'run_ensemble_train', 
+    'run_hyperopt_train', 
+    'run_cv_train', 
+    'run_automl_train', 
     'PerformanceMonitor', 
     'TrainingDashboard', 
-    'TrainingReporter',
+    'TrainingReporter', 
     'TrainingMetrics'
 ]
 
@@ -151,13 +151,13 @@ __version__ = "2.1.0"
 __author__ = "ML Training Team"
 __description__ = "Modular ML training pipeline with advanced features"
 
-# Module-level configuration
+# Module - level configuration
 DEFAULT_CONFIG = {
-    'model_type': 'catboost',
-    'target_auc': 70.0,
-    'max_iterations': 5,
-    'cv_folds': 5,
-    'random_state': 42,
+    'model_type': 'catboost', 
+    'target_auc': 70.0, 
+    'max_iterations': 5, 
+    'cv_folds': 5, 
+    'random_state': 42, 
     'verbose': True
 }
 
@@ -172,9 +172,9 @@ def get_available_components():
 def get_module_info():
     """Get detailed module information"""
     return {
-        'version': __version__,
-        'author': __author__,
-        'description': __description__,
-        'available_components': get_available_components(),
+        'version': __version__, 
+        'author': __author__, 
+        'description': __description__, 
+        'available_components': get_available_components(), 
         'default_config': DEFAULT_CONFIG
     }

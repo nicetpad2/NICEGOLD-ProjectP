@@ -1,8 +1,8 @@
-"""Helper utilities for dynamic module management."""
-
 from types import ModuleType
 import importlib
 import sys
+"""Helper utilities for dynamic module management."""
+
 
 # [Patch v6.3.3] Provide safe_reload to avoid ImportError when module removed
 
@@ -10,12 +10,12 @@ def safe_reload(module: ModuleType) -> ModuleType:
     """Reload a module even if it was removed from ``sys.modules``.
 
     Parameters
-    ----------
+    - -  -  -  -  -  -  -  -  - 
     module : ModuleType
         Module object to reload.
 
     Returns
-    -------
+    - -  -  -  -  -  - 
     ModuleType
         Reloaded module reference.
     """

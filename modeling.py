@@ -1,46 +1,48 @@
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning)
-import pandas as pd
+        from flaml import AutoML
+    from ProjectP import ensure_super_features_file, get_feature_target_columns
+    from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, StackingClassifier
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import roc_auc_score
+        import lightgbm as lgb
+        import numpy as np
 import os
+import pandas as pd
+        import torch
+        import torch.nn as nn
+import warnings
+warnings.filterwarnings("ignore", category = UserWarning)
 
 # modeling.py
 # ฟังก์ชันเกี่ยวกับ Model & Ensemble
 
 def run_stacking_ensemble():
-    """Stacking/Blending หลายโมเดล (meta-model)"""
-    from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, StackingClassifier
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.metrics import roc_auc_score
-    from ProjectP import ensure_super_features_file, get_feature_target_columns
+    """Stacking/Blending หลายโมเดล (meta - model)"""
     fe_super_path = ensure_super_features_file()
     df = pd.read_parquet(fe_super_path)
     feature_cols, target_col = get_feature_target_columns(df)
     X = df[feature_cols]
     y = df[target_col]
     estimators = [
-        ('rf', RandomForestClassifier(n_estimators=50, random_state=42)),
-        ('gb', GradientBoostingClassifier(n_estimators=50, random_state=42)),
+        ('rf', RandomForestClassifier(n_estimators = 50, random_state = 42)), 
+        ('gb', GradientBoostingClassifier(n_estimators = 50, random_state = 42)), 
     ]
-    clf = StackingClassifier(estimators=estimators, final_estimator=LogisticRegression())
+    clf = StackingClassifier(estimators = estimators, final_estimator = LogisticRegression())
     clf.fit(X, y)
-    y_pred = clf.predict_proba(X)[:,1]
+    y_pred = clf.predict_proba(X)[:, 1]
     auc = roc_auc_score(y, y_pred)
     print(f'[Stacking] Stacking ensemble AUC: {auc:.4f}')
 
 def run_automl():
     """AutoML integration (FLAML)"""
     try:
-        from flaml import AutoML
-        from sklearn.metrics import roc_auc_score
-        from ProjectP import ensure_super_features_file, get_feature_target_columns
         fe_super_path = ensure_super_features_file()
         df = pd.read_parquet(fe_super_path)
         feature_cols, target_col = get_feature_target_columns(df)
         X = df[feature_cols]
         y = df[target_col]
         automl = AutoML()
-        automl.fit(X, y, task='classification', time_budget=60)
-        y_pred = automl.predict_proba(X)[:,1]
+        automl.fit(X, y, task = 'classification', time_budget = 60)
+        y_pred = automl.predict_proba(X)[:, 1]
         auc = roc_auc_score(y, y_pred)
         print(f'[AutoML] FLAML AUC: {auc:.4f}')
     except ImportError:
@@ -49,10 +51,6 @@ def run_automl():
 def run_deep_learning():
     """Deep Learning (LSTM) สำหรับ time series"""
     try:
-        import numpy as np
-        import torch
-        import torch.nn as nn
-        from ProjectP import ensure_super_features_file, get_feature_target_columns
         fe_super_path = ensure_super_features_file()
         df = pd.read_parquet(fe_super_path)
         feature_cols, target_col = get_feature_target_columns(df)
@@ -63,16 +61,16 @@ def run_deep_learning():
         class LSTMModel(nn.Module):
             def __init__(self, input_dim):
                 super().__init__()
-                self.lstm = nn.LSTM(input_dim, 16, batch_first=True)
+                self.lstm = nn.LSTM(input_dim, 16, batch_first = True)
                 self.fc = nn.Linear(16, 1)
             def forward(self, x):
                 x, _ = self.lstm(x)
-                x = self.fc(x[:,-1,:])
+                x = self.fc(x[:, -1, :])
                 return torch.sigmoid(x)
         model = LSTMModel(X.shape[1])
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+        optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
         loss_fn = nn.BCELoss()
-        X_seq = X.unsqueeze(1).repeat(1,5,1)  # dummy sequence
+        X_seq = X.unsqueeze(1).repeat(1, 5, 1)  # dummy sequence
         for epoch in range(3):
             optimizer.zero_grad()
             out = model(X_seq)
@@ -86,8 +84,6 @@ def run_deep_learning():
 def estimate_model_uncertainty():
     """Model uncertainty estimation (quantile regression)"""
     try:
-        import lightgbm as lgb
-        from ProjectP import ensure_super_features_file, get_feature_target_columns
         fe_super_path = ensure_super_features_file()
         df = pd.read_parquet(fe_super_path)
         feature_cols, target_col = get_feature_target_columns(df)
@@ -95,8 +91,8 @@ def estimate_model_uncertainty():
         y = df[target_col]
         # กรองเฉพาะคอลัมน์ตัวเลขก่อน fit
         if isinstance(X, pd.DataFrame):
-            X = X.select_dtypes(include=["number"])
-        model = lgb.LGBMRegressor(objective='quantile', alpha=0.9)
+            X = X.select_dtypes(include = ["number"])
+        model = lgb.LGBMRegressor(objective = 'quantile', alpha = 0.9)
         model.fit(X, y)
         preds = model.predict(X)
         print(f'[Uncertainty] Quantile regression (90th percentile) ตัวอย่าง: {preds[:5]}')

@@ -1,18 +1,24 @@
 from .common import *
 from .engineering import DEFAULT_META_CLASSIFIER_FEATURES
 from .io_utils import safe_path, safe_makedirs_for_file
+    from catboost import CatBoostClassifier, Pool
+from collections import Counter
+    from imblearn.over_sampling import RandomOverSampler
+    from imblearn.under_sampling import RandomUnderSampler
+    from src.utils.resource_auto import get_optimal_resource_fraction
 from src.utils.resource_auto import print_resource_summary, get_optimal_resource_fraction
-import os
 import json
 import matplotlib.pyplot as plt
-import traceback
-import sys
-try:
+import numpy as np
+import os
+import pandas as pd
     import shap
+import sys
+import traceback
+try:
 except ImportError:
     shap = None
 try:
-    from catboost import CatBoostClassifier, Pool
 except ImportError:
     CatBoostClassifier = None
     Pool = None
@@ -20,9 +26,9 @@ except ImportError:
 print_resource_summary()
 
 
-# --- SHAP Feature Selection Helper Function ---
+# - - - SHAP Feature Selection Helper Function - -  - 
 # [Patch v5.0.2] Exclude SHAP helper from coverage
-def select_top_shap_features(shap_values_val, feature_names, shap_threshold=0.01):  # pragma: no cover
+def select_top_shap_features(shap_values_val, feature_names, shap_threshold = 0.01):  # pragma: no cover
     """
     Selects features based on Normalized Mean Absolute SHAP values exceeding a threshold.
     (v4.8.8 Patch 4: Corrected return for invalid feature_names)
@@ -54,14 +60,14 @@ def select_top_shap_features(shap_values_val, feature_names, shap_threshold=0.01
     # <<< End of [Patch] MODIFIED v4.8.8 (Patch 1) >>>
 
     try:
-        mean_abs_shap = np.abs(shap_values_val).mean(axis=0)
+        mean_abs_shap = np.abs(shap_values_val).mean(axis = 0)
         if np.isnan(mean_abs_shap).any() or np.isinf(mean_abs_shap).any():
             logging.warning("      (Warning) พบ NaN หรือ Inf ใน Mean Absolute SHAP values. ไม่สามารถเลือก Features ได้. คืนค่า Features เดิม.")
             return feature_names
 
         shap_df = pd.DataFrame({"Feature": feature_names, "Mean_Abs_SHAP": mean_abs_shap})
         total_shap = shap_df["Mean_Abs_SHAP"].sum()
-        if total_shap > 1e-9:
+        if total_shap > 1e - 9:
             shap_df["Normalized_SHAP"] = shap_df["Mean_Abs_SHAP"] / total_shap
         else:
             shap_df["Normalized_SHAP"] = 0.0
@@ -79,17 +85,17 @@ def select_top_shap_features(shap_values_val, feature_names, shap_threshold=0.01
             logging.info(f"      (Success) เลือก Features ได้ {len(selected_features)} ตัวจาก SHAP.")
             logging.info(f"         Features ที่ถูกตัดออก {len(removed_features)} ตัว: {removed_features}")
             logging.info("         Features ที่เลือก (เรียงตามค่า SHAP):")
-            logging.info("\n" + selected_features_df.sort_values("Normalized_SHAP", ascending=False)[["Feature", "Normalized_SHAP"]].round(5).to_string(index=False))
+            logging.info("\n" + selected_features_df.sort_values("Normalized_SHAP", ascending = False)[["Feature", "Normalized_SHAP"]].round(5).to_string(index = False))
         else:
             logging.info("      (Success) Features ทั้งหมดผ่านเกณฑ์ SHAP.")
         return selected_features
     except Exception as e:
-        logging.error(f"      (Error) เกิดข้อผิดพลาดระหว่างการเลือก Features ด้วย SHAP: {e}. คืนค่า Features เดิม.", exc_info=True)
+        logging.error(f"      (Error) เกิดข้อผิดพลาดระหว่างการเลือก Features ด้วย SHAP: {e}. คืนค่า Features เดิม.", exc_info = True)
         return feature_names
 
-# --- Model Quality Check Functions ---
+# - - - Model Quality Check Functions - -  - 
 # [Patch v5.0.2] Exclude model overfit check from coverage
-def check_model_overfit(model, X_train, y_train, X_val, y_val, X_test=None, y_test=None, metric="AUC", threshold_pct=15.0):  # pragma: no cover
+def check_model_overfit(model, X_train, y_train, X_val, y_val, X_test = None, y_test = None, metric = "AUC", threshold_pct = 15.0):  # pragma: no cover
     """
     Checks for potential overfitting by comparing model performance.
     (v4.8.8 Patch 9: Fixed logging logic and format)
@@ -108,11 +114,11 @@ def check_model_overfit(model, X_train, y_train, X_val, y_val, X_test=None, y_te
     def _ensure_pd(data, name):
         if data is None: return None
         if isinstance(data, np.ndarray):
-            if data.ndim == 1: return pd.Series(data, name=name)
+            if data.ndim == 1: return pd.Series(data, name = name)
             elif data.ndim == 2:
                 feature_names = getattr(model, 'feature_names_', None)
                 if feature_names and len(feature_names) == data.shape[1]:
-                    return pd.DataFrame(data, columns=feature_names)
+                    return pd.DataFrame(data, columns = feature_names)
                 else:
                     return pd.DataFrame(data)
             else:
@@ -189,7 +195,7 @@ def check_model_overfit(model, X_train, y_train, X_val, y_val, X_test=None, y_te
                         return None
                 return pred
             except Exception as e_pred:
-                logging.error(f"      (Error) Calculating {method_name} failed: {e_pred}", exc_info=True)
+                logging.error(f"      (Error) Calculating {method_name} failed: {e_pred}", exc_info = True)
                 return None
 
         if metric == "AUC":
@@ -201,11 +207,11 @@ def check_model_overfit(model, X_train, y_train, X_val, y_val, X_test=None, y_te
             if test_pred_proba_raw is not None: test_score = roc_auc_score(y_test, test_pred_proba_raw[:, 1])
         elif metric == "LogLoss":
             val_pred_proba = safe_predict(model, X_val, "predict_proba")
-            if val_pred_proba is not None: val_score = log_loss(y_val.astype(int), val_pred_proba, labels=model_classes)
+            if val_pred_proba is not None: val_score = log_loss(y_val.astype(int), val_pred_proba, labels = model_classes)
             train_pred_proba = safe_predict(model, X_train, "predict_proba")
-            if train_pred_proba is not None: train_score = log_loss(y_train.astype(int), train_pred_proba, labels=model_classes)
+            if train_pred_proba is not None: train_score = log_loss(y_train.astype(int), train_pred_proba, labels = model_classes)
             test_pred_proba = safe_predict(model, X_test, "predict_proba")
-            if test_pred_proba is not None: test_score = log_loss(y_test.astype(int), test_pred_proba, labels=model_classes)
+            if test_pred_proba is not None: test_score = log_loss(y_test.astype(int), test_pred_proba, labels = model_classes)
         elif metric == "Accuracy":
             val_pred = safe_predict(model, X_val, "predict")
             if val_pred is not None: val_score = accuracy_score(y_val, val_pred)
@@ -231,28 +237,28 @@ def check_model_overfit(model, X_train, y_train, X_val, y_val, X_test=None, y_te
             if metric == "LogLoss": # Lower is better
                 # Check if val_score is significantly worse (higher) than train_score
                 denominator = abs(train_score)
-                if val_score > train_score + 1e-9: # Check if val score is worse
-                    if denominator > 1e-9:
+                if val_score > train_score + 1e - 9: # Check if val score is worse
+                    if denominator > 1e - 9:
                         diff_val_pct = abs(diff_val / denominator) * 100.0
                     if diff_val_pct > threshold_pct:
                         is_overfitting_val = True
             else: # Higher is better (AUC, Accuracy)
                 # Check if train_score is significantly better (higher) than val_score
                 denominator = abs(train_score)
-                if train_score > val_score + 1e-9: # Check if train score is better
-                    if denominator > 1e-9:
+                if train_score > val_score + 1e - 9: # Check if train score is better
+                    if denominator > 1e - 9:
                         diff_val_pct = abs(diff_val / denominator) * 100.0
                     if diff_val_pct > threshold_pct:
                         is_overfitting_val = True
 
             # Log comparison results regardless of overfitting detection
-            if denominator > 1e-9:
+            if denominator > 1e - 9:
                 logging.info(f"      Diff (Train - Val): {diff_val:.4f} ({diff_val_pct:.2f}%)")
             else:
                 logging.info(f"      Diff (Train - Val): {diff_val:.4f} (Cannot calculate % diff - denominator near zero)")
 
             if is_overfitting_val:
-                # Use the user-specified log message format
+                # Use the user - specified log message format
                 logging.warning(f"[Patch] Potential Overfitting detected. Train vs Val {metric} gap = {abs(diff_val):.4f} ({diff_val_pct:.2f}% > {threshold_pct:.1f}%)")
 
         elif X_train is not None:
@@ -267,34 +273,34 @@ def check_model_overfit(model, X_train, y_train, X_val, y_val, X_test=None, y_te
 
             if metric == "LogLoss": # Lower is better
                 denominator_test = abs(val_score)
-                if test_score > val_score + 1e-9: # Test score is worse
-                    if denominator_test > 1e-9:
+                if test_score > val_score + 1e - 9: # Test score is worse
+                    if denominator_test > 1e - 9:
                         diff_test_pct = abs(diff_test / denominator_test) * 100.0
                     if diff_test_pct > threshold_pct:
                         is_generalization_issue = True
             else: # Higher is better
                 denominator_test = abs(val_score)
-                if val_score > test_score + 1e-9: # Val score is better
-                    if denominator_test > 1e-9:
+                if val_score > test_score + 1e - 9: # Val score is better
+                    if denominator_test > 1e - 9:
                         diff_test_pct = abs(diff_test / denominator_test) * 100.0
                     if diff_test_pct > threshold_pct:
                         is_generalization_issue = True
 
-            if denominator_test > 1e-9:
+            if denominator_test > 1e - 9:
                  logging.info(f"      Diff (Val - Test): {diff_test:.4f} ({diff_test_pct:.2f}%)")
             else:
                  logging.info(f"      Diff (Val - Test): {diff_test:.4f} (Cannot calculate % diff - denominator near zero)")
 
             if is_generalization_issue:
-                logging.warning(f"      (ALERT) Potential Generalization Issue: Val {metric} significantly {'lower' if metric=='LogLoss' else 'higher'} than Test {metric} (Diff % > {threshold_pct:.1f}%).")
+                logging.warning(f"      (ALERT) Potential Generalization Issue: Val {metric} significantly {'lower' if metric =  = 'LogLoss' else 'higher'} than Test {metric} (Diff % > {threshold_pct:.1f}%).")
         elif X_test is not None:
             logging.warning("      Diff (Val - Test): Cannot calculate (NaN score).")
 
     except Exception as e:
-        logging.error(f"      (Error) Error during Overfitting check ({metric}): {e}", exc_info=True)
+        logging.error(f"      (Error) Error during Overfitting check ({metric}): {e}", exc_info = True)
 
 # [Patch v5.0.2] Exclude SHAP noise check from coverage
-def check_feature_noise_shap(shap_values, feature_names, threshold=0.01):  # pragma: no cover
+def check_feature_noise_shap(shap_values, feature_names, threshold = 0.01):  # pragma: no cover
     """
     Checks for potentially noisy features based on low mean absolute SHAP values.
     (v4.8.8 Patch 9: Fixed logging logic and format)
@@ -305,31 +311,31 @@ def check_feature_noise_shap(shap_values, feature_names, threshold=0.01):  # pra
         logging.warning("      (Warning) Skipping Feature Noise Check: Invalid inputs."); return
 
     try:
-        mean_abs_shap = np.abs(shap_values).mean(axis=0)
+        mean_abs_shap = np.abs(shap_values).mean(axis = 0)
         if np.isnan(mean_abs_shap).any() or np.isinf(mean_abs_shap).any():
             logging.warning("      (Warning) Found NaN/Inf in Mean Abs SHAP. Skipping noise check.")
             return
 
         shap_df = pd.DataFrame({"Feature": feature_names, "Mean_Abs_SHAP": mean_abs_shap})
         total_shap = shap_df["Mean_Abs_SHAP"].sum()
-        shap_df["Normalized_SHAP"] = (shap_df["Mean_Abs_SHAP"] / total_shap) if total_shap > 1e-9 else 0.0
+        shap_df["Normalized_SHAP"] = (shap_df["Mean_Abs_SHAP"] / total_shap) if total_shap > 1e - 9 else 0.0
 
         # <<< [Patch] MODIFIED v4.8.8 (Patch 9): Corrected logging as per user prompt and test failure >>>
         # Use the DataFrame index directly if feature_names match the index
-        shap_series_for_check = pd.Series(shap_df["Normalized_SHAP"].values, index=shap_df["Feature"])
+        shap_series_for_check = pd.Series(shap_df["Normalized_SHAP"].values, index = shap_df["Feature"])
         noise_feats = shap_series_for_check[shap_series_for_check < threshold].index.tolist()
         if noise_feats:
-            # Use the user-specified log message format (logging.info as per patch 6 note)
+            # Use the user - specified log message format (logging.info as per patch 6 note)
             logging.info(f"[Patch] SHAP Noise features detected: {noise_feats}")
         # <<< End of [Patch] MODIFIED v4.8.8 (Patch 9) >>>
         else:
             logging.info(f"      (Success) No features with significant noise detected (Normalized SHAP < {threshold:.4f}).")
     except Exception as e:
-        logging.error(f"      (Error) Error during Feature Noise check (SHAP): {e}", exc_info=True)
+        logging.error(f"      (Error) Error during Feature Noise check (SHAP): {e}", exc_info = True)
 
-# --- SHAP Analysis Function ---
+# - - - SHAP Analysis Function - -  - 
 # [Patch v5.0.2] Exclude SHAP importance analysis from coverage
-def analyze_feature_importance_shap(model, model_type, data_sample, features, output_dir, fold_idx=None):  # pragma: no cover
+def analyze_feature_importance_shap(model, model_type, data_sample, features, output_dir, fold_idx = None):  # pragma: no cover
     """
     Analyzes feature importance using SHAP values and saves summary plots.
     (v4.8.8 Patch 1: Enhanced robustness for SHAP value structure and feature validation)
@@ -356,8 +362,8 @@ def analyze_feature_importance_shap(model, model_type, data_sample, features, ou
         logging.warning(f"   (Warning) Skipping SHAP: Output directory '{output_dir}' invalid.")
         return
 
-    fold_suffix = f"_fold{fold_idx+1}" if fold_idx is not None else "_validation_set"
-    logging.info(f"\n(Analyzing) SHAP analysis ({model_type} - Sample Size: {len(data_sample)}) - {fold_suffix.replace('_',' ').title()}...")
+    fold_suffix = f"_fold{fold_idx + 1}" if fold_idx is not None else "_validation_set"
+    logging.info(f"\n(Analyzing) SHAP analysis ({model_type} - Sample Size: {len(data_sample)}) - {fold_suffix.replace('_', ' ').title()}...")
 
     missing_features = [f for f in features if f not in data_sample.columns]
     if missing_features:
@@ -369,7 +375,7 @@ def analyze_feature_importance_shap(model, model_type, data_sample, features, ou
         logging.error(f"   (Error) Skipping SHAP: Feature(s) not found: {e}")
         return
     except Exception as e_select:
-        logging.error(f"   (Error) Skipping SHAP: Error selecting features: {e_select}", exc_info=True)
+        logging.error(f"   (Error) Skipping SHAP: Error selecting features: {e_select}", exc_info = True)
         return
 
     cat_features_indices = []
@@ -380,13 +386,13 @@ def analyze_feature_importance_shap(model, model_type, data_sample, features, ou
         if cat_col in X_shap.columns:
             try:
                 if X_shap[cat_col].isnull().any():
-                    X_shap[cat_col].fillna("Missing", inplace=True)
+                    X_shap[cat_col].fillna("Missing", inplace = True)
                 X_shap[cat_col] = X_shap[cat_col].astype(str)
                 if model_type == "CatBoostClassifier":
                     cat_feature_names_shap.append(cat_col)
             except Exception as e_cat_str:
                 logging.warning(f"      (Warning) Could not convert '{cat_col}' to string for SHAP: {e_cat_str}.")
-    
+
     if model_type == "CatBoostClassifier" and cat_feature_names_shap:
         try:
             cat_features_indices = [X_shap.columns.get_loc(col) for col in cat_feature_names_shap]
@@ -394,28 +400,28 @@ def analyze_feature_importance_shap(model, model_type, data_sample, features, ou
         except KeyError as e_loc:
             logging.error(f"      (Error) Could not locate categorical feature index for SHAP: {e_loc}.")
             cat_features_indices = []
-    
+
     logging.debug("      Handling NaN/Inf in numeric features for SHAP...")
-    numeric_cols_shap = X_shap.select_dtypes(include=np.number).columns
-    
+    numeric_cols_shap = X_shap.select_dtypes(include = np.number).columns
+
     if X_shap[numeric_cols_shap].isin([np.inf, -np.inf]).any().any():
         X_shap[numeric_cols_shap] = X_shap[numeric_cols_shap].replace([np.inf, -np.inf], np.nan)
-    
+
     if X_shap[numeric_cols_shap].isnull().any().any():
         X_shap[numeric_cols_shap] = X_shap[numeric_cols_shap].fillna(0)
-    
+
     if X_shap.isnull().any().any():
         missing_final = X_shap.columns[X_shap.isnull().any()].tolist()
         logging.error(f"      (Error) Skipping SHAP: NaNs still present after fill in columns: {missing_final}")
         return
-    
+
     try:
         explainer = None
         shap_values = None
         global CatBoostClassifier, Pool
         logging.debug(f"      Initializing SHAP explainer for model type: {model_type}...")
         if model_type == "CatBoostClassifier" and CatBoostClassifier and Pool:
-            shap_pool = Pool(X_shap, label=None, cat_features=cat_features_indices)
+            shap_pool = Pool(X_shap, label = None, cat_features = cat_features_indices)
             explainer = shap.TreeExplainer(model)
             logging.info(f"      Calculating SHAP values (CatBoost)...")
             shap_values = explainer.shap_values(shap_pool)
@@ -465,13 +471,13 @@ def analyze_feature_importance_shap(model, model_type, data_sample, features, ou
         shap_plot_path = os.path.join(output_dir, f"shap_summary_{model_type}_bar{fold_suffix}.png")
         plt.figure()
         try:
-            shap.summary_plot(shap_values_positive_class, X_shap, plot_type="bar", show=False, feature_names=features, max_display=20)
-            plt.title(f"SHAP Feature Importance ({model_type} - {fold_suffix.replace('_',' ').title()})")
+            shap.summary_plot(shap_values_positive_class, X_shap, plot_type = "bar", show = False, feature_names = features, max_display = 20)
+            plt.title(f"SHAP Feature Importance ({model_type} - {fold_suffix.replace('_', ' ').title()})")
             plt.tight_layout()
-            plt.savefig(shap_plot_path, dpi=300, bbox_inches="tight")
+            plt.savefig(shap_plot_path, dpi = 300, bbox_inches = "tight")
             logging.info(f"      (Success) Saved SHAP Plot (Bar): {os.path.basename(shap_plot_path)}")
         except Exception as e_save_bar:
-            logging.error(f"      (Error) Failed to create/save SHAP bar plot: {e_save_bar}", exc_info=True)
+            logging.error(f"      (Error) Failed to create/save SHAP bar plot: {e_save_bar}", exc_info = True)
         finally:
             plt.close()
 
@@ -479,22 +485,22 @@ def analyze_feature_importance_shap(model, model_type, data_sample, features, ou
         shap_beeswarm_path = os.path.join(output_dir, f"shap_summary_{model_type}_beeswarm{fold_suffix}.png")
         plt.figure()
         try:
-            shap.summary_plot(shap_values_positive_class, X_shap, plot_type="dot", show=False, feature_names=features, max_display=20)
-            plt.title(f"SHAP Feature Summary ({model_type} - {fold_suffix.replace('_',' ').title()})")
+            shap.summary_plot(shap_values_positive_class, X_shap, plot_type = "dot", show = False, feature_names = features, max_display = 20)
+            plt.title(f"SHAP Feature Summary ({model_type} - {fold_suffix.replace('_', ' ').title()})")
             plt.tight_layout()
-            plt.savefig(shap_beeswarm_path, dpi=300, bbox_inches="tight")
+            plt.savefig(shap_beeswarm_path, dpi = 300, bbox_inches = "tight")
             logging.info(f"      (Success) Saved SHAP Plot (Beeswarm): {os.path.basename(shap_beeswarm_path)}")
         except Exception as e_save_beeswarm:
-            logging.error(f"      (Error) Failed to create/save SHAP beeswarm plot: {e_save_beeswarm}", exc_info=True)
+            logging.error(f"      (Error) Failed to create/save SHAP beeswarm plot: {e_save_beeswarm}", exc_info = True)
         finally:
             plt.close()
 
     except ImportError:
         logging.error("   (Error) SHAP Error: Could not import shap library components.")
     except Exception as e:
-        logging.error(f"   (Error) Error during SHAP analysis: {e}", exc_info=True)
+        logging.error(f"   (Error) Error during SHAP analysis: {e}", exc_info = True)
 
-# --- Feature Loading Function ---
+# - - - Feature Loading Function - -  - 
 # [Patch v5.0.2] Exclude feature loader from coverage
 def load_features_for_model(model_name, output_dir):  # pragma: no cover
     """
@@ -520,9 +526,9 @@ def load_features_for_model(model_name, output_dir):  # pragma: no cover
                 "      (Generating) Default features_main.json."
             )
             try:
-                os.makedirs(output_dir, exist_ok=True)
-                with open(main_features_path, "w", encoding="utf-8") as f_def:
-                    json.dump(DEFAULT_META_CLASSIFIER_FEATURES, f_def, ensure_ascii=False, indent=2)
+                os.makedirs(output_dir, exist_ok = True)
+                with open(main_features_path, "w", encoding = "utf - 8") as f_def:
+                    json.dump(DEFAULT_META_CLASSIFIER_FEATURES, f_def, ensure_ascii = False, indent = 2)
                 logging.info(
                     "      (Generated) Default features_main.json created using DEFAULT_META_CLASSIFIER_FEATURES."
                 )
@@ -545,12 +551,12 @@ def load_features_for_model(model_name, output_dir):  # pragma: no cover
         logging.error(f"   (Error) Failed to decode JSON from feature file '{os.path.basename(features_file_path)}': {e_json}")
         return None
     except Exception as e:
-        logging.error(f"   (Error) Failed to load features for model '{model_name}' from '{os.path.basename(features_file_path)}': {e}", exc_info=True)
+        logging.error(f"   (Error) Failed to load features for model '{model_name}' from '{os.path.basename(features_file_path)}': {e}", exc_info = True)
         return None
 
-# --- Model Switcher Function ---
+# - - - Model Switcher Function - -  - 
 # [Patch v5.0.2] Exclude model switcher from coverage
-def select_model_for_trade(context, available_models=None):  # pragma: no cover
+def select_model_for_trade(context, available_models = None):  # pragma: no cover
     """
     Selects the appropriate AI model ('main', 'spike', 'cluster') based on context.
     Falls back to 'main' if the selected model is invalid or missing.
@@ -569,7 +575,7 @@ def select_model_for_trade(context, available_models=None):  # pragma: no cover
     spike_switch_threshold = 0.6
     cluster_switch_value = 2
 
-    logging.debug(f"      (Switcher) Context: SpikeScore={spike_score_value:.3f}, Cluster={cluster_value}")
+    logging.debug(f"      (Switcher) Context: SpikeScore = {spike_score_value:.3f}, Cluster = {cluster_value}")
 
     if spike_score_value > spike_switch_threshold:
         selected_model_key = 'spike'
@@ -597,7 +603,7 @@ def select_model_for_trade(context, available_models=None):  # pragma: no cover
 
 logging.info("Part 6: Machine Learning Configuration & Helpers Loaded (v4.8.8 Patch 9 Applied).")
 
-def build_catboost_model(params=None, use_gpu=True):
+def build_catboost_model(params = None, use_gpu = True):
     """
     Create a CatBoostClassifier optimized for Colab GPU and high RAM usage.
     """
@@ -617,13 +623,12 @@ def build_catboost_model(params=None, use_gpu=True):
 
 def build_catboost_model(params: dict, use_gpu: bool = True, ram_fraction: float = 0.8, gpu_ram_fraction: float = 0.8):
     """
-    Build a CatBoostClassifier with optimal RAM and GPU usage for Colab/High-resource environments.
+    Build a CatBoostClassifier with optimal RAM and GPU usage for Colab/High - resource environments.
     - use_gpu: If True, use GPU (Colab: Tesla T4/A100 etc.)
-    - ram_fraction: Fraction of system RAM to use (0.0-1.0)
-    - gpu_ram_fraction: Fraction of GPU RAM to use (0.0-1.0)
+    - ram_fraction: Fraction of system RAM to use (0.0 - 1.0)
+    - gpu_ram_fraction: Fraction of GPU RAM to use (0.0 - 1.0)
     """
-    from src.utils.resource_auto import get_optimal_resource_fraction
-    # Auto-detect optimal resource
+    # Auto - detect optimal resource
     ram_gb, gpu_gb = get_optimal_resource_fraction(ram_fraction, gpu_ram_fraction)
     params = dict(params) if params else {}
     params['thread_count'] = -1
@@ -635,17 +640,14 @@ def build_catboost_model(params: dict, use_gpu: bool = True, ram_fraction: float
         os.environ['CATBOOST_GPU_MEMORY_PART'] = str(gpu_ram_fraction)
     return CatBoostClassifier(**params)
 
-import numpy as np
-import pandas as pd
-from collections import Counter
 
-def log_target_distribution(y, label='target'):
+def log_target_distribution(y, label = 'target'):
     counts = Counter(y)
     total = sum(counts.values())
-    print(f"[INFO] Distribution of {label}: {dict(counts)} (total={total})")
+    print(f"[INFO] Distribution of {label}: {dict(counts)} (total = {total})")
     for k, v in counts.items():
         print(f"  Class {k}: {v} ({v/total:.2%})")
-    plt.figure(figsize=(4,2))
+    plt.figure(figsize = (4, 2))
     plt.bar(list(counts.keys()), list(counts.values()))
     plt.title(f"Distribution of {label}")
     plt.xlabel(label)
@@ -654,25 +656,23 @@ def log_target_distribution(y, label='target'):
     plt.savefig(f'output_default/{label}_distribution.png')
     plt.close()
 
-def balance_classes(X, y, method='auto', random_state=42):
+def balance_classes(X, y, method = 'auto', random_state = 42):
     """
     Balance classes in y using oversampling or undersampling.
     method: 'auto' (oversample if imbalance > 10%), 'oversample', 'undersample', or 'none'
     """
-    from imblearn.over_sampling import RandomOverSampler
-    from imblearn.under_sampling import RandomUnderSampler
     counts = Counter(y)
-    maj, min_ = max(counts, key=counts.get), min(counts, key=counts.get)
+    maj, min_ = max(counts, key = counts.get), min(counts, key = counts.get)
     ratio = counts[min_] / counts[maj]
     if method == 'none' or (method == 'auto' and ratio > 0.9):
         return X, y
     if method == 'undersample':
-        rus = RandomUnderSampler(random_state=random_state)
+        rus = RandomUnderSampler(random_state = random_state)
         X_res, y_res = rus.fit_resample(X, y)
         print(f"[INFO] Undersampled: {Counter(y_res)}")
         return X_res, y_res
     # default: oversample
-    ros = RandomOverSampler(random_state=random_state)
+    ros = RandomOverSampler(random_state = random_state)
     X_res, y_res = ros.fit_resample(X, y)
     print(f"[INFO] Oversampled: {Counter(y_res)}")
     return X_res, y_res

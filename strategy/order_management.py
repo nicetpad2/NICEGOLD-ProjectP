@@ -1,16 +1,14 @@
-"""Order management utilities with cooldown and kill switch logic."""
 from __future__ import annotations
-
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
+from src.utils import load_settings, Settings
 from threading import Lock
 from typing import Dict
 import logging
 import math
 import pandas as pd
-
-from src.utils import load_settings, Settings
+"""Order management utilities with cooldown and kill switch logic."""
 
 
 class OrderStatus(Enum):
@@ -25,7 +23,7 @@ class OrderStatus(Enum):
 class OrderManager:
     """Manage order placement with cooldown and kill switch."""
 
-    settings: Settings = field(default_factory=load_settings)
+    settings: Settings = field(default_factory = load_settings)
 
     def __post_init__(self) -> None:
         self._last_order_time: datetime | None = None
@@ -38,19 +36,19 @@ class OrderManager:
             if (
                 self._last_order_time
                 and (current_time - self._last_order_time)
-                < timedelta(seconds=self.settings.cooldown_secs)
+                < timedelta(seconds = self.settings.cooldown_secs)
             ):
                 logging.info(
-                    "order_management: %s at %s",
-                    OrderStatus.BLOCKED_COOLDOWN.value,
-                    current_time.isoformat(),
+                    "order_management: %s at %s", 
+                    OrderStatus.BLOCKED_COOLDOWN.value, 
+                    current_time.isoformat(), 
                 )
                 return OrderStatus.BLOCKED_COOLDOWN
             if self._current_drawdown >= self.settings.kill_switch_pct:
                 logging.info(
-                    "order_management: %s at %s",
-                    OrderStatus.KILL_SWITCH.value,
-                    current_time.isoformat(),
+                    "order_management: %s at %s", 
+                    OrderStatus.KILL_SWITCH.value, 
+                    current_time.isoformat(), 
                 )
                 return OrderStatus.KILL_SWITCH
             return OrderStatus.OPEN
@@ -75,11 +73,11 @@ __all__ = ["OrderManager", "OrderStatus"]
 def place_order(side: str, price: float, sl: float, tp: float, size: float) -> Dict:
     """Return an order dictionary with mandatory SL/TP."""
     return {
-        "side": side,
-        "entry_price": price,
-        "sl_price": sl,
-        "tp_price": tp,
-        "size": size,
+        "side": side, 
+        "entry_price": price, 
+        "sl_price": sl, 
+        "tp_price": tp, 
+        "size": size, 
     }
 
 __all__.append("place_order")
@@ -94,10 +92,10 @@ def create_order(side: str, price: float, sl: float, tp: float) -> Dict:
     if side not in {"BUY", "SELL"}:
         raise ValueError("side must be BUY or SELL")
     return {
-        "side": side,
-        "entry_price": price,
-        "sl": sl,
-        "tp": tp,
+        "side": side, 
+        "entry_price": price, 
+        "sl": sl, 
+        "tp": tp, 
     }
 
 __all__.append("create_order")

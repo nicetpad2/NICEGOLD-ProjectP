@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
+from pathlib import Path
+from run_full_pipeline import ProductionPipelineRunner, load_config
+import subprocess
+import sys
 """
 Test script for the production pipeline runner
 """
 
-import subprocess
-import sys
-from pathlib import Path
-
 
 def test_pipeline_runner():
     """Test the production pipeline runner"""
-    print("Testing NICEGOLD-ProjectP Production Pipeline Runner")
-    print("=" * 60)
+    print("Testing NICEGOLD - ProjectP Production Pipeline Runner")
+    print(" = " * 60)
 
     # Test 1: Help and basic functionality
     print("\n1. Testing help functionality...")
     try:
         result = subprocess.run(
-            [sys.executable, "run_full_pipeline.py", "--help"],
-            capture_output=True,
-            text=True,
-            timeout=30,
+            [sys.executable, "run_full_pipeline.py", " -  - help"], 
+            capture_output = True, 
+            text = True, 
+            timeout = 30, 
         )
 
         if result.returncode == 0:
@@ -34,14 +34,14 @@ def test_pipeline_runner():
         print(f"❌ Help test failed: {e}")
         return False
 
-    # Test 2: Validation-only mode
-    print("\n2. Testing validation-only mode...")
+    # Test 2: Validation - only mode
+    print("\n2. Testing validation - only mode...")
     try:
         result = subprocess.run(
-            [sys.executable, "run_full_pipeline.py", "--validate-only", "--debug"],
-            capture_output=True,
-            text=True,
-            timeout=60,
+            [sys.executable, "run_full_pipeline.py", " -  - validate - only", " -  - debug"], 
+            capture_output = True, 
+            text = True, 
+            timeout = 60, 
         )
 
         if result.returncode in [0, 1]:  # Either success or expected validation failure
@@ -66,11 +66,8 @@ def test_pipeline_runner():
     print("\n3. Testing import functionality...")
     try:
         import_test_code = """
-import sys
-from pathlib import Path
 sys.path.insert(0, str(Path.cwd()))
 
-from run_full_pipeline import ProductionPipelineRunner, load_config
 
 # Test configuration loading
 config = load_config()
@@ -85,10 +82,10 @@ print("Import test successful")
 """
 
         result = subprocess.run(
-            [sys.executable, "-c", import_test_code],
-            capture_output=True,
-            text=True,
-            timeout=30,
+            [sys.executable, " - c", import_test_code], 
+            capture_output = True, 
+            text = True, 
+            timeout = 30, 
         )
 
         if result.returncode == 0:
@@ -105,14 +102,14 @@ print("Import test successful")
         print(f"❌ Import test failed: {e}")
         return False
 
-    print("\n" + "=" * 60)
+    print("\n" + " = " * 60)
     print("🎉 All tests passed! Pipeline runner is ready for production.")
     print("\n📋 Usage examples:")
-    print("   python run_full_pipeline.py --validate-only")
-    print("   python run_full_pipeline.py --mode train --debug")
-    print("   python run_full_pipeline.py --mode full --monitor")
-    print("   python run_full_pipeline.py --resume backtest")
-    print("   python run_full_pipeline.py --mode deploy --gpu")
+    print("   python run_full_pipeline.py - - validate - only")
+    print("   python run_full_pipeline.py - - mode train - - debug")
+    print("   python run_full_pipeline.py - - mode full - - monitor")
+    print("   python run_full_pipeline.py - - resume backtest")
+    print("   python run_full_pipeline.py - - mode deploy - - gpu")
 
     return True
 

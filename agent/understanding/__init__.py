@@ -1,6 +1,6 @@
 """
 Project Understanding Module
-===========================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 
 Deep project analysis and comprehension capabilities.
 """

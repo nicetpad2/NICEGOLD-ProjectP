@@ -1,7 +1,7 @@
-import numpy as np
+
+
 from src.features import is_volume_spike
-
-
+import numpy as np
 def test_is_volume_spike_true():
     assert is_volume_spike(150, 90)
 
@@ -12,4 +12,3 @@ def test_is_volume_spike_false():
 
 def test_is_volume_spike_invalid():
     assert not is_volume_spike(np.nan, 50)
-

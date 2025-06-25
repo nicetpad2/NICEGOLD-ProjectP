@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
+from pathlib import Path
+        from src.evidently_compat import EVIDENTLY_AVAILABLE, DataDrift, ValueDrift
+        from src.pydantic_v2_compat import BaseModel, Field, SecretField
+import logging
+        import numpy as np
+        import ProjectP
+import sys
+import traceback
 """
 Final Integration Test
-====================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 Test that all compatibility layers work together in the ML pipeline
 """
 
-import logging
-import sys
-import traceback
-from pathlib import Path
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level = logging.INFO, format = "%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -22,12 +26,11 @@ def test_pydantic_compatibility():
     logger.info("🧪 Testing Pydantic v2 compatibility...")
 
     try:
-        from src.pydantic_v2_compat import BaseModel, Field, SecretField
 
         # Test BaseModel
         class TestModel(BaseModel):
-            name: str = Field(default="test")
-            secret: str = SecretField(default="secret_value")
+            name: str = Field(default = "test")
+            secret: str = SecretField(default = "secret_value")
 
         model = TestModel()
         logger.info(f"✅ Pydantic test successful: {model.name}")
@@ -43,21 +46,19 @@ def test_evidently_compatibility():
     logger.info("🧪 Testing Evidently compatibility...")
 
     try:
-        from src.evidently_compat import EVIDENTLY_AVAILABLE, DataDrift, ValueDrift
 
         # Test ValueDrift creation
         drift_detector = ValueDrift("target")
         logger.info(f"✅ ValueDrift created: {type(drift_detector).__name__}")
 
         # Test calculation
-        import numpy as np
 
         ref_data = {"target": np.random.normal(0, 1, 100)}
         cur_data = {"target": np.random.normal(0.5, 1, 100)}
 
         result = drift_detector.calculate(ref_data, cur_data)
         logger.info(
-            f"✅ Drift calculation successful: score={result['drift_score']:.3f}, method={result['method']}"
+            f"✅ Drift calculation successful: score = {result['drift_score']:.3f}, method = {result['method']}"
         )
 
         return True
@@ -73,10 +74,10 @@ def test_pipeline_imports():
     logger.info("🧪 Testing pipeline imports...")
 
     import_tests = [
-        ("ProjectP", "ProjectP"),
-        ("automl_utils", "automl_utils"),
-        ("feature_engineering", "feature_engineering"),
-        ("classification_utils", "classification_utils"),
+        ("ProjectP", "ProjectP"), 
+        ("automl_utils", "automl_utils"), 
+        ("feature_engineering", "feature_engineering"), 
+        ("classification_utils", "classification_utils"), 
     ]
 
     success_count = 0
@@ -98,7 +99,6 @@ def test_pipeline_initialization():
 
     try:
         # Test main entry point
-        import ProjectP
 
         # Test if we can access key functions
         if hasattr(ProjectP, "main"):
@@ -144,18 +144,18 @@ def run_comprehensive_test():
     logger.info("🚀 Starting comprehensive integration test...")
 
     tests = [
-        ("Pydantic v2 Compatibility", test_pydantic_compatibility),
-        ("Evidently Compatibility", test_evidently_compatibility),
-        ("Pipeline Imports", test_pipeline_imports),
-        ("Pipeline Initialization", test_pipeline_initialization),
-        ("Output Directory", test_output_directory),
+        ("Pydantic v2 Compatibility", test_pydantic_compatibility), 
+        ("Evidently Compatibility", test_evidently_compatibility), 
+        ("Pipeline Imports", test_pipeline_imports), 
+        ("Pipeline Initialization", test_pipeline_initialization), 
+        ("Output Directory", test_output_directory), 
     ]
 
     results = {}
     for test_name, test_func in tests:
-        logger.info(f"\n{'='*50}")
+        logger.info(f"\n{' = '*50}")
         logger.info(f"🧪 Running: {test_name}")
-        logger.info("=" * 50)
+        logger.info(" = " * 50)
 
         try:
             result = test_func()
@@ -167,9 +167,9 @@ def run_comprehensive_test():
             logger.error(f"❌ {test_name}: FAIL - {e}")
 
     # Summary
-    logger.info(f"\n{'='*50}")
+    logger.info(f"\n{' = '*50}")
     logger.info("📊 INTEGRATION TEST SUMMARY")
-    logger.info("=" * 50)
+    logger.info(" = " * 50)
 
     passed = sum(results.values())
     total = len(results)
@@ -196,7 +196,7 @@ if __name__ == "__main__":
 
     if success:
         logger.info("\n🎯 RECOMMENDATION: You can now run the full pipeline!")
-        logger.info("💻 Try: python ProjectP.py --run_full_pipeline")
+        logger.info("💻 Try: python ProjectP.py - - run_full_pipeline")
         logger.info("💻 Or use the VS Code task: 'Run Full ML Pipeline'")
     else:
         logger.error(

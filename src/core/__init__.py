@@ -1,22 +1,18 @@
+# -*- coding: utf-8 -*-
 """
-🏗️ Core Module สำหรับ ProjectP
-============================
+NICEGOLD ProjectP - Core Module
+════════════════════════════════════════════════════════════════════════════════
 
-Module หลักที่รวมส่วนประกอบสำคัญของระบบ
+Core functionality and utilities for ProjectP system.
+
+Author: NICEGOLD Team
+Version: 3.0
+Created: 2025-01-05
 """
-/content/drive/MyDrive/Phiradon1688_co# cd /content/drive/MyDrive/Phiradon1688_co && python -c "
-> import ast
-> try:
->     with open('auc_improvement_pipeline.py', 'r') as f:
->         content = f.read()
->     ast.parse(content)
->     print('✅ Syntax is valid')
-> except SyntaxError as e:
->     print(f'❌ Syntax error: {e}')
->     print(f'Line {e.lineno}: {e.text}')
->     print(f'Error at position {e.offset}')
-> "
-❌ Syntax error: unindent does not match any outer indentation level (<unknown>, line 945)
-Line 945:     def _manual_undersample(self, X, y):
 
-Error at position 41
+from .colors import Colors, ColorThemes, colorize, print_colored
+
+__all__ = ["Colors", "ColorThemes", "colorize", "print_colored"]
+
+__version__ = "3.0"
+__author__ = "NICEGOLD Team"

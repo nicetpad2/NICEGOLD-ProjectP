@@ -1,112 +1,119 @@
 #!/usr/bin/env python3
+            from basic_auc_fix import create_optimized_model
+        from basic_auc_fix import create_optimized_model, emergency_model_creation
+from pathlib import Path
+    from pydantic import SecretField, Field, BaseModel
+        from src.data_loader.csv_loader import CSVLoader, safe_load_csv_auto
+            from src.data_loader.csv_loader import safe_load_csv_auto
+        from src.evidently_compat import DataDrift, ValueDrift, get_drift_detector
+        from src.pydantic_fix import SecretField, Field, BaseModel
+        from src.pydantic_v2_compat import BaseModel, Field, SecretField
+            from src.pydantic_v2_compat import SecretField, Field, BaseModel
+import logging
+import os
+        import ProjectP
+import sys
+import traceback
 """
 Production Ready Fix Script - FINAL VERSION
-==========================================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 แก้ไขปัญหาสุดท้ายให้พร้อมใช้งาน Production แบบสมบูรณ์
 
 ✅ ทุกอย่างที่ต้องการสำหรับ Production:
 - Pydantic v2 compatibility
-- Evidently compatibility 
+- Evidently compatibility
 - Basic AUC fix integration
 - CSV loader without circular imports
 - Complete pipeline verification
 """
 
-import logging
-import os
-import sys
-import traceback
-from pathlib import Path
 
 # Setup production logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level = logging.INFO, format = "%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
 class ProductionReadyFix:
-    """Production-ready fix for ML Pipeline"""
-    
+    """Production - ready fix for ML Pipeline"""
+
     def __init__(self):
         self.issues_fixed = []
         self.production_status = {
-            'pydantic': False,
-            'evidently': False,
-            'basic_auc_fix': False,
-            'csv_loader': False,
-            'projectp': False,
+            'pydantic': False, 
+            'evidently': False, 
+            'basic_auc_fix': False, 
+            'csv_loader': False, 
+            'projectp': False, 
             'final_pipeline': False
         }
-    
+
     def run_production_fix(self):
         """Run complete production fix"""
         logger.info("🚀 PRODUCTION READY FIX - STARTING")
-        logger.info("=" * 60)
-        
+        logger.info(" = " * 60)
+
         # 1. Fix Pydantic v2 compatibility
         self._fix_pydantic_production()
-        
+
         # 2. Fix Evidently compatibility
         self._fix_evidently_production()
-        
+
         # 3. Ensure basic_auc_fix is ready
         self._ensure_basic_auc_fix()
-        
+
         # 4. Fix CSV loader production issues
         self._fix_csv_loader_production()
-        
+
         # 5. Verify ProjectP integration
         self._verify_projectp_integration()
-        
+
         # 6. Final pipeline verification
         self._verify_final_pipeline()
-        
+
         # Report production status
         return self._report_production_status()
-    
+
     def _fix_pydantic_production(self):
-        """Ensure Pydantic v2 compatibility is production-ready"""
+        """Ensure Pydantic v2 compatibility is production - ready"""
         try:
             logger.info("🔧 Ensuring Pydantic v2 production compatibility...")
-            
+
             # Test the compatibility layer
-            from src.pydantic_v2_compat import SecretField, Field, BaseModel
-            
+
             # Create a production test
             class ProductionTestModel(BaseModel):
-                secret_config: str = SecretField(default="production")
-                api_key: str = Field(default="test")
-            
+                secret_config: str = SecretField(default = "production")
+                api_key: str = Field(default = "test")
+
             # Test instantiation
             test_model = ProductionTestModel()
             test_dict = test_model.dict() if hasattr(test_model, 'dict') else {}
-            
+
             logger.info("✅ Pydantic v2 compatibility - PRODUCTION READY")
             self.production_status['pydantic'] = True
             self.issues_fixed.append("Pydantic v2 compatibility")
-            
+
         except Exception as e:
             logger.error(f"❌ Pydantic v2 production issue: {e}")
             self.production_status['pydantic'] = False
                     content = content.replace(
                         "try:
-    from pydantic import SecretField, Field, BaseModel
 except ImportError:
     try:
-        from src.pydantic_fix import SecretField, Field, BaseModel
     except ImportError:
         # Fallback
-        def SecretField(default=None, **kwargs): return default
-        def Field(default=None, **kwargs): return default
-        class BaseModel: pass",
-                        "from src.pydantic_v2_compat import BaseModel, Field, SecretField",
+        def SecretField(default = None, **kwargs): return default
+        def Field(default = None, **kwargs): return default
+        class BaseModel: pass", 
+                        "from src.pydantic_v2_compat import BaseModel, Field, SecretField", 
                     )
                     fixes_made += 1
 
                 # Write back if changes made
                 if fixes_made > 0:
-                    with open(file_path, "w", encoding="utf-8") as f:
+                    with open(file_path, "w", encoding = "utf - 8") as f:
                         f.write(content)
                     logger.info(f"✅ Fixed imports in {file_path}")
 
@@ -124,12 +131,11 @@ def verify_all_imports():
 
     # Test 1: Pydantic compatibility
     try:
-        from src.pydantic_v2_compat import BaseModel, Field, SecretField
 
         # Test model creation
         class TestModel(BaseModel):
-            secret: str = SecretField(default="test")
-            normal: str = Field(default="normal")
+            secret: str = SecretField(default = "test")
+            normal: str = Field(default = "normal")
 
         model = TestModel()
         test_results["pydantic"] = True
@@ -141,7 +147,6 @@ def verify_all_imports():
 
     # Test 2: Evidently compatibility
     try:
-        from src.evidently_compat import DataDrift, ValueDrift, get_drift_detector
 
         detector = get_drift_detector()
         test_results["evidently"] = True
@@ -153,7 +158,6 @@ def verify_all_imports():
 
     # Test 3: Basic AUC fix
     try:
-        from basic_auc_fix import create_optimized_model, emergency_model_creation
 
         # Test function exists and is callable
         if callable(create_optimized_model) and callable(emergency_model_creation):
@@ -169,7 +173,6 @@ def verify_all_imports():
 
     # Test 4: CSV loader (circular imports)
     try:
-        from src.data_loader.csv_loader import CSVLoader, safe_load_csv_auto
 
         test_results["csv_loader"] = True
         logger.info("✅ CSV loader imported (no circular imports)")
@@ -180,7 +183,6 @@ def verify_all_imports():
 
     # Test 5: ProjectP import
     try:
-        import ProjectP
 
         # Check critical functions exist
         has_main = hasattr(ProjectP, "main")
@@ -206,14 +208,12 @@ def run_final_pipeline_test():
 
     try:
         # Try to import and run basic pipeline functions
-        import ProjectP
 
         # Check if we can access the main components
         logger.info("📊 Testing pipeline components...")
 
         # Test data loading capabilities
         try:
-            from src.data_loader.csv_loader import safe_load_csv_auto
 
             logger.info("✅ Data loading capability verified")
         except Exception as e:
@@ -221,7 +221,6 @@ def run_final_pipeline_test():
 
         # Test model creation
         try:
-            from basic_auc_fix import create_optimized_model
 
             logger.info("✅ Model creation capability verified")
         except Exception as e:
@@ -238,7 +237,7 @@ def run_final_pipeline_test():
 def main():
     """Main production ready fix function"""
     logger.info("🚀 Production Ready Fix Started")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     # Step 1: Fix any remaining import references
     fixes_made = fix_import_references()
@@ -255,9 +254,9 @@ def main():
     test_results["final_pipeline"] = pipeline_ok
 
     # Report results
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
     logger.info("📊 PRODUCTION READINESS REPORT")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     all_passed = True
     for component, status in test_results.items():
@@ -266,13 +265,13 @@ def main():
         if not status:
             all_passed = False
 
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     if all_passed:
         logger.info("🎉 PRODUCTION READY!")
         logger.info("✅ All systems verified and operational")
-        logger.info("💡 Ready to run: python ProjectP.py --run_full_pipeline")
-        print("\n" + "=" * 60)
+        logger.info("💡 Ready to run: python ProjectP.py - - run_full_pipeline")
+        print("\n" + " = " * 60)
         print("🎉 SUCCESS: โปรเจคพร้อมใช้งานจริงแล้ว!")
         print("📋 สิ่งที่แก้ไขเสร็จแล้ว:")
         print("   ✅ Pydantic v2 SecretField compatibility")
@@ -281,8 +280,8 @@ def main():
         print("   ✅ Circular import resolution")
         print("   ✅ Full pipeline verification")
         print("\n💡 คำสั่งเรียกใช้:")
-        print("   python ProjectP.py --run_full_pipeline")
-        print("=" * 60)
+        print("   python ProjectP.py - - run_full_pipeline")
+        print(" = " * 60)
         return True
     else:
         logger.error("❌ PRODUCTION NOT READY")

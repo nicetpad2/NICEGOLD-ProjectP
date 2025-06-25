@@ -1,27 +1,28 @@
 #!/usr/bin/env python3
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, Optional, Tuple
+import logging
+            import math
+    import numpy as np
+import os
+import pandas as pd
+    import warnings
 """
 Real Data Loader for XAUUSD CSV Files
-====================================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 
 Loads real XAUUSD M1 and M15 data from datacsv/ folder without any limitations
 or dummy data generation. Processes the full dataset for production use.
 """
 
-import logging
-import os
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 try:
-    import numpy as np
 except ImportError:
-    import warnings
 
     warnings.warn("NumPy not available, using fallback calculations")
     np = None
 
-import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -68,10 +69,10 @@ class RealDataLoader:
             # Load data without row limits if limit_rows is None
             if limit_rows is None:
                 df = pd.read_csv(self.m1_file)
-                logger.info(f"Loaded full M1 dataset: {len(df):,} rows")
+                logger.info(f"Loaded full M1 dataset: {len(df):, } rows")
             else:
-                df = pd.read_csv(self.m1_file, nrows=limit_rows)
-                logger.info(f"Loaded M1 dataset (limited): {len(df):,} rows")
+                df = pd.read_csv(self.m1_file, nrows = limit_rows)
+                logger.info(f"Loaded M1 dataset (limited): {len(df):, } rows")
 
             # Process data
             df = self._process_data(df, "M1")
@@ -98,10 +99,10 @@ class RealDataLoader:
             # Load data without row limits if limit_rows is None
             if limit_rows is None:
                 df = pd.read_csv(self.m15_file)
-                logger.info(f"Loaded full M15 dataset: {len(df):,} rows")
+                logger.info(f"Loaded full M15 dataset: {len(df):, } rows")
             else:
-                df = pd.read_csv(self.m15_file, nrows=limit_rows)
-                logger.info(f"Loaded M15 dataset (limited): {len(df):,} rows")
+                df = pd.read_csv(self.m15_file, nrows = limit_rows)
+                logger.info(f"Loaded M15 dataset (limited): {len(df):, } rows")
 
             # Process data
             df = self._process_data(df, "M15")
@@ -118,48 +119,74 @@ class RealDataLoader:
         """
         logger.info("Processing %s data...", timeframe)
 
-        # Convert Buddhist calendar date to Gregorian
-        def convert_buddhist_date(date_str):
-            """Convert Buddhist calendar date (YYYYMMDD) to Gregorian"""
-            date_str = str(date_str)
-            if len(date_str) == 8:
-                year = int(date_str[:4])
-                month = date_str[4:6]
-                day = date_str[6:8]
+        # Handle different date/time column formats
+        if "Time" in df.columns:
+            # M1 format: has combined 'Time' column
+            df["datetime"] = pd.to_datetime(df["Time"], errors = "coerce")
+            logger.info("Using 'Time' column for datetime conversion")
+        elif "Date" in df.columns and "Timestamp" in df.columns:
+            # M15 format: has separate 'Date' and 'Timestamp' columns
+            # Convert Buddhist calendar date to Gregorian
+            def convert_buddhist_date(date_str):
+                """Convert Buddhist calendar date (YYYYMMDD) to Gregorian"""
+                date_str = str(date_str)
+                if len(date_str) == 8:
+                    year = int(date_str[:4])
+                    month = date_str[4:6]
+                    day = date_str[6:8]
 
-                # Convert from Buddhist year to Gregorian year
-                gregorian_year = year - 543
+                    # Convert from Buddhist year to Gregorian year
+                    gregorian_year = year - 543
 
-                return f"{gregorian_year}-{month}-{day}"
-            return date_str
+                    return f"{gregorian_year} - {month} - {day}"
+                return date_str
 
-        # Apply Buddhist to Gregorian conversion
-        df["gregorian_date"] = df["Date"].apply(convert_buddhist_date)
+            # Apply Buddhist to Gregorian conversion
+            df["gregorian_date"] = df["Date"].apply(convert_buddhist_date)
 
-        # Create datetime column with proper format
-        try:
-            df["datetime"] = pd.to_datetime(
-                df["gregorian_date"] + " " + df["Timestamp"].astype(str),
-                format="%Y-%m-%d %H:%M:%S",
-                errors="coerce",
-            )
-            logger.info("Successfully converted Buddhist dates to Gregorian")
-        except Exception as e:
-            logger.warning("Date conversion failed, trying alternative method: %s", e)
-            # Fallback method
-            df["datetime"] = pd.to_datetime(
-                df["gregorian_date"] + " " + df["Timestamp"].astype(str),
-                errors="coerce",
-            )
+            # Create datetime column with proper format
+            try:
+                df["datetime"] = pd.to_datetime(
+                    df["gregorian_date"] + " " + df["Timestamp"].astype(str), 
+                    format = "%Y - %m - %d %H:%M:%S", 
+                    errors = "coerce", 
+                )
+                logger.info("Successfully converted Buddhist dates to Gregorian")
+            except Exception as e:
+                logger.warning(
+                    "Date conversion failed, trying alternative method: %s", e
+                )
+                # Fallback method
+                df["datetime"] = pd.to_datetime(
+                    df["gregorian_date"] + " " + df["Timestamp"].astype(str), 
+                    errors = "coerce", 
+                )
+        elif "timestamp" in df.columns:
+            # Generic format: has 'timestamp' column
+            df["datetime"] = pd.to_datetime(df["timestamp"], errors = "coerce")
+            logger.info("Using 'timestamp' column for datetime conversion")
+        else:
+            logger.error("No recognizable date/time columns found in data")
+            # Try to find any column with date - like name
+            date_cols = [
+                col
+                for col in df.columns
+                if any(word in col.lower() for word in ["date", "time"])
+            ]
+            if date_cols:
+                logger.info("Attempting to use column: %s", date_cols[0])
+                df["datetime"] = pd.to_datetime(df[date_cols[0]], errors = "coerce")
+            else:
+                raise ValueError("Cannot find suitable date/time column in data")
 
         # Drop rows with invalid dates
         initial_len = len(df)
-        df = df.dropna(subset=["datetime"])
+        df = df.dropna(subset = ["datetime"])
         if len(df) < initial_len:
             logger.info("Dropped %d rows with invalid dates", initial_len - len(df))
 
         # Sort by datetime
-        df = df.sort_values("datetime").reset_index(drop=True)
+        df = df.sort_values("datetime").reset_index(drop = True)
 
         # Add basic features
         df = self._add_basic_features(df)
@@ -178,13 +205,13 @@ class RealDataLoader:
         # Returns
         df["returns"] = df["Close"].pct_change()
 
-        # High-Low spread
+        # High - Low spread
         df["hl_spread"] = (df["High"] - df["Low"]) / df["Close"]
 
         # Price position within range
         df["price_position"] = (df["Close"] - df["Low"]) / (df["High"] - df["Low"])
 
-        # Volume-weighted price
+        # Volume - weighted price
         df["vwap"] = df["Volume"] * df["Close"]
 
         # Log returns for better distribution
@@ -192,7 +219,6 @@ class RealDataLoader:
             df["log_returns"] = np.log(df["Close"]).diff()
         else:
             # Fallback without numpy
-            import math
 
             df["log_returns"] = (
                 df["Close"].apply(lambda x: math.log(x) if x > 0 else None).diff()
@@ -212,23 +238,23 @@ class RealDataLoader:
             m15_size = self.m15_file.stat().st_size / (1024 * 1024)  # MB
 
             # Get row counts (approximate from first few rows)
-            m1_sample = pd.read_csv(self.m1_file, nrows=1000)
-            m15_sample = pd.read_csv(self.m15_file, nrows=1000)
+            m1_sample = pd.read_csv(self.m1_file, nrows = 1000)
+            m15_sample = pd.read_csv(self.m15_file, nrows = 1000)
 
             info = {
                 "files": {
                     "XAUUSD_M1.csv": {
-                        "size_mb": round(m1_size, 2),
-                        "exists": True,
-                        "columns": list(m1_sample.columns),
-                    },
+                        "size_mb": round(m1_size, 2), 
+                        "exists": True, 
+                        "columns": list(m1_sample.columns), 
+                    }, 
                     "XAUUSD_M15.csv": {
-                        "size_mb": round(m15_size, 2),
-                        "exists": True,
-                        "columns": list(m15_sample.columns),
-                    },
-                },
-                "estimated_rows": {"M1": "~1.7M rows", "M15": "~118K rows"},
+                        "size_mb": round(m15_size, 2), 
+                        "exists": True, 
+                        "columns": list(m15_sample.columns), 
+                    }, 
+                }, 
+                "estimated_rows": {"M1": "~1.7M rows", "M15": "~118K rows"}, 
             }
 
         except Exception as e:
@@ -280,7 +306,6 @@ def load_real_data(
         Processed DataFrame ready for ML pipeline
     """
     # Check for environment variable for row limit (for debug mode)
-    import os
 
     env_limit = os.environ.get("NICEGOLD_ROW_LIMIT")
     if env_limit is not None:
@@ -295,15 +320,15 @@ def load_real_data(
     # Load M1 data by default
     if limit_rows is not None:
         logger.info("Loading real data with row limit: %d", limit_rows)
-        df = loader.load_m1_data(limit_rows=limit_rows)
+        df = loader.load_m1_data(limit_rows = limit_rows)
     else:
         logger.info("Loading complete real data (no row limit)")
-        df = loader.load_m1_data(limit_rows=None)
+        df = loader.load_m1_data(limit_rows = None)
 
     # Add target column for ML (this is a placeholder - should be based on actual trading logic)
     df["target"] = _create_target_column(df)
 
-    logger.info(f"Real data loaded successfully: {len(df):,} rows")
+    logger.info(f"Real data loaded successfully: {len(df):, } rows")
     return df
 
 
@@ -313,7 +338,7 @@ def _create_target_column(df: pd.DataFrame) -> pd.Series:
     This is a simplified example - should be replaced with actual trading logic
     """
     # Simple target: 1 if next price is higher, 0 otherwise
-    future_returns = df["Close"].shift(-1) / df["Close"] - 1
+    future_returns = df["Close"].shift( - 1) / df["Close"] - 1
 
     # Target based on future return threshold
     threshold = 0.0001  # 0.01% price movement
@@ -324,29 +349,28 @@ def _create_target_column(df: pd.DataFrame) -> pd.Series:
 
 if __name__ == "__main__":
     # Test the real data loader
-    import logging
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level = logging.INFO)
 
     try:
         loader = RealDataLoader()
 
         # Get data info
         info = loader.get_data_info()
-        print("\n=== Data Information ===")
+        print("\n =  = = Data Information = =  = ")
         for key, value in info.items():
             print(f"{key}: {value}")
 
         # Load sample data (first 10000 rows for testing)
-        print("\n=== Loading Sample Data ===")
-        df = load_real_data(limit_rows=10000)
+        print("\n =  = = Loading Sample Data = =  = ")
+        df = load_real_data(limit_rows = 10000)
 
         print(f"\nData shape: {df.shape}")
         print(f"Columns: {list(df.columns)}")
         print(f"Date range: {df['datetime'].min()} to {df['datetime'].max()}")
         print(f"Target distribution: {df['target'].value_counts().to_dict()}")
 
-        print("\n=== First 5 rows ===")
+        print("\n =  = = First 5 rows = =  = ")
         print(df.head())
 
     except Exception as e:

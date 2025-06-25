@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
+        from basic_auc_fix import create_optimized_model, emergency_model_creation
+        from src.data_loader.csv_loader import safe_load_csv_auto
+        from src.evidently_compat import DataDrift, ValueDrift, get_drift_detector
+        from src.pydantic_v2_compat import BaseModel, BaseSettings, Field, SecretField
+import logging
+        import ProjectP
+import sys
 """
 Final Production Readiness Check
-===============================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 ตรวจสอบความพร้อมสำหรับ Production ครั้งสุดท้าย
 """
 
-import logging
-import sys
 
 # Setup logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -21,12 +26,11 @@ def test_all_compatibility_layers():
     # Test 1: Pydantic v2 compatibility (SecretField, Field, BaseModel, BaseSettings)
     logger.info("🔍 Testing Pydantic v2 compatibility...")
     try:
-        from src.pydantic_v2_compat import BaseModel, BaseSettings, Field, SecretField
 
         # Test BaseModel
         class TestModel(BaseModel):
-            secret: str = SecretField(default="test")
-            normal: str = Field(default="normal")
+            secret: str = SecretField(default = "test")
+            normal: str = Field(default = "normal")
 
         model = TestModel()
 
@@ -47,7 +51,6 @@ def test_all_compatibility_layers():
     # Test 2: Evidently compatibility
     logger.info("🔍 Testing Evidently compatibility...")
     try:
-        from src.evidently_compat import DataDrift, ValueDrift, get_drift_detector
 
         detector = get_drift_detector()
         results["evidently"] = True
@@ -60,7 +63,6 @@ def test_all_compatibility_layers():
     # Test 3: Basic AUC fix
     logger.info("🔍 Testing basic_auc_fix...")
     try:
-        from basic_auc_fix import create_optimized_model, emergency_model_creation
 
         if callable(create_optimized_model) and callable(emergency_model_creation):
             results["basic_auc_fix"] = True
@@ -76,7 +78,6 @@ def test_all_compatibility_layers():
     # Test 4: CSV loader (no circular imports)
     logger.info("🔍 Testing CSV loader...")
     try:
-        from src.data_loader.csv_loader import safe_load_csv_auto
 
         results["csv_loader"] = True
         logger.info("✅ CSV loader - WORKING")
@@ -88,7 +89,6 @@ def test_all_compatibility_layers():
     # Test 5: ProjectP main components
     logger.info("🔍 Testing ProjectP...")
     try:
-        import ProjectP
 
         has_main = hasattr(ProjectP, "main")
         has_pipeline = hasattr(ProjectP, "run_full_pipeline")
@@ -111,15 +111,15 @@ def main():
     """Main production readiness check"""
 
     logger.info("🚀 FINAL PRODUCTION READINESS CHECK")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     # Run all compatibility tests
     results = test_all_compatibility_layers()
 
     # Generate final report
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
     logger.info("📊 PRODUCTION READINESS REPORT")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     all_ready = True
     for component, status in results.items():
@@ -128,16 +128,16 @@ def main():
         if not status:
             all_ready = False
 
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     if all_ready:
         logger.info("🎉 PRODUCTION READY!")
         logger.info("✅ ALL SYSTEMS OPERATIONAL")
         logger.info("🚀 READY TO DEPLOY")
 
-        print("\n" + "=" * 60)
+        print("\n" + " = " * 60)
         print("🎉 SUCCESS: ระบบพร้อมสำหรับ Production แล้ว!")
-        print("=" * 60)
+        print(" = " * 60)
         print("📋 ส่วนประกอบที่พร้อมใช้งาน:")
         print("   ✅ Pydantic v2 (SecretField, BaseModel, BaseSettings)")
         print("   ✅ Evidently drift detection")
@@ -146,15 +146,15 @@ def main():
         print("   ✅ ProjectP main pipeline")
         print("")
         print("🚀 คำสั่งเรียกใช้:")
-        print("   python ProjectP.py --run_full_pipeline")
+        print("   python ProjectP.py - - run_full_pipeline")
         print("")
         print("📈 Features ที่พร้อมใช้:")
         print("   • ML pipeline with AUC optimization")
         print("   • Data drift detection")
         print("   • Automated feature engineering")
         print("   • Model training and evaluation")
-        print("   • Production-ready error handling")
-        print("=" * 60)
+        print("   • Production - ready error handling")
+        print(" = " * 60)
 
         return True
     else:

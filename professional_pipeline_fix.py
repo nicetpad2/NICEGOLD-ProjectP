@@ -1,17 +1,27 @@
+                    from evidently.metrics import ValueDrift
+from pathlib import Path
+    from pydantic import SecretField, Field, BaseModel
+                from sklearn.feature_selection import mutual_info_regression
+                    from sklearn.metrics import mutual_info_regression
+                        from src.evidently_compat import ValueDrift
+        from src.pydantic_fix import SecretField, Field, BaseModel
+                    from src.pydantic_v2_compat import BaseModel, Field, SecretField
+            import builtins
+                import evidently
+import logging
+            import pydantic
+import sys
+import warnings
 """
 Professional Pipeline Import Fix
-===============================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 Comprehensive fix for all pipeline import issues including Pydantic v2 compatibility
 """
 
-import logging
-import sys
-import warnings
-from pathlib import Path
 
 # Configure professional logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level = logging.INFO, format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -51,7 +61,6 @@ class PipelineImportFixer:
             logger.info("🔧 Fixing Pydantic v2 compatibility...")
 
             # Test current Pydantic
-            import pydantic
 
             version = pydantic.__version__
             logger.info(f"📦 Pydantic version: {version}")
@@ -59,12 +68,11 @@ class PipelineImportFixer:
             if version.startswith("2."):
                 # Import our professional compatibility layer
                 try:
-                    from src.pydantic_v2_compat import BaseModel, Field, SecretField
 
                     logger.info("✅ Professional Pydantic v2 compatibility loaded")
 
                     # Verify it works
-                    test_field = SecretField(default="test")
+                    test_field = SecretField(default = "test")
                     logger.info("✅ SecretField compatibility verified")
 
                     return True
@@ -87,14 +95,13 @@ class PipelineImportFixer:
     def _create_emergency_pydantic_fix(self):
         """Create emergency Pydantic fix if compatibility layer fails"""
         try:
-            import builtins
 
             # Create minimal compatible objects
-            def SecretField(default=None, **kwargs):
-                kwargs.pop("secret", None)  # Remove v1-specific args
+            def SecretField(default = None, **kwargs):
+                kwargs.pop("secret", None)  # Remove v1 - specific args
                 return default
 
-            def Field(default=None, **kwargs):
+            def Field(default = None, **kwargs):
                 return default
 
             class MinimalBaseModel:
@@ -114,7 +121,6 @@ class PipelineImportFixer:
 
             # Monkey patch pydantic if it exists
             try:
-                import pydantic
 
                 if not hasattr(pydantic, "SecretField"):
                     pydantic.SecretField = SecretField
@@ -135,14 +141,12 @@ class PipelineImportFixer:
 
             # Test Evidently
             try:
-                import evidently
 
                 version = getattr(evidently, "__version__", "unknown")
                 logger.info(f"📦 Evidently version: {version}")
 
                 # Test ValueDrift import
                 try:
-                    from evidently.metrics import ValueDrift
 
                     logger.info("✅ Evidently ValueDrift available")
                     return True
@@ -164,17 +168,16 @@ class PipelineImportFixer:
         try:
 
             class FallbackValueDrift:
-                def __init__(self, column_name="target", **kwargs):
+                def __init__(self, column_name = "target", **kwargs):
                     self.column_name = column_name
 
                 def calculate(self, reference_data, current_data):
                     return {
-                        "drift_score": 0.05,
-                        "drift_detected": False,
-                        "method": "fallback",
+                        "drift_score": 0.05, 
+                        "drift_detected": False, 
+                        "method": "fallback", 
                     }
 
-            import builtins
 
             builtins.ValueDrift = FallbackValueDrift
             builtins.DataDrift = FallbackValueDrift
@@ -193,12 +196,10 @@ class PipelineImportFixer:
 
             # Fix sklearn imports
             try:
-                from sklearn.feature_selection import mutual_info_regression
 
                 logger.info("✅ sklearn mutual_info_regression available")
             except ImportError:
                 try:
-                    from sklearn.metrics import mutual_info_regression
 
                     logger.info("✅ sklearn mutual_info_regression from metrics")
                 except ImportError:
@@ -228,9 +229,9 @@ class PipelineImportFixer:
 
             # Test key imports
             test_imports = [
-                ("pydantic", "SecretField"),
-                ("evidently_compat", "ValueDrift"),
-                ("sklearn.feature_selection", "mutual_info_regression"),
+                ("pydantic", "SecretField"), 
+                ("evidently_compat", "ValueDrift"), 
+                ("sklearn.feature_selection", "mutual_info_regression"), 
             ]
 
             success_count = 0
@@ -238,21 +239,17 @@ class PipelineImportFixer:
                 try:
                     if module == "pydantic":
                         try:
-    from pydantic import SecretField, Field, BaseModel
 except ImportError:
     try:
-        from src.pydantic_fix import SecretField, Field, BaseModel
     except ImportError:
         # Fallback
-        def SecretField(default=None, **kwargs): return default
-        def Field(default=None, **kwargs): return default
+        def SecretField(default = None, **kwargs): return default
+        def Field(default = None, **kwargs): return default
         class BaseModel: pass
 
-                        SecretField(default="test")  # Test it works
+                        SecretField(default = "test")  # Test it works
                     elif module == "evidently_compat":
-                        from src.evidently_compat import ValueDrift
                     elif module == "sklearn.feature_selection":
-                        from sklearn.feature_selection import mutual_info_regression
 
                     logger.info(f"✅ {module}.{item} - OK")
                     success_count += 1
@@ -271,9 +268,9 @@ except ImportError:
 
     def _report_results(self):
         """Report fix results"""
-        logger.info("\n" + "=" * 60)
+        logger.info("\n" + " = " * 60)
         logger.info("🎯 PIPELINE IMPORT FIX RESULTS")
-        logger.info("=" * 60)
+        logger.info(" = " * 60)
 
         if self.fixes_applied:
             logger.info("✅ Fixes Applied:")
@@ -285,7 +282,7 @@ except ImportError:
             for error in self.errors_found:
                 logger.warning(f"   • {error}")
 
-        logger.info("=" * 60)
+        logger.info(" = " * 60)
 
 
 def main():

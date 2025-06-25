@@ -1,34 +1,33 @@
-# 🛡️ Advanced ML Protection System
-# Anti-Noise, Anti-Leak, Anti-Overfitting Framework
-# For Enterprise Trading ML Systems
 
-import logging
-import warnings
+
+# Anti - Noise, Anti - Leak, Anti - Overfitting Framework
+# For Enterprise Trading ML Systems
+# Import required modules
+# 🔧 FALLBACK FIX: sklearn mutual_info_regression compatibility
+# 🛡️ Advanced ML Protection System
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-import joblib
-
-# Import required modules
-import numpy as np
-import pandas as pd
-import yaml
 from sklearn.ensemble import IsolationForest
+    from sklearn.feature_selection import mutual_info_regression
 from sklearn.feature_selection import RFE, SelectFromModel
+        from sklearn.metrics import mutual_info_regression
 from sklearn.model_selection import TimeSeriesSplit, cross_val_score
 from sklearn.preprocessing import RobustScaler, StandardScaler
-
-# 🔧 FALLBACK FIX: sklearn mutual_info_regression compatibility
+    from tracking import EnterpriseTracker
+from typing import Any, Dict, List, Optional, Tuple, Union
+import joblib
+import logging
+import numpy as np
+import pandas as pd
+import warnings
+import yaml
 try:
-    from sklearn.feature_selection import mutual_info_regression
 
     print("✅ Using sklearn.feature_selection.mutual_info_regression")
 except ImportError:
     try:
-        from sklearn.metrics import mutual_info_regression
 
         print("✅ Using sklearn.metrics.mutual_info_regression")
     except ImportError:
@@ -38,7 +37,7 @@ except ImportError:
 
         def mutual_info_regression(X, y, **kwargs):
             """Fallback implementation for mutual_info_regression"""
-            # Simple correlation-based fallback
+            # Simple correlation - based fallback
             if hasattr(X, "shape") and len(X.shape) == 2:
                 n_features = X.shape[1]
             else:
@@ -50,7 +49,6 @@ except ImportError:
 
 # Import tracking system
 try:
-    from tracking import EnterpriseTracker
 
     TRACKING_AVAILABLE = True
 except ImportError:
@@ -133,7 +131,7 @@ class OverfittingConfig:
     enable_permutation_importance: bool = True
     importance_stability_check: bool = True
     ensemble_methods: List[str] = field(
-        default_factory=lambda: ["bagging", "boosting", "stacking"]
+        default_factory = lambda: ["bagging", "boosting", "stacking"]
     )
     ensemble_diversity_threshold: float = 0.1
     max_depth: int = 10
@@ -145,7 +143,7 @@ class OverfittingConfig:
     enable_early_stopping: bool = True
     validation_fraction: float = 0.1
     n_iter_no_change: int = 5
-    tol: float = 1e-4
+    tol: float = 1e - 4
     l1_ratio: float = 0.5
     enable_nested_cv: bool = True
     early_stopping_min_delta: float = 0.001
@@ -153,7 +151,7 @@ class OverfittingConfig:
     enable_permutation_importance: bool = True
     importance_stability_check: bool = True
     ensemble_methods: List[str] = field(
-        default_factory=lambda: ["bagging", "boosting", "stacking"]
+        default_factory = lambda: ["bagging", "boosting", "stacking"]
     )
     ensemble_diversity_threshold: float = 0.1
     max_depth: int = 10
@@ -167,10 +165,10 @@ class ProtectionResult:
     noise_score: float
     leakage_score: float
     overfitting_score: float
-    issues_found: List[str] = field(default_factory=list)
-    recommendations: List[str] = field(default_factory=list)
+    issues_found: List[str] = field(default_factory = list)
+    recommendations: List[str] = field(default_factory = list)
     cleaned_data: Optional[pd.DataFrame] = None
-    feature_report: Dict[str, Any] = field(default_factory=dict)
+    feature_report: Dict[str, Any] = field(default_factory = dict)
 
 
 class NoiseDetector:
@@ -179,7 +177,7 @@ class NoiseDetector:
     def __init__(self, config: NoiseConfig):
         self.config = config
         self.outlier_detector = IsolationForest(
-            contamination=config.contamination_rate, random_state=42
+            contamination = config.contamination_rate, random_state = 42
         )
         self.scaler = RobustScaler()
         self.noise_history = []
@@ -187,22 +185,22 @@ class NoiseDetector:
     def detect_statistical_noise(self, data: pd.DataFrame) -> Dict[str, Any]:
         """Detect statistical noise in data"""
         noise_report = {
-            "outliers": {},
-            "volatility_spikes": {},
-            "missing_patterns": {},
-            "distribution_anomalies": {},
+            "outliers": {}, 
+            "volatility_spikes": {}, 
+            "missing_patterns": {}, 
+            "distribution_anomalies": {}, 
         }
 
-        for column in data.select_dtypes(include=[np.number]).columns:
+        for column in data.select_dtypes(include = [np.number]).columns:
             series = data[column].dropna()
 
             # Outlier detection
             z_scores = np.abs((series - series.mean()) / series.std())
             outliers = z_scores > self.config.volatility_threshold
             noise_report["outliers"][column] = {
-                "count": outliers.sum(),
-                "percentage": (outliers.sum() / len(series)) * 100,
-                "indices": series[outliers].index.tolist(),
+                "count": outliers.sum(), 
+                "percentage": (outliers.sum() / len(series)) * 100, 
+                "indices": series[outliers].index.tolist(), 
             }
 
             # Volatility spikes
@@ -210,9 +208,9 @@ class NoiseDetector:
                 rolling_std = series.rolling(self.config.rolling_window_size).std()
                 volatility_spikes = rolling_std > rolling_std.quantile(0.95)
                 noise_report["volatility_spikes"][column] = {
-                    "count": volatility_spikes.sum(),
-                    "max_volatility": rolling_std.max(),
-                    "avg_volatility": rolling_std.mean(),
+                    "count": volatility_spikes.sum(), 
+                    "max_volatility": rolling_std.max(), 
+                    "avg_volatility": rolling_std.mean(), 
                 }
 
             # Missing value patterns
@@ -230,10 +228,10 @@ class NoiseDetector:
                         current_run = 0
 
                 noise_report["missing_patterns"][column] = {
-                    "total_missing": missing_mask.sum(),
-                    "missing_percentage": (missing_mask.sum() / len(data)) * 100,
-                    "longest_missing_run": max(missing_runs) if missing_runs else 0,
-                    "missing_runs": len(missing_runs),
+                    "total_missing": missing_mask.sum(), 
+                    "missing_percentage": (missing_mask.sum() / len(data)) * 100, 
+                    "longest_missing_run": max(missing_runs) if missing_runs else 0, 
+                    "missing_runs": len(missing_runs), 
                 }
 
         return noise_report
@@ -242,12 +240,12 @@ class NoiseDetector:
         """Detect noise in features relative to target"""
         feature_noise = {}
 
-        for column in X.select_dtypes(include=[np.number]).columns:
+        for column in X.select_dtypes(include = [np.number]).columns:
             feature = X[column].dropna()
 
             # Mutual information with target
             mi_score = mutual_info_regression(
-                feature.values.reshape(-1, 1), y[feature.index]
+                feature.values.reshape( - 1, 1), y[feature.index]
             )[0]
 
             # Feature stability over time
@@ -263,9 +261,9 @@ class NoiseDetector:
                 correlation_stability = 0
 
             feature_noise[column] = {
-                "mutual_info_score": mi_score,
-                "correlation_stability": correlation_stability,
-                "is_noisy": mi_score < 0.01 or correlation_stability > 0.5,
+                "mutual_info_score": mi_score, 
+                "correlation_stability": correlation_stability, 
+                "is_noisy": mi_score < 0.01 or correlation_stability > 0.5, 
             }
 
         return feature_noise
@@ -274,14 +272,14 @@ class NoiseDetector:
         """Clean data by removing noise"""
         cleaned_data = data.copy()
         cleaning_report = {
-            "rows_removed": 0,
-            "columns_modified": [],
-            "outliers_handled": {},
-            "missing_values_filled": {},
+            "rows_removed": 0, 
+            "columns_modified": [], 
+            "outliers_handled": {}, 
+            "missing_values_filled": {}, 
         }
 
         # Remove extreme outliers using Isolation Forest
-        numeric_columns = cleaned_data.select_dtypes(include=[np.number]).columns
+        numeric_columns = cleaned_data.select_dtypes(include = [np.number]).columns
         if len(numeric_columns) > 0:
             outlier_mask = (
                 self.outlier_detector.fit_predict(
@@ -301,13 +299,13 @@ class NoiseDetector:
                 if cleaned_data[column].dtype in ["int64", "float64"]:
                     # Use median for numeric columns
                     cleaned_data[column].fillna(
-                        cleaned_data[column].median(), inplace=True
+                        cleaned_data[column].median(), inplace = True
                     )
                 else:
                     # Use mode for categorical columns
                     mode_value = cleaned_data[column].mode()
                     if len(mode_value) > 0:
-                        cleaned_data[column].fillna(mode_value[0], inplace=True)
+                        cleaned_data[column].fillna(mode_value[0], inplace = True)
 
                 cleaning_report["missing_values_filled"][column] = missing_count
                 cleaning_report["columns_modified"].append(column)
@@ -324,17 +322,17 @@ class LeakageDetector:
         self.leakage_history = []
 
     def detect_temporal_leakage(
-        self,
-        data: pd.DataFrame,
-        timestamp_col: str = "timestamp",
-        target_col: str = "target",
+        self, 
+        data: pd.DataFrame, 
+        timestamp_col: str = "timestamp", 
+        target_col: str = "target", 
     ) -> Dict[str, Any]:
         """Detect temporal data leakage"""
         leakage_report = {
-            "future_data_leakage": False,
-            "temporal_gaps": {},
-            "feature_timing_issues": {},
-            "target_shift_problems": {},
+            "future_data_leakage": False, 
+            "temporal_gaps": {}, 
+            "feature_timing_issues": {}, 
+            "target_shift_problems": {}, 
         }
 
         if timestamp_col not in data.columns:
@@ -360,17 +358,17 @@ class LeakageDetector:
             feature_availability = data[column].notna()
             if self.config.enable_feature_timing_check:
                 # Features should not be available before they logically could be
-                # This is domain-specific, but we can check for suspicious patterns
+                # This is domain - specific, but we can check for suspicious patterns
 
                 # Check for features that are perfectly correlated with future target
                 if target_col in data.columns:
-                    shifted_target = data[target_col].shift(-1)  # Future target
+                    shifted_target = data[target_col].shift( - 1)  # Future target
                     if len(shifted_target.dropna()) > 10:
                         correlation = data[column].corr(shifted_target)
                         if abs(correlation) > self.config.target_leakage_threshold:
                             leakage_report["feature_timing_issues"][column] = {
-                                "future_target_correlation": correlation,
-                                "risk_level": "HIGH",
+                                "future_target_correlation": correlation, 
+                                "risk_level": "HIGH", 
                             }
 
         return leakage_report
@@ -378,18 +376,18 @@ class LeakageDetector:
     def detect_feature_leakage(self, X: pd.DataFrame, y: pd.Series) -> Dict[str, Any]:
         """Detect feature leakage through statistical analysis"""
         leakage_report = {
-            "suspicious_features": {},
-            "perfect_correlations": {},
-            "target_encodings": {},
+            "suspicious_features": {}, 
+            "perfect_correlations": {}, 
+            "target_encodings": {}, 
         }
 
-        for column in X.select_dtypes(include=[np.number]).columns:
-            # Check for perfect or near-perfect correlation with target
+        for column in X.select_dtypes(include = [np.number]).columns:
+            # Check for perfect or near - perfect correlation with target
             correlation = X[column].corr(y)
             if abs(correlation) > self.config.target_leakage_threshold:
                 leakage_report["perfect_correlations"][column] = {
-                    "correlation": correlation,
-                    "risk_level": "HIGH" if abs(correlation) > 0.95 else "MEDIUM",
+                    "correlation": correlation, 
+                    "risk_level": "HIGH" if abs(correlation) > 0.95 else "MEDIUM", 
                 }
 
             # Check for target encoding leakage
@@ -404,8 +402,8 @@ class LeakageDetector:
                 and abs(feature_mean - target_mean) < 0.01
             ):
                 leakage_report["target_encodings"][column] = {
-                    "statistical_similarity": True,
-                    "risk_level": "MEDIUM",
+                    "statistical_similarity": True, 
+                    "risk_level": "MEDIUM", 
                 }
 
         return leakage_report
@@ -415,10 +413,10 @@ class LeakageDetector:
     ) -> Dict[str, Any]:
         """Validate proper time series splitting"""
         validation_report = {
-            "is_valid_split": True,
-            "chronological_order": True,
-            "temporal_gaps": [],
-            "recommendations": [],
+            "is_valid_split": True, 
+            "chronological_order": True, 
+            "temporal_gaps": [], 
+            "recommendations": [], 
         }
 
         if timestamp_col not in data.columns:
@@ -445,14 +443,14 @@ class LeakageDetector:
         if large_gaps.any():
             validation_report["temporal_gaps"] = [
                 {
-                    "index": idx,
-                    "gap_size": str(time_diffs.iloc[idx]),
-                    "expected_size": str(median_diff),
+                    "index": idx, 
+                    "gap_size": str(time_diffs.iloc[idx]), 
+                    "expected_size": str(median_diff), 
                 }
                 for idx in np.where(large_gaps)[0]
             ]
             validation_report["recommendations"].append(
-                "Large temporal gaps detected. Consider gap-aware cross-validation."
+                "Large temporal gaps detected. Consider gap - aware cross - validation."
             )
 
         return validation_report
@@ -471,22 +469,22 @@ class OverfittingDetector:
     ) -> Dict[str, Any]:
         """Detect overfitting risk factors"""
         risk_report = {
-            "risk_level": "LOW",
-            "risk_factors": {},
-            "feature_analysis": {},
-            "data_complexity": {},
-            "recommendations": [],
+            "risk_level": "LOW", 
+            "risk_factors": {}, 
+            "feature_analysis": {}, 
+            "data_complexity": {}, 
+            "recommendations": [], 
         }
 
         n_samples, n_features = X.shape
 
-        # Check sample-to-feature ratio
+        # Check sample - to - feature ratio
         samples_per_feature = n_samples / n_features
         if samples_per_feature < self.config.min_samples_per_feature:
             risk_report["risk_factors"]["low_sample_ratio"] = {
-                "current_ratio": samples_per_feature,
-                "recommended_min": self.config.min_samples_per_feature,
-                "severity": "HIGH",
+                "current_ratio": samples_per_feature, 
+                "recommended_min": self.config.min_samples_per_feature, 
+                "severity": "HIGH", 
             }
             risk_report["risk_level"] = "HIGH"
             risk_report["recommendations"].append(
@@ -494,7 +492,7 @@ class OverfittingDetector:
             )
 
         # Check feature correlation (multicollinearity)
-        numeric_features = X.select_dtypes(include=[np.number])
+        numeric_features = X.select_dtypes(include = [np.number])
         if len(numeric_features.columns) > 1:
             correlation_matrix = numeric_features.corr().abs()
             # Find highly correlated feature pairs
@@ -504,16 +502,16 @@ class OverfittingDetector:
                     if correlation_matrix.iloc[i, j] > 0.9:
                         high_corr_pairs.append(
                             {
-                                "feature1": correlation_matrix.columns[i],
-                                "feature2": correlation_matrix.columns[j],
-                                "correlation": correlation_matrix.iloc[i, j],
+                                "feature1": correlation_matrix.columns[i], 
+                                "feature2": correlation_matrix.columns[j], 
+                                "correlation": correlation_matrix.iloc[i, j], 
                             }
                         )
 
             if high_corr_pairs:
                 risk_report["risk_factors"]["multicollinearity"] = {
-                    "high_correlation_pairs": high_corr_pairs,
-                    "severity": "MEDIUM",
+                    "high_correlation_pairs": high_corr_pairs, 
+                    "severity": "MEDIUM", 
                 }
                 risk_report["recommendations"].append(
                     "Remove highly correlated features to reduce overfitting risk"
@@ -526,8 +524,8 @@ class OverfittingDetector:
 
         if target_entropy < 0.5:
             risk_report["risk_factors"]["low_target_variance"] = {
-                "entropy": target_entropy,
-                "severity": "MEDIUM",
+                "entropy": target_entropy, 
+                "severity": "MEDIUM", 
             }
             risk_report["recommendations"].append(
                 "Low target variance detected. Consider data augmentation or resampling."
@@ -538,20 +536,20 @@ class OverfittingDetector:
     def validate_with_time_series_cv(
         self, X: pd.DataFrame, y: pd.Series, model: Any, timestamp_col: str = None
     ) -> Dict[str, Any]:
-        """Validate model using proper time series cross-validation"""
+        """Validate model using proper time series cross - validation"""
         validation_report = {
-            "cv_scores": [],
-            "mean_score": 0.0,
-            "std_score": 0.0,
-            "overfitting_detected": False,
-            "score_variance": 0.0,
+            "cv_scores": [], 
+            "mean_score": 0.0, 
+            "std_score": 0.0, 
+            "overfitting_detected": False, 
+            "score_variance": 0.0, 
         }
 
         # Use TimeSeriesSplit for proper validation
-        tscv = TimeSeriesSplit(n_splits=self.config.cross_validation_folds)
+        tscv = TimeSeriesSplit(n_splits = self.config.cross_validation_folds)
 
         try:
-            scores = cross_val_score(model, X, y, cv=tscv, scoring="r2")
+            scores = cross_val_score(model, X, y, cv = tscv, scoring = "r2")
             validation_report["cv_scores"] = scores.tolist()
             validation_report["mean_score"] = scores.mean()
             validation_report["std_score"] = scores.std()
@@ -561,26 +559,26 @@ class OverfittingDetector:
             if scores.std() > self.config.validation_score_threshold:
                 validation_report["overfitting_detected"] = True
                 validation_report["overfitting_reason"] = (
-                    "High variance in cross-validation scores"
+                    "High variance in cross - validation scores"
                 )
 
             # Check for negative scores (very bad sign)
             if any(score < 0 for score in scores):
                 validation_report["overfitting_detected"] = True
                 validation_report["overfitting_reason"] = (
-                    "Negative cross-validation scores detected"
+                    "Negative cross - validation scores detected"
                 )
 
         except Exception as e:
             validation_report["error"] = str(e)
             validation_report["overfitting_detected"] = True
-            validation_report["overfitting_reason"] = "Cross-validation failed"
+            validation_report["overfitting_reason"] = "Cross - validation failed"
 
         return validation_report
 
     def _calculate_entropy(self, series: pd.Series) -> float:
         """Calculate entropy of a series"""
-        value_counts = series.value_counts(normalize=True)
+        value_counts = series.value_counts(normalize = True)
         entropy = -sum(p * np.log2(p) for p in value_counts if p > 0)
         return entropy
 
@@ -589,16 +587,16 @@ class OverfittingDetector:
     ) -> Dict[str, Any]:
         """Validate feature selection to prevent overfitting"""
         selection_report = {
-            "selected_features": [],
-            "feature_importance": {},
-            "selection_method": "recursive_feature_elimination",
-            "features_removed": [],
+            "selected_features": [], 
+            "feature_importance": {}, 
+            "selection_method": "recursive_feature_elimination", 
+            "features_removed": [], 
         }
 
         # Use Recursive Feature Elimination
         max_features = max(1, int(len(X.columns) * self.config.max_features_ratio))
 
-        rfe = RFE(estimator=model, n_features_to_select=max_features, step=1)
+        rfe = RFE(estimator = model, n_features_to_select = max_features, step = 1)
         rfe.fit(X, y)
 
         selected_features = X.columns[rfe.support_].tolist()
@@ -617,9 +615,9 @@ class MLProtectionSystem:
     """Main protection system coordinating all components"""
 
     def __init__(
-        self,
-        protection_level: ProtectionLevel = ProtectionLevel.STANDARD,
-        config_path: Optional[str] = None,
+        self, 
+        protection_level: ProtectionLevel = ProtectionLevel.STANDARD, 
+        config_path: Optional[str] = None, 
     ):
         self.protection_level = protection_level
         self.config = self._load_config(config_path)
@@ -640,7 +638,7 @@ class MLProtectionSystem:
     def _load_config(self, config_path: Optional[str]) -> Dict[str, Any]:
         """Load configuration based on protection level"""
         if config_path and Path(config_path).exists():
-            with open(config_path, "r", encoding="utf-8") as f:
+            with open(config_path, "r", encoding = "utf - 8") as f:
                 loaded_config = yaml.safe_load(f)
                 # Convert dictionaries to config objects if needed
                 return self._convert_dict_to_config_objects(loaded_config)
@@ -648,44 +646,44 @@ class MLProtectionSystem:
         # Default configurations based on protection level
         configs = {
             ProtectionLevel.BASIC: {
-                "noise": NoiseConfig(contamination_rate=0.05),
-                "leakage": LeakageConfig(temporal_gap_hours=12),
-                "overfitting": OverfittingConfig(max_features_ratio=0.5),
-            },
+                "noise": NoiseConfig(contamination_rate = 0.05), 
+                "leakage": LeakageConfig(temporal_gap_hours = 12), 
+                "overfitting": OverfittingConfig(max_features_ratio = 0.5), 
+            }, 
             ProtectionLevel.STANDARD: {
-                "noise": NoiseConfig(),
-                "leakage": LeakageConfig(),
-                "overfitting": OverfittingConfig(),
-            },
+                "noise": NoiseConfig(), 
+                "leakage": LeakageConfig(), 
+                "overfitting": OverfittingConfig(), 
+            }, 
             ProtectionLevel.AGGRESSIVE: {
-                "noise": NoiseConfig(contamination_rate=0.15, volatility_threshold=2.0),
+                "noise": NoiseConfig(contamination_rate = 0.15, volatility_threshold = 2.0), 
                 "leakage": LeakageConfig(
-                    temporal_gap_hours=48, target_leakage_threshold=0.6
-                ),
+                    temporal_gap_hours = 48, target_leakage_threshold = 0.6
+                ), 
                 "overfitting": OverfittingConfig(
-                    max_features_ratio=0.2, min_samples_per_feature=20
-                ),
-            },
+                    max_features_ratio = 0.2, min_samples_per_feature = 20
+                ), 
+            }, 
             ProtectionLevel.ENTERPRISE: {
                 "noise": NoiseConfig(
-                    contamination_rate=0.2,
-                    volatility_threshold=1.5,
-                    enable_adaptive_filtering=True,
-                    feature_noise_detection=True,
-                ),
+                    contamination_rate = 0.2, 
+                    volatility_threshold = 1.5, 
+                    enable_adaptive_filtering = True, 
+                    feature_noise_detection = True, 
+                ), 
                 "leakage": LeakageConfig(
-                    temporal_gap_hours=72,
-                    strict_time_validation=True,
-                    target_leakage_threshold=0.5,
-                    enable_feature_timing_check=True,
-                ),
+                    temporal_gap_hours = 72, 
+                    strict_time_validation = True, 
+                    target_leakage_threshold = 0.5, 
+                    enable_feature_timing_check = True, 
+                ), 
                 "overfitting": OverfittingConfig(
-                    max_features_ratio=0.15,
-                    min_samples_per_feature=30,
-                    cross_validation_folds=10,
-                    enable_ensemble_validation=True,
-                ),
-            },
+                    max_features_ratio = 0.15, 
+                    min_samples_per_feature = 30, 
+                    cross_validation_folds = 10, 
+                    enable_ensemble_validation = True, 
+                ), 
+            }, 
         }
 
         return configs[self.protection_level]
@@ -741,11 +739,11 @@ class MLProtectionSystem:
         return logger
 
     def protect_dataset(
-        self,
-        data: pd.DataFrame,
-        target_col: str = "target",
-        timestamp_col: str = "timestamp",
-        model: Any = None,
+        self, 
+        data: pd.DataFrame, 
+        target_col: str = "target", 
+        timestamp_col: str = "timestamp", 
+        model: Any = None, 
     ) -> ProtectionResult:
         """Main method to protect dataset from all issues"""
 
@@ -762,11 +760,11 @@ class MLProtectionSystem:
 
         try:
             result = ProtectionResult(
-                is_clean=True, noise_score=0.0, leakage_score=0.0, overfitting_score=0.0
+                is_clean = True, noise_score = 0.0, leakage_score = 0.0, overfitting_score = 0.0
             )
 
             # Prepare data
-            X = data.drop([target_col], axis=1) if target_col in data.columns else data
+            X = data.drop([target_col], axis = 1) if target_col in data.columns else data
             y = data[target_col] if target_col in data.columns else None
 
             # 1. Noise Detection and Cleaning
@@ -795,8 +793,8 @@ class MLProtectionSystem:
                 if tracking_run:
                     self.tracker.log_metrics(
                         {
-                            "noise_score": result.noise_score,
-                            "rows_removed_by_cleaning": cleaning_report["rows_removed"],
+                            "noise_score": result.noise_score, 
+                            "rows_removed_by_cleaning": cleaning_report["rows_removed"], 
                         }
                     )
             else:
@@ -835,10 +833,10 @@ class MLProtectionSystem:
                 if tracking_run:
                     self.tracker.log_metrics(
                         {
-                            "leakage_score": result.leakage_score,
+                            "leakage_score": result.leakage_score, 
                             "leakage_issues_count": len(
                                 temporal_leakage.get("perfect_correlations", {})
-                            ),
+                            ), 
                         }
                     )
 
@@ -849,7 +847,7 @@ class MLProtectionSystem:
                     X, y, model
                 )
 
-                # Perform time series cross-validation
+                # Perform time series cross - validation
                 cv_results = self.overfitting_detector.validate_with_time_series_cv(
                     X, y, model, timestamp_col
                 )
@@ -876,20 +874,20 @@ class MLProtectionSystem:
                     if tracking_run:
                         self.tracker.log_metrics(
                             {
-                                "overfitting_score": result.overfitting_score,
-                                "cv_mean_score": cv_results.get("mean_score", 0),
-                                "cv_std_score": cv_results.get("std_score", 0),
-                                "risk_factors_count": risk_factors,
+                                "overfitting_score": result.overfitting_score, 
+                                "cv_mean_score": cv_results.get("mean_score", 0), 
+                                "cv_std_score": cv_results.get("std_score", 0), 
+                                "risk_factors_count": risk_factors, 
                             }
                         )
 
                 # Store detailed results
                 result.feature_report = {
-                    "noise_analysis": noise_report,
-                    "leakage_analysis": temporal_leakage,
-                    "overfitting_analysis": overfitting_risk,
-                    "cv_results": cv_results,
-                    "feature_selection": feature_selection,
+                    "noise_analysis": noise_report, 
+                    "leakage_analysis": temporal_leakage, 
+                    "overfitting_analysis": overfitting_risk, 
+                    "cv_results": cv_results, 
+                    "feature_selection": feature_selection, 
                 }
 
             # Generate final recommendations
@@ -916,9 +914,9 @@ class MLProtectionSystem:
                             - result.noise_score
                             - result.leakage_score
                             - result.overfitting_score
-                        ),
-                        "is_clean": int(result.is_clean),
-                        "issues_found_count": len(result.issues_found),
+                        ), 
+                        "is_clean": int(result.is_clean), 
+                        "issues_found_count": len(result.issues_found), 
                     }
                 )
 
@@ -930,17 +928,17 @@ class MLProtectionSystem:
                     yaml.dump(
                         {
                             "protection_result": {
-                                "is_clean": result.is_clean,
+                                "is_clean": result.is_clean, 
                                 "scores": {
-                                    "noise": result.noise_score,
-                                    "leakage": result.leakage_score,
-                                    "overfitting": result.overfitting_score,
-                                },
-                                "issues": result.issues_found,
-                                "recommendations": result.recommendations,
+                                    "noise": result.noise_score, 
+                                    "leakage": result.leakage_score, 
+                                    "overfitting": result.overfitting_score, 
+                                }, 
+                                "issues": result.issues_found, 
+                                "recommendations": result.recommendations, 
                             }
-                        },
-                        f,
+                        }, 
+                        f, 
                     )
 
                 self.tracker.log_artifact(report_path)
@@ -968,52 +966,52 @@ class MLProtectionSystem:
         <head>
             <title>ML Protection System Report</title>
             <style>
-                body { font-family: Arial, sans-serif; margin: 40px; }
-                .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }
-                .score { display: inline-block; margin: 10px; padding: 15px; border-radius: 5px; color: white; }
+                body { font - family: Arial, sans - serif; margin: 40px; }
+                .header { background: #2c3e50; color: white; padding: 20px; border - radius: 5px; }
+                .score { display: inline - block; margin: 10px; padding: 15px; border - radius: 5px; color: white; }
                 .score.good { background: #27ae60; }
                 .score.warning { background: #f39c12; }
                 .score.danger { background: #e74c3c; }
-                .section { margin: 20px 0; padding: 15px; border-left: 4px solid #3498db; }
-                .issue { background: #f8d7da; padding: 10px; margin: 5px 0; border-radius: 3px; }
-                .recommendation { background: #d1ecf1; padding: 10px; margin: 5px 0; border-radius: 3px; }
+                .section { margin: 20px 0; padding: 15px; border - left: 4px solid #3498db; }
+                .issue { background: #f8d7da; padding: 10px; margin: 5px 0; border - radius: 3px; }
+                .recommendation { background: #d1ecf1; padding: 10px; margin: 5px 0; border - radius: 3px; }
             </style>
         </head>
         <body>
-            <div class="header">
+            <div class = "header">
                 <h1>🛡️ ML Protection System Report</h1>
                 <p>Generated on: {timestamp}</p>
                 <p>Protection Level: {protection_level}</p>
                 <p>Overall Status: {"✅ CLEAN" if result.is_clean else "⚠️ ISSUES DETECTED"}</p>
             </div>
-            
-            <div class="section">
+
+            <div class = "section">
                 <h2>📊 Protection Scores</h2>
-                <div class="score {noise_class}">
+                <div class = "score {noise_class}">
                     <h3>Noise Score</h3>
                     <p>{noise_score:.3f}</p>
                 </div>
-                <div class="score {leakage_class}">
+                <div class = "score {leakage_class}">
                     <h3>Leakage Score</h3>
                     <p>{leakage_score:.3f}</p>
                 </div>
-                <div class="score {overfitting_class}">
+                <div class = "score {overfitting_class}">
                     <h3>Overfitting Score</h3>
                     <p>{overfitting_score:.3f}</p>
                 </div>
             </div>
-            
-            <div class="section">
+
+            <div class = "section">
                 <h2>⚠️ Issues Found</h2>
                 {issues_html}
             </div>
-            
-            <div class="section">
+
+            <div class = "section">
                 <h2>💡 Recommendations</h2>
                 {recommendations_html}
             </div>
-            
-            <div class="section">
+
+            <div class = "section">
                 <h2>📋 Detailed Analysis</h2>
                 <pre>{detailed_report}</pre>
             </div>
@@ -1032,36 +1030,36 @@ class MLProtectionSystem:
 
         # Generate HTML content
         issues_html = "".join(
-            [f'<div class="issue">❌ {issue}</div>' for issue in result.issues_found]
+            [f'<div class = "issue">❌ {issue}</div>' for issue in result.issues_found]
         )
         if not issues_html:
-            issues_html = '<div class="score good">No issues detected ✅</div>'
+            issues_html = '<div class = "score good">No issues detected ✅</div>'
 
         recommendations_html = "".join(
             [
-                f'<div class="recommendation">💡 {rec}</div>'
+                f'<div class = "recommendation">💡 {rec}</div>'
                 for rec in result.recommendations
             ]
         )
 
         # Generate report
         html_content = html_template.format(
-            timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            protection_level=self.protection_level.value.upper(),
-            result=result,
-            noise_score=result.noise_score,
-            leakage_score=result.leakage_score,
-            overfitting_score=result.overfitting_score,
-            noise_class=get_score_class(result.noise_score),
-            leakage_class=get_score_class(result.leakage_score),
-            overfitting_class=get_score_class(result.overfitting_score),
-            issues_html=issues_html,
-            recommendations_html=recommendations_html,
-            detailed_report=yaml.dump(result.feature_report, default_flow_style=False),
+            timestamp = datetime.now().strftime("%Y - %m - %d %H:%M:%S"), 
+            protection_level = self.protection_level.value.upper(), 
+            result = result, 
+            noise_score = result.noise_score, 
+            leakage_score = result.leakage_score, 
+            overfitting_score = result.overfitting_score, 
+            noise_class = get_score_class(result.noise_score), 
+            leakage_class = get_score_class(result.leakage_score), 
+            overfitting_class = get_score_class(result.overfitting_score), 
+            issues_html = issues_html, 
+            recommendations_html = recommendations_html, 
+            detailed_report = yaml.dump(result.feature_report, default_flow_style = False), 
         )
 
         # Save report
-        with open(output_path, "w", encoding="utf-8") as f:
+        with open(output_path, "w", encoding = "utf - 8") as f:
             f.write(html_content)
 
         self.logger.info(f"Protection report saved to: {output_path}")
@@ -1077,7 +1075,7 @@ if __name__ == "__main__":
     # data = pd.read_csv("your_trading_data.csv")
 
     # Protect dataset
-    # result = protection_system.protect_dataset(data, target_col='target', timestamp_col='timestamp')
+    # result = protection_system.protect_dataset(data, target_col = 'target', timestamp_col = 'timestamp')
 
     # Generate report
     # protection_system.generate_protection_report(result)

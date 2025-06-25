@@ -6,7 +6,7 @@ Simple test to verify data loading from datacsv without pandas dependency
 
 def test_data_loading():
     """Test data loading using basic Python"""
-    print("=== Testing Data Loading from datacsv ===")
+    print(" =  = = Testing Data Loading from datacsv = =  = ")
 
     try:
         import csv
@@ -67,8 +67,8 @@ def test_data_loading():
             m15_lines = sum(1 for line in f) - 1  # Subtract header
 
         print(f"✅ Total data rows:")
-        print(f"   M1: {m1_lines:,} rows")
-        print(f"   M15: {m15_lines:,} rows")
+        print(f"   M1: {m1_lines:, } rows")
+        print(f"   M15: {m15_lines:, } rows")
 
         print(f"✅ Data format validation:")
         print(f"   Expected columns: Date, Timestamp, Open, High, Low, Close, Volume")
@@ -90,13 +90,13 @@ def test_data_loading():
 
 def test_system_ready():
     """Final test - check if system is ready to use real data"""
-    print("\n=== System Readiness Check ===")
+    print("\n =  = = System Readiness Check = =  = ")
 
     checks = [
-        ("Config points to datacsv", "datacsv" in open("config.yaml").read()),
-        ("M1 data file exists", os.path.exists("datacsv/XAUUSD_M1.csv")),
-        ("M15 data file exists", os.path.exists("datacsv/XAUUSD_M15.csv")),
-        ("Real data loader exists", os.path.exists("src/real_data_loader.py")),
+        ("Config points to datacsv", "datacsv" in open("config.yaml").read()), 
+        ("M1 data file exists", os.path.exists("datacsv/XAUUSD_M1.csv")), 
+        ("M15 data file exists", os.path.exists("datacsv/XAUUSD_M15.csv")), 
+        ("Real data loader exists", os.path.exists("src/real_data_loader.py")), 
     ]
 
     all_passed = True
@@ -111,15 +111,14 @@ def test_system_ready():
 
 
 if __name__ == "__main__":
-    import os
 
     print("🔍 NICEGOLD Real Data Verification")
-    print("=" * 50)
+    print(" = " * 50)
 
     success1 = test_data_loading()
     success2 = test_system_ready()
 
-    print("\n" + "=" * 50)
+    print("\n" + " = " * 50)
     if success1 and success2:
         print("🎉 SUCCESS: System configured to use REAL DATA from datacsv!")
         print("📊 No dummy data, no row limits, full dataset ready!")

@@ -1,13 +1,12 @@
-import os
-import sys
-import pandas as pd
-import numpy as np
-import pytest
-
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, ROOT_DIR)
 
 from strategy import strategy as strategy_module
+import numpy as np
+import os
+import pandas as pd
+import pytest
+import sys
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, ROOT_DIR)
 
 
 def test_apply_strategy_empty_df(monkeypatch):
@@ -17,12 +16,12 @@ def test_apply_strategy_empty_df(monkeypatch):
     def fake_open(arg):
         assert arg is df
         called["open"] = True
-        return np.array([], dtype=np.int8)
+        return np.array([], dtype = np.int8)
 
     def fake_close(arg):
         assert arg is df
         called["close"] = True
-        return np.array([], dtype=np.int8)
+        return np.array([], dtype = np.int8)
 
     monkeypatch.setattr(strategy_module, "generate_open_signals", fake_open)
     monkeypatch.setattr(strategy_module, "generate_close_signals", fake_close)

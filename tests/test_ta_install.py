@@ -1,9 +1,9 @@
-import importlib
-import types
-import sys
-import os
-import logging
 
+import importlib
+import logging
+import os
+import sys
+import types
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 sys.path.insert(1, os.path.join(ROOT_DIR, 'src'))
@@ -17,7 +17,7 @@ def test_ensure_ta_installed(monkeypatch, caplog):
     monkeypatch.setitem(sys.modules, 'requests', types.ModuleType('requests'))
     monkeypatch.setitem(sys.modules, 'shap', types.ModuleType('shap'))
     if 'src.config' in sys.modules:
-        monkeypatch.delitem(sys.modules, 'src.config', raising=False)
+        monkeypatch.delitem(sys.modules, 'src.config', raising = False)
     logger = logging.getLogger("NiceGold")
     captured = []
     monkeypatch.setattr(logger, "info", lambda msg, *a, **k: captured.append(msg))
@@ -39,7 +39,7 @@ def test_ta_version_fallback(monkeypatch, caplog):
         return original_version(name)
     monkeypatch.setattr(importlib.metadata, 'version', fake_version)
     if 'src.config' in sys.modules:
-        monkeypatch.delitem(sys.modules, 'src.config', raising=False)
+        monkeypatch.delitem(sys.modules, 'src.config', raising = False)
     logger = logging.getLogger("NiceGold")
     captured = []
     monkeypatch.setattr(logger, "info", lambda msg, *a, **k: captured.append(msg))

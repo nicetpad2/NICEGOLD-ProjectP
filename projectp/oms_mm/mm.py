@@ -1,8 +1,8 @@
+
 # MM (Money Management) - เทพ
 from typing import List, Dict, Optional, Any
-
 class Portfolio:
-    """Portfolio Management (multi-asset, multi-currency, risk, plug-in, robust, usable)"""
+    """Portfolio Management (multi - asset, multi - currency, risk, plug - in, robust, usable)"""
     def __init__(self, initial_capital: float = 100.0, risk_config: Optional[Dict[str, Any]] = None, currency: str = 'USD', fee_model: Optional[Any] = None):
         self.initial_capital: float = initial_capital
         self.cash: float = initial_capital
@@ -13,11 +13,11 @@ class Portfolio:
         self.equity_curve: List[float] = [initial_capital]
         self.risk_config: Dict[str, Any] = risk_config or {}
         self.risk_violations: List[str] = []
-        self.fee_model = fee_model  # plug-in: function(symbol, qty, price, side) -> fee
+        self.fee_model = fee_model  # plug - in: function(symbol, qty, price, side) -> fee
         self.unrealized_pnl: float = 0.0
         self.realized_pnl: float = 0.0
         self.snapshots: List[Dict[str, Any]] = []  # portfolio snapshot/history
-        # ...future: multi-account, plug-in, logging...
+        # ...future: multi - account, plug - in, logging...
 
     def check_risk(self, symbol: str, qty: float, price: float, side: str) -> bool:
         """ตรวจสอบ risk ก่อนเทรด (max position, max loss, max drawdown)"""
@@ -73,7 +73,7 @@ class Portfolio:
         return pnl
 
     def get_equity(self) -> float:
-        """คำนวณ equity ปัจจุบัน (multi-asset)"""
+        """คำนวณ equity ปัจจุบัน (multi - asset)"""
         return self.cash + sum(self.positions.get(s, 0) * self.position_cost.get(s, 0) for s in self.positions)
 
     def get_drawdown(self) -> float:
@@ -93,25 +93,25 @@ class Portfolio:
     def get_risk_status(self) -> Dict[str, Any]:
         """ดูสถานะ risk ล่าสุด"""
         return {
-            'risk_violations': self.risk_violations[-10:],
-            'current_drawdown': self.get_drawdown(),
-            'positions': self.positions.copy(),
-            'equity': self.get_equity(),
+            'risk_violations': self.risk_violations[ - 10:], 
+            'current_drawdown': self.get_drawdown(), 
+            'positions': self.positions.copy(), 
+            'equity': self.get_equity(), 
         }
 
     def get_stats(self) -> Dict[str, Any]:
-        """สรุปสถิติพอร์ต (multi-asset, risk-aware)"""
+        """สรุปสถิติพอร์ต (multi - asset, risk - aware)"""
         stats = {
-            'initial_capital': self.initial_capital,
-            'cash': self.cash,
-            'currency': self.currency,
-            'equity': self.get_equity(),
-            'drawdown': self.get_drawdown(),
-            'positions': self.positions.copy(),
-            'trades': len(self.trade_history),
-            'risk_violations': len(self.risk_violations),
-            'realized_pnl': self.realized_pnl,
-            'unrealized_pnl': self.unrealized_pnl,
+            'initial_capital': self.initial_capital, 
+            'cash': self.cash, 
+            'currency': self.currency, 
+            'equity': self.get_equity(), 
+            'drawdown': self.get_drawdown(), 
+            'positions': self.positions.copy(), 
+            'trades': len(self.trade_history), 
+            'risk_violations': len(self.risk_violations), 
+            'realized_pnl': self.realized_pnl, 
+            'unrealized_pnl': self.unrealized_pnl, 
         }
         return stats
-    # ... จุดขยาย: custom risk model, plug-in, multi-account, logging, ...
+    # ... จุดขยาย: custom risk model, plug - in, multi - account, logging, ...

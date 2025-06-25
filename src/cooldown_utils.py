@@ -1,11 +1,9 @@
-"""Utility functions for cooldown logic."""
-
 from __future__ import annotations
-
-import logging
-from typing import List
 from dataclasses import dataclass
+from typing import List
+import logging
 import numpy as np
+"""Utility functions for cooldown logic."""
 
 
 @dataclass
@@ -49,9 +47,9 @@ class CooldownManager:
             self.in_cooldown = True
             self.cooldown_counter = self._cooldown_period
             logging.info(
-                "Entering soft cooldown: losses_count=%d, threshold=%d",
-                self.losses_count,
-                self._loss_threshold,
+                "Entering soft cooldown: losses_count = %d, threshold = %d", 
+                self.losses_count, 
+                self._loss_threshold, 
             )
             return True
         return False
@@ -82,11 +80,11 @@ class CooldownManager:
 
 
 def is_soft_cooldown_triggered(
-    pnls: List[float],
-    lookback: int = 15,
-    loss_count: int = 2,
-    sides: List[str] | None = None,
-    side_filter: str | None = None,
+    pnls: List[float], 
+    lookback: int = 15, 
+    loss_count: int = 2, 
+    sides: List[str] | None = None, 
+    side_filter: str | None = None, 
 ) -> tuple[bool, int]:
     """[Patch v5.6.6] Determine if soft cooldown should activate.
 
@@ -106,11 +104,11 @@ def is_soft_cooldown_triggered(
     if sides is not None and side_filter is not None and len(sides) == len(pnls):
         relevant = [
             p
-            for p, s in zip(pnls[-effective_lookback:], sides[-effective_lookback:])
+            for p, s in zip(pnls[ - effective_lookback:], sides[ - effective_lookback:])
             if s == side_filter
         ]
     else:
-        relevant = pnls[-effective_lookback:]
+        relevant = pnls[ - effective_lookback:]
     recent_losses = sum(1 for p in relevant if p < 0)
     return recent_losses >= loss_count, recent_losses
 

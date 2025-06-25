@@ -1,6 +1,8 @@
 import json
-import os
 import logging
+import os
+
+import psutil
 
 logger = logging.getLogger(__name__)
 
@@ -8,7 +10,6 @@ logger = logging.getLogger(__name__)
 def get_resource_plan() -> dict:
     """Return basic resource information."""
     try:
-        import psutil
 
         mem = round(psutil.virtual_memory().total / 1e9, 2)
     except Exception as e:
@@ -23,6 +24,6 @@ def save_resource_plan(output_dir: str) -> None:
     os.makedirs(output_dir, exist_ok=True)
     path = os.path.join(output_dir, "resource_plan.json")
     plan = get_resource_plan()
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf - 8") as f:
         json.dump(plan, f)
     logger.info("Resource plan saved to %s", path)

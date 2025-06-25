@@ -1,11 +1,10 @@
+
+
+# [Patch v5.5.14] Simple dataclass - based pipeline config loader
 from dataclasses import dataclass
+from src.utils.errors import PipelineError
 import os
 import yaml
-
-from src.utils.errors import PipelineError
-
-# [Patch v5.5.14] Simple dataclass-based pipeline config loader
-
 CONFIG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config')
 DEFAULT_CONFIG_FILE = os.path.join(CONFIG_DIR, 'pipeline.yaml')
 
@@ -28,7 +27,7 @@ def load_config(path: str = DEFAULT_CONFIG_FILE) -> 'PipelineConfig':
     """Load configuration from YAML file if available."""
     if os.path.exists(path):
         try:
-            with open(path, 'r', encoding='utf-8') as fh:
+            with open(path, 'r', encoding = 'utf - 8') as fh:
                 data = yaml.safe_load(fh) or {}
         except yaml.YAMLError as exc:
             mark = getattr(exc, 'problem_mark', None)

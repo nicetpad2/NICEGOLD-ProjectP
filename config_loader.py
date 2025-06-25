@@ -1,14 +1,14 @@
-"""Utility for updating the runtime config."""
-
+from pathlib import Path
+from types import ModuleType
+from typing import Any, Optional
 import importlib
 import logging
 import warnings
-from pathlib import Path
-from typing import Any, Optional
-
 import yaml
+"""Utility for updating the runtime config."""
 
-warnings.filterwarnings("ignore", category=UserWarning)
+
+warnings.filterwarnings("ignore", category = UserWarning)
 
 
 class ConfigManager:
@@ -21,8 +21,8 @@ class ConfigManager:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self,
-                 settings_path: str = "config/settings.yaml",
+    def __init__(self, 
+                 settings_path: str = "config/settings.yaml", 
                  pipeline_path: str = "config/pipeline.yaml") -> None:
         if hasattr(self, "initialized"):
             return
@@ -33,7 +33,7 @@ class ConfigManager:
         self.initialized = True
 
     def _load_yaml(self, path: Path) -> dict:
-        with path.open("r", encoding="utf-8") as f:
+        with path.open("r", encoding = "utf - 8") as f:
             return yaml.safe_load(f)
 
     def get_setting(self, key: str, default: Any | None = None) -> Any:
@@ -41,14 +41,11 @@ class ConfigManager:
         return self.settings.get(key, default)
 
 
-from types import ModuleType
-
-
 def update_config_from_dict(params: dict) -> ModuleType:
     """Update :mod:`src.config` attributes from ``params``.
 
     Parameters
-    ----------
+    - -  -  -  -  -  -  -  -  - 
     params : dict
         Dictionary of parameter names and values to write into ``src.config``.
     """

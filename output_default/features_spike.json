@@ -1,0 +1,15 @@
+[
+  "open",
+  "high",
+  "low",
+  "close",
+  "volume",
+  "sma_20",
+  "rsi",
+  "macd",
+  "bb_upper",
+  "bb_lower",
+  "returns",
+  "volatility",
+  "momentum"
+]

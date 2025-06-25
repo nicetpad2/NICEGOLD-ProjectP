@@ -1,10 +1,10 @@
+
 import builtins
 import importlib
 import logging
 import os
 import sys
 import types
-
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT_DIR)
 
@@ -13,7 +13,7 @@ def _import_config(monkeypatch):
     monkeypatch.setitem(sys.modules, 'seaborn', types.ModuleType('seaborn'))
     monkeypatch.setitem(sys.modules, 'requests', types.ModuleType('requests'))
     if 'src.config' in sys.modules:
-        monkeypatch.delitem(sys.modules, 'src.config', raising=False)
+        monkeypatch.delitem(sys.modules, 'src.config', raising = False)
     return importlib.import_module('src.config')
 
 

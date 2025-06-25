@@ -1,7 +1,7 @@
-import sys
+
+
 from src.utils import load_json_with_comments
-
-
+import sys
 def validate_features(path: str) -> bool:
     """ตรวจสอบความสมบูรณ์ของไฟล์ features_main.json"""
     try:

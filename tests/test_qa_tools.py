@@ -1,15 +1,15 @@
-import os
-# [Patch] Additional tests for quick_qa_output
-import sys
-import pandas as pd
-import gzip
-from pathlib import Path
 
+# [Patch] Additional tests for quick_qa_output
+from pathlib import Path
+import gzip
+import os
+import pandas as pd
+import pytest
+import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 
 # from src import qa_tools  # Disabled due to circular import issues
-import pytest
 
 # quick_qa_output = qa_tools.quick_qa_output
 
@@ -18,12 +18,12 @@ import pytest
 #     f_ok = tmp_path / 'fold1.csv.gz'
 #     df_ok = pd.DataFrame({'pnl':[1], 'entry_price':[1]})
 #     with gzip.open(f_ok, 'wt') as fh:
-#         df_ok.to_csv(fh, index=False)
+#         df_ok.to_csv(fh, index = False)
 #
 #     f_missing = tmp_path / 'fold2.csv.gz'
 #     df_missing = pd.DataFrame({'pnl':[ ]})
 #     with gzip.open(f_missing, 'wt') as fh:
-#         df_missing.to_csv(fh, index=False)
+#         df_missing.to_csv(fh, index = False)
 #
 #     issues = quick_qa_output(str(tmp_path), 'report.txt')
 #     assert any('No trades' in i or 'Missing columns' in i for i in issues)
@@ -35,7 +35,7 @@ import pytest
 #     f_bad = tmp_path / 'fold_missing.csv.gz'
 #     df_bad = pd.DataFrame({'pnl': [1, 2]})
 #     with gzip.open(f_bad, 'wt') as fh:
-#         df_bad.to_csv(fh, index=False)
+#         df_bad.to_csv(fh, index = False)
 #
 #     issues = quick_qa_output(str(tmp_path), 'missing_report.txt')
 #     assert any('Missing columns' in i for i in issues)
@@ -59,7 +59,7 @@ import pytest
 #
 #     monkeypatch.setattr(qa_tools.strategy, 'run_backtest_simulation_v34', dummy_backtest)
 #
-#     result = qa_tools.run_noise_backtest(n=50, seed=42)
+#     result = qa_tools.run_noise_backtest(n = 50, seed = 42)
 #     assert captured['rows'] == 50
 #     assert 'total_pnl' in result
 #
@@ -72,6 +72,6 @@ import pytest
 #
 #     monkeypatch.setattr(qa_tools.strategy, 'run_backtest_simulation_v34', dummy_backtest)
 #
-#     res = qa_tools.run_noise_backtest(n=10)
+#     res = qa_tools.run_noise_backtest(n = 10)
 #     assert res['total_pnl'] == 0.5
-#     assert abs(res['winrate'] - 50.0) < 1e-6
+#     assert abs(res['winrate'] - 50.0) < 1e - 6

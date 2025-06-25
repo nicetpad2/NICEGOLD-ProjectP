@@ -1,12 +1,11 @@
-"""Stop-loss calculation helpers."""
 from __future__ import annotations
-
-import pandas as pd
 from src.adaptive import compute_trailing_atr_stop
+import pandas as pd
+"""Stop - loss calculation helpers."""
 
 
 def atr_stop_loss(close: pd.Series, period: int = 14) -> pd.Series:
-    """Return a naive ATR-based stop loss distance series."""
+    """Return a naive ATR - based stop loss distance series."""
     if len(close) < period:
         raise ValueError("close length must be >= period")
     return close.diff().abs().rolling(period).mean().bfill()
@@ -15,12 +14,12 @@ __all__ = ["atr_stop_loss", "atr_trailing_stop"]
 
 
 def atr_trailing_stop(
-    entry_price: float,
-    current_price: float,
-    atr: float,
-    side: str,
-    current_sl: float,
-    atr_mult: float = 1.5,
+    entry_price: float, 
+    current_price: float, 
+    atr: float, 
+    side: str, 
+    current_sl: float, 
+    atr_mult: float = 1.5, 
 ) -> float:
     """[Patch v6.8.5] Return updated stop loss using ATR trailing logic."""
     return compute_trailing_atr_stop(

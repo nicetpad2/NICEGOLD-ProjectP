@@ -1,9 +1,9 @@
-import os
-import sys
-import logging
-import pandas as pd
-import numpy as np
 
+import logging
+import numpy as np
+import os
+import pandas as pd
+import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 
@@ -37,7 +37,7 @@ sys.path.insert(0, ROOT_DIR)
 
 # def test_get_dynamic_signal_score_entry():
 #     df = pd.DataFrame({'Signal_Score': [0.2, 0.6, 0.8, 2.5]})
-#     assert strategy.get_dynamic_signal_score_entry(df, window=2, quantile=0.5) == 1.65
+#     assert strategy.get_dynamic_signal_score_entry(df, window = 2, quantile = 0.5) == 1.65
 #     df_empty = pd.DataFrame({'Signal_Score': []})
 #     assert strategy.get_dynamic_signal_score_entry(df_empty) == 0.5
 #     assert strategy.get_dynamic_signal_score_entry(None) == 0.5
@@ -45,7 +45,7 @@ sys.path.insert(0, ROOT_DIR)
 
 # def test_get_dynamic_signal_score_thresholds():
 #     s = pd.Series([0.2, 0.6, 1.2, 5.0])
-#     res = strategy.get_dynamic_signal_score_thresholds(s, window=2, quantile=0.5)
+#     res = strategy.get_dynamic_signal_score_thresholds(s, window = 2, quantile = 0.5)
 #     assert len(res) == 4
 #     assert res[2] >= res[1]
 #     assert all(0.5 <= r <= 3.0 for r in res)
@@ -84,7 +84,7 @@ sys.path.insert(0, ROOT_DIR)
 # def test_adjust_lot_tp2_boost(monkeypatch, caplog):
 #     monkeypatch.setattr(strategy, 'MIN_LOT_SIZE', 0.01)
 #     with caplog.at_level(logging.INFO):
-#         result = strategy.adjust_lot_tp2_boost(['TP', 'TP'], base_lot=0.1)
+#         result = strategy.adjust_lot_tp2_boost(['TP', 'TP'], base_lot = 0.1)
 #     assert result > 0.1
 #     assert 'TP Boost' in caplog.text
 #     assert strategy.adjust_lot_tp2_boost(['SL']) == 0.01

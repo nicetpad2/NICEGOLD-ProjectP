@@ -1,17 +1,22 @@
+from datetime import datetime
+from fastapi import FastAPI, Request
+from prometheus_client import Counter, generate_latest, REGISTRY
+from starlette.responses import Response
+import joblib
+    import json
+import logging
+import os
+    import pandas as pd
+    import streamlit as st
+    import sys
+        import uvicorn
 """
 Enterprise Services Integration: Serving, Monitoring, Dashboard, Compliance
-- FastAPI: Model serving endpoint (batch/real-time)
+- FastAPI: Model serving endpoint (batch/real - time)
 - Prometheus: Metrics/monitoring endpoint
 - Streamlit: Dashboard UI
 - Audit/Compliance: User/action logging, data privacy, retention
 """
-from fastapi import FastAPI, Request
-from prometheus_client import Counter, generate_latest, REGISTRY
-import joblib
-import os
-from starlette.responses import Response
-import logging
-from datetime import datetime
 
 # FastAPI app for serving
 app = FastAPI()
@@ -22,7 +27,7 @@ if 'model_predict_total' in REGISTRY._names_to_collectors:
 predict_counter = Counter('model_predict_total', 'Total model predictions')
 
 # Load model (example: from MLflow registry or local)
-def load_model(model_path=None):
+def load_model(model_path = None):
     if model_path is None:
         model_dir = os.path.abspath(os.path.join(os.getcwd(), "output_default"))
         model_path = os.path.join(model_dir, "catboost_model.pkl")
@@ -51,23 +56,19 @@ async def predict(request: Request):
 
 @app.get("/metrics")
 def metrics():
-    return Response(generate_latest(), media_type="text/plain")
+    return Response(generate_latest(), media_type = "text/plain")
 
 # Audit/Compliance Logging
 def audit_log(user, action, input_hash):
     with open("output_default/audit.log", "a") as f:
-        f.write(f"{datetime.now()},{user},{action},{input_hash}\n")
+        f.write(f"{datetime.now()}, {user}, {action}, {input_hash}\n")
 
 # Streamlit dashboard (run separately)
 def run_dashboard():
-    import streamlit as st
-    import pandas as pd
-    import json
-    import os
-    st.set_page_config(page_title="ProjectP Dashboard", layout="wide")
+    st.set_page_config(page_title = "ProjectP Dashboard", layout = "wide")
     st.title("🚀 ProjectP Enterprise Dashboard (เทพ)")
 
-    # --- Profit Curve ---
+    # - - - Profit Curve - -  - 
     profit_path = os.path.join("output", "backtest_results.csv")
     try:
         if os.path.exists(profit_path):
@@ -83,7 +84,7 @@ def run_dashboard():
     except Exception as e:
         st.error(f"เกิดข้อผิดพลาดขณะโหลด profit curve: {e}")
 
-    # --- System State ---
+    # - - - System State - -  - 
     state_path = os.path.join("output", "system_state.json")
     try:
         if os.path.exists(state_path):
@@ -101,28 +102,26 @@ def run_dashboard():
     except Exception as e:
         st.error(f"เกิดข้อผิดพลาดขณะโหลด system state: {e}")
 
-    # --- Audit Log (ถ้ามี) ---
+    # - - - Audit Log (ถ้ามี) - -  - 
     audit_path = os.path.join("output_default", "audit.log")
     try:
         if os.path.exists(audit_path):
             st.subheader("📝 Audit Log (ล่าสุด 100 รายการ)")
             with open(audit_path, "r") as f:
-                lines = f.readlines()[-100:]
+                lines = f.readlines()[ - 100:]
             st.text("".join(lines))
     except Exception as e:
         st.error(f"เกิดข้อผิดพลาดขณะโหลด audit log: {e}")
 
-    # --- Refresh Button ---
-    st.button("🔄 Refresh Dashboard", on_click=lambda: st.experimental_rerun())
+    # - - - Refresh Button - -  - 
+    st.button("🔄 Refresh Dashboard", on_click = lambda: st.experimental_rerun())
 
-    st.markdown("---")
+    st.markdown(" -  -  - ")
     st.caption("ProjectP Dashboard | Powered by Streamlit | ออกแบบ UI/UX สำหรับเทรดเดอร์และนักพัฒนา | v1.0")
 
 if __name__ == "__main__":
-    import sys
     if any("streamlit" in arg for arg in sys.argv):
         run_dashboard()
     else:
-        import uvicorn
-        uvicorn.run(app, host="0.0.0.0", port=8500)
+        uvicorn.run(app, host = "0.0.0.0", port = 8500)
     # To run dashboard: run_dashboard()

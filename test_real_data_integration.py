@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
+        from config_defaults import (
+import os
+import sys
+        import yaml
 """
 Test script to verify that the system uses real data from datacsv folder
 """
 
-import os
-import sys
-
 
 def test_config_real_data():
     """Test that config.yaml points to real data"""
-    print("=== Testing Config Real Data Settings ===")
+    print(" =  = = Testing Config Real Data Settings = =  = ")
 
     try:
-        import yaml
 
         with open("config.yaml", "r") as f:
             config = yaml.safe_load(f)
@@ -55,7 +55,7 @@ def test_config_real_data():
 
 def test_datacsv_files():
     """Test that datacsv files exist and are accessible"""
-    print("\n=== Testing DataCSV Files ===")
+    print("\n =  = = Testing DataCSV Files = =  = ")
 
     try:
         datacsv_dir = "datacsv"
@@ -93,13 +93,12 @@ def test_datacsv_files():
 
 def test_config_defaults():
     """Test that config defaults point to datacsv"""
-    print("\n=== Testing Config Defaults ===")
+    print("\n =  = = Testing Config Defaults = =  = ")
 
     try:
         sys.path.insert(0, "src")
-        from config_defaults import (
-            DEFAULT_DATA_FILE_PATH_M1,
-            DEFAULT_DATA_FILE_PATH_M15,
+            DEFAULT_DATA_FILE_PATH_M1, 
+            DEFAULT_DATA_FILE_PATH_M15, 
         )
 
         print(f"✅ Config defaults loaded")
@@ -123,7 +122,7 @@ def test_config_defaults():
 
 def test_real_data_loader_exists():
     """Test that real data loader exists and is importable"""
-    print("\n=== Testing Real Data Loader ===")
+    print("\n =  = = Testing Real Data Loader = =  = ")
 
     try:
         sys.path.insert(0, "src")
@@ -162,13 +161,13 @@ def test_real_data_loader_exists():
 def main():
     """Run all tests"""
     print("🔍 NICEGOLD ProjectP Real Data Integration Test")
-    print("=" * 60)
+    print(" = " * 60)
 
     tests = [
-        test_config_real_data,
-        test_datacsv_files,
-        test_config_defaults,
-        test_real_data_loader_exists,
+        test_config_real_data, 
+        test_datacsv_files, 
+        test_config_defaults, 
+        test_real_data_loader_exists, 
     ]
 
     results = []
@@ -180,9 +179,9 @@ def main():
             print(f"❌ Test failed with exception: {e}")
             results.append(False)
 
-    print("\n" + "=" * 60)
+    print("\n" + " = " * 60)
     print("🏁 TEST RESULTS SUMMARY")
-    print("=" * 60)
+    print(" = " * 60)
 
     passed = sum(results)
     total = len(results)

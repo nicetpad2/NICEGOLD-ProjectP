@@ -1,11 +1,15 @@
-"""Pipeline-related helpers extracted from src.main"""
-
+    from src import main as main_mod
+    from src.features import ENABLE_AUTO_THRESHOLD_TUNING
+from src.features import engineer_m1_features, save_features, load_features
+from src.strategy import run_backtest_simulation_v34, plot_equity_curve
+from src.utils import load_settings, maybe_collect
+            from src.utils.data_utils import safe_read_csv
 import logging
 import os
 import pandas as pd
-from src.utils import load_settings, maybe_collect
-from src.features import engineer_m1_features, save_features, load_features
-from src.strategy import run_backtest_simulation_v34, plot_equity_curve
+        import threshold_optimization as topt
+"""Pipeline - related helpers extracted from src.main"""
+
 
 OUTPUT_DIR = ""
 OPTUNA_N_TRIALS = 50
@@ -15,19 +19,17 @@ INITIAL_CAPITAL = 100.0
 
 
 def run_auto_threshold_stage():
-    """Run Optuna-based threshold tuning if enabled."""
-    from src.features import ENABLE_AUTO_THRESHOLD_TUNING
+    """Run Optuna - based threshold tuning if enabled."""
 
     if ENABLE_AUTO_THRESHOLD_TUNING:
-        import threshold_optimization as topt
 
         logging.info("[Patch v6.2.4] Starting Auto Threshold Optimization")
         topt.run_threshold_optimization(
-            output_dir=OUTPUT_DIR,
-            trials=OPTUNA_N_TRIALS,
-            study_name="threshold_wfv",
-            direction=OPTUNA_DIRECTION,
-            timeout=None,
+            output_dir = OUTPUT_DIR, 
+            trials = OPTUNA_N_TRIALS, 
+            study_name = "threshold_wfv", 
+            direction = OPTUNA_DIRECTION, 
+            timeout = None, 
         )
         logging.info("[Patch v6.2.4] Auto Threshold Optimization Completed")
 
@@ -56,14 +58,13 @@ def run_pipeline_stage(stage: str):
         else:
             df = main_mod.load_validated_csv(DATA_FILE_PATH_M1, "M1")
         run_backtest_simulation_v34(
-            df, label="WFV", initial_capital_segment=INITIAL_CAPITAL
+            df, label = "WFV", initial_capital_segment = INITIAL_CAPITAL
         )
         logging.info("[Pipeline] Backtest completed")
         return None
     if stage == "report":
         metrics_path = os.path.join(OUTPUT_DIR, "metrics_summary.csv")
         if os.path.exists(metrics_path):
-            from src.utils.data_utils import safe_read_csv
 
             safe_read_csv(metrics_path)
             plot_equity_curve([], "Equity", INITIAL_CAPITAL, OUTPUT_DIR, "report")
@@ -78,14 +79,12 @@ def run_pipeline_stage(stage: str):
 def prepare_train_data():
     """Run PREPARE_TRAIN_DATA step programmatically."""
     logging.info("[Patch] Run Mode Selected: PREPARE_TRAIN_DATA (helper)")
-    from src import main as main_mod
 
-    return main_mod.main(run_mode="PREPARE_TRAIN_DATA")
+    return main_mod.main(run_mode = "PREPARE_TRAIN_DATA")
 
 
 def train_models():
     """Run TRAIN_MODEL_ONLY step programmatically."""
     logging.info("[Patch] Run Mode Selected: TRAIN_MODEL (helper)")
-    from src import main as main_mod
 
-    return main_mod.main(run_mode="TRAIN_MODEL_ONLY")
+    return main_mod.main(run_mode = "TRAIN_MODEL_ONLY")

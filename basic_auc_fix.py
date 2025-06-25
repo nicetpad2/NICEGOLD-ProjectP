@@ -1,43 +1,44 @@
+from pathlib import Path
+        from sklearn.dummy import DummyClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+import json
+import numpy as np
+import os
+import pandas as pd
+import pickle
+        import traceback
+import warnings
 """
 🆘 BASIC AUC EMERGENCY FIX
-==========================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 แก้ไขปัญหา AUC ด้วย basic libraries เท่านั้น - ไม่ต้องพึ่ง external dependencies
 
 สำหรับกรณีที่มีปัญหา dependency conflicts
 """
 
-import json
-import os
-import pickle
-import warnings
-from pathlib import Path
-
-import numpy as np
-import pandas as pd
 
 warnings.filterwarnings("ignore")
 
 # Only use basic sklearn
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 
 def basic_emergency_fix():
     """Emergency fix using only basic libraries"""
     print("🆘 BASIC EMERGENCY AUC FIX")
-    print("=" * 50)
+    print(" = " * 50)
 
     output_dir = Path("output_default")
-    output_dir.mkdir(exist_ok=True)
+    output_dir.mkdir(exist_ok = True)
 
     try:
         # 1. Load or create data
         df = None
         data_sources = [
-            "output_default/preprocessed_super.parquet",
-            "data/raw/your_data_file.csv",
+            "output_default/preprocessed_super.parquet", 
+            "data/raw/your_data_file.csv", 
         ]
 
         for source in data_sources:
@@ -46,7 +47,7 @@ def basic_emergency_fix():
                     if source.endswith(".parquet"):
                         df = pd.read_parquet(source)
                     else:
-                        df = pd.read_csv(source, nrows=10000)
+                        df = pd.read_csv(source, nrows = 10000)
                     print(f"✅ Loaded: {source}")
                     break
                 except Exception as e:
@@ -62,11 +63,11 @@ def basic_emergency_fix():
             # Simple features
             df = pd.DataFrame(
                 {
-                    "feature_1": np.random.normal(0, 1, n_samples),
-                    "feature_2": np.random.normal(0, 1, n_samples),
-                    "feature_3": np.random.uniform(-1, 1, n_samples),
-                    "feature_4": np.random.exponential(1, n_samples),
-                    "feature_5": np.random.normal(0, 0.5, n_samples),
+                    "feature_1": np.random.normal(0, 1, n_samples), 
+                    "feature_2": np.random.normal(0, 1, n_samples), 
+                    "feature_3": np.random.uniform( - 1, 1, n_samples), 
+                    "feature_4": np.random.exponential(1, n_samples), 
+                    "feature_5": np.random.normal(0, 0.5, n_samples), 
                 }
             )
 
@@ -82,18 +83,18 @@ def basic_emergency_fix():
         # 2. Standardize columns
         df.columns = [col.lower().replace(" ", "_") for col in df.columns]
 
-        # 3. Find or create target and fix multi-class issue
+        # 3. Find or create target and fix multi - class issue
         target_col = "target"
         if "target" not in df.columns:
             if "close" in df.columns:
-                df["target"] = (df["close"].shift(-1) > df["close"]).astype(int)
+                df["target"] = (df["close"].shift( - 1) > df["close"]).astype(int)
                 target_col = "target"
             else:
                 # Create random target as last resort
-                df["target"] = np.random.choice([0, 1], len(df), p=[0.4, 0.6])
+                df["target"] = np.random.choice([0, 1], len(df), p = [0.4, 0.6])
                 target_col = "target"
 
-        # Fix multi-class target to binary
+        # Fix multi - class target to binary
         unique_targets = df[target_col].unique()
         print(f"🎯 Original target classes: {unique_targets}")
 
@@ -104,7 +105,7 @@ def basic_emergency_fix():
             print(f"🔧 Converted to binary: 0 vs 1")
         elif len(unique_targets) == 2 and -1 in unique_targets:
             # Convert -1 to 0
-            df[target_col] = df[target_col].replace(-1, 0)
+            df[target_col] = df[target_col].replace( - 1, 0)
             print(f"🔧 Converted -1 to 0")
 
         # Remove any remaining invalid targets
@@ -150,9 +151,9 @@ def basic_emergency_fix():
             n_needed = len(majority_data) - len(minority_data)
             if n_needed > 0:
                 oversampled = minority_data.sample(
-                    n=n_needed, replace=True, random_state=42
+                    n = n_needed, replace = True, random_state = 42
                 )
-                df = pd.concat([df, oversampled], ignore_index=True)
+                df = pd.concat([df, oversampled], ignore_index = True)
 
                 X = df[feature_cols]
                 y = df[target_col]
@@ -162,7 +163,7 @@ def basic_emergency_fix():
         print("🤖 Training model...")
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
+            X, y, test_size = 0.2, random_state = 42, stratify = y
         )
 
         # Scale features
@@ -172,13 +173,13 @@ def basic_emergency_fix():
 
         # Train Random Forest with balanced weights
         model = RandomForestClassifier(
-            n_estimators=200,
-            max_depth=8,
-            min_samples_split=10,
-            min_samples_leaf=4,
-            random_state=42,
-            class_weight="balanced",
-            n_jobs=-1,
+            n_estimators = 200, 
+            max_depth = 8, 
+            min_samples_split = 10, 
+            min_samples_leaf = 4, 
+            random_state = 42, 
+            class_weight = "balanced", 
+            n_jobs = -1, 
         )
 
         model.fit(X_train_scaled, y_train)
@@ -199,10 +200,10 @@ def basic_emergency_fix():
 
             # Create composite model (scaler + classifier)
             composite_model = {
-                "scaler": scaler,
-                "classifier": model,
-                "feature_names": feature_cols,
-                "auc_score": float(auc),
+                "scaler": scaler, 
+                "classifier": model, 
+                "feature_names": feature_cols, 
+                "auc_score": float(auc), 
             }
 
             # Save model
@@ -220,9 +221,9 @@ def basic_emergency_fix():
             full_pred_proba = model.predict_proba(X_full_scaled)[:, 1]
             pred_df = pd.DataFrame(
                 {
-                    "target": y,
-                    "pred_proba": full_pred_proba,
-                    "prediction": (full_pred_proba >= 0.5).astype(int),
+                    "target": y, 
+                    "pred_proba": full_pred_proba, 
+                    "prediction": (full_pred_proba >= 0.5).astype(int), 
                 }
             )
 
@@ -231,24 +232,24 @@ def basic_emergency_fix():
                 pred_df[col] = X[col].values
 
             pred_path = output_dir / "predictions.csv"
-            pred_df.to_csv(pred_path, index=False)
+            pred_df.to_csv(pred_path, index = False)
 
             # Save metrics
             metrics = {
-                "auc": float(auc),
+                "auc": float(auc), 
                 "pred_proba": {
-                    "mean": float(full_pred_proba.mean()),
-                    "std": float(full_pred_proba.std()),
-                    "min": float(full_pred_proba.min()),
-                    "max": float(full_pred_proba.max()),
-                },
+                    "mean": float(full_pred_proba.mean()), 
+                    "std": float(full_pred_proba.std()), 
+                    "min": float(full_pred_proba.min()), 
+                    "max": float(full_pred_proba.max()), 
+                }, 
             }
 
             metrics_path = output_dir / "predict_summary_metrics.json"
             with open(metrics_path, "w") as f:
-                json.dump(metrics, f, indent=2)
+                json.dump(metrics, f, indent = 2)
 
-            print("=" * 50)
+            print(" = " * 50)
             print("✅ BASIC EMERGENCY FIX SUCCESSFUL!")
             print(f"🏆 AUC: {auc:.4f}")
             print(f"📁 Model: {model_path}")
@@ -264,13 +265,12 @@ def basic_emergency_fix():
 
     except Exception as e:
         print(f"❌ Basic emergency fix failed: {e}")
-        import traceback
 
         traceback.print_exc()
         return False
 
 
-def create_optimized_model(X_train=None, y_train=None, **kwargs):
+def create_optimized_model(X_train = None, y_train = None, **kwargs):
     """
     Create optimized model for AUC improvement
 
@@ -293,11 +293,11 @@ def create_optimized_model(X_train=None, y_train=None, **kwargs):
 
             X_train = pd.DataFrame(
                 {
-                    "feature_1": np.random.normal(0, 1, n_samples),
-                    "feature_2": np.random.normal(0, 1, n_samples),
-                    "feature_3": np.random.uniform(-1, 1, n_samples),
-                    "feature_4": np.random.exponential(1, n_samples),
-                    "feature_5": np.random.normal(0, 0.5, n_samples),
+                    "feature_1": np.random.normal(0, 1, n_samples), 
+                    "feature_2": np.random.normal(0, 1, n_samples), 
+                    "feature_3": np.random.uniform( - 1, 1, n_samples), 
+                    "feature_4": np.random.exponential(1, n_samples), 
+                    "feature_5": np.random.normal(0, 0.5, n_samples), 
                 }
             )
 
@@ -312,12 +312,12 @@ def create_optimized_model(X_train=None, y_train=None, **kwargs):
 
         # Create and train optimized model
         model = RandomForestClassifier(
-            n_estimators=100,
-            max_depth=10,
-            min_samples_split=5,
-            min_samples_leaf=2,
-            random_state=42,
-            n_jobs=-1,
+            n_estimators = 100, 
+            max_depth = 10, 
+            min_samples_split = 5, 
+            min_samples_leaf = 2, 
+            random_state = 42, 
+            n_jobs = -1, 
         )
 
         print("🏃 Training optimized model...")
@@ -333,9 +333,8 @@ def create_optimized_model(X_train=None, y_train=None, **kwargs):
     except Exception as e:
         print(f"❌ Model creation failed: {e}")
         # Return simple fallback model
-        from sklearn.dummy import DummyClassifier
 
-        fallback = DummyClassifier(strategy="most_frequent")
+        fallback = DummyClassifier(strategy = "most_frequent")
         if X_train is not None and y_train is not None:
             fallback.fit(X_train, y_train)
         return fallback

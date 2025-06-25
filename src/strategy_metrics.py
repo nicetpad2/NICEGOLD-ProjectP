@@ -1,23 +1,23 @@
+        from .strategy import INITIAL_CAPITAL
+    from gc import collect as maybe_collect
+    import logging
+    import math
+    import numpy as np
+    import pandas as pd
 """
 Metrics and analysis logic for strategy module.
 - Functions for calculating metrics, drawdown, performance, etc.
 - No DataFrame or simulation loop logic here.
 """
 
-def calculate_metrics(trade_log_df, final_equity, equity_history_segment, initial_capital=None, label="", model_type_l1="N/A", model_type_l2="N/A", run_summary=None, ib_lot_accumulator=0.0):
+def calculate_metrics(trade_log_df, final_equity, equity_history_segment, initial_capital = None, label = "", model_type_l1 = "N/A", model_type_l2 = "N/A", run_summary = None, ib_lot_accumulator = 0.0):
     """
     Calculates a comprehensive set of performance metrics from trade log and equity data.
     (ย้ายจาก strategy.py)
     Returns: dict of calculated metrics
     """
     # ...copy logic from strategy.py...
-    import logging
-    import numpy as np
-    import pandas as pd
-    import math
-    from gc import collect as maybe_collect
     if initial_capital is None:
-        from .strategy import INITIAL_CAPITAL
         initial_capital = INITIAL_CAPITAL
     metrics = {}
     label = label.strip()

@@ -1,15 +1,15 @@
-"""Utility/helper functions for strategy module (memory, fallback, etc.)"""
 import gc
 import logging
-import pandas as pd
 import numpy as np
+import pandas as pd
+"""Utility/helper functions for strategy module (memory, fallback, etc.)"""
 
 def maybe_collect():
     """Force garbage collection if needed."""
     gc.collect()
     logging.debug("Garbage collection triggered.")
 
-# === Utility Functions (moved from strategy.py) ===
+# = = = Utility Functions (moved from strategy.py) = =  = 
 
 def attempt_order(side: str, price: float, params: dict) -> tuple[bool, list[str]]:
     """Attempt to execute an order and log all block reasons."""
@@ -34,27 +34,27 @@ def attempt_order(side: str, price: float, params: dict) -> tuple[bool, list[str
         can_execute = False
         primary_reason = block_reasons[0]
         logging.warning(
-            "Order Blocked | Side=%s, Reason=%s, All_Reasons=%s",
-            side,
-            primary_reason,
-            block_reasons,
+            "Order Blocked | Side = %s, Reason = %s, All_Reasons = %s", 
+            side, 
+            primary_reason, 
+            block_reasons, 
         )
         return False, block_reasons
     logging.info(
-        "Order Executed | Side=%s, Price=%s, Params=%s",
-        side,
-        price,
-        params,
+        "Order Executed | Side = %s, Price = %s, Params = %s", 
+        side, 
+        price, 
+        params, 
     )
     return True, []
 
-def dynamic_tp2_multiplier(current_atr, avg_atr, base=None):
+def dynamic_tp2_multiplier(current_atr, avg_atr, base = None):
     """Calculates a dynamic TP multiplier based on current vs average ATR."""
     if base is None:
         base = 1.8
-    current_atr_num = pd.to_numeric(current_atr, errors='coerce')
-    avg_atr_num = pd.to_numeric(avg_atr, errors='coerce')
-    if pd.isna(current_atr_num) or pd.isna(avg_atr_num) or np.isinf(current_atr_num) or np.isinf(avg_atr_num) or avg_atr_num < 1e-9:
+    current_atr_num = pd.to_numeric(current_atr, errors = 'coerce')
+    avg_atr_num = pd.to_numeric(avg_atr, errors = 'coerce')
+    if pd.isna(current_atr_num) or pd.isna(avg_atr_num) or np.isinf(current_atr_num) or np.isinf(avg_atr_num) or avg_atr_num < 1e - 9:
         return base
     try:
         ratio = current_atr_num / avg_atr_num
@@ -71,7 +71,7 @@ def dynamic_tp2_multiplier(current_atr, avg_atr, base=None):
     except Exception:
         return base
 
-def get_adaptive_tsl_step(current_atr, avg_atr, default_step=None):
+def get_adaptive_tsl_step(current_atr, avg_atr, default_step = None):
     """Determines the TSL step size (in R units) based on volatility."""
     if default_step is None:
         default_step = 0.5
@@ -79,9 +79,9 @@ def get_adaptive_tsl_step(current_atr, avg_atr, default_step=None):
     high_vol_step = 1.0
     low_vol_ratio = 0.75
     low_vol_step = 0.3
-    current_atr_num = pd.to_numeric(current_atr, errors='coerce')
-    avg_atr_num = pd.to_numeric(avg_atr, errors='coerce')
-    if pd.isna(current_atr_num) or pd.isna(avg_atr_num) or np.isinf(current_atr_num) or np.isinf(avg_atr_num) or avg_atr_num < 1e-9:
+    current_atr_num = pd.to_numeric(current_atr, errors = 'coerce')
+    avg_atr_num = pd.to_numeric(avg_atr, errors = 'coerce')
+    if pd.isna(current_atr_num) or pd.isna(avg_atr_num) or np.isinf(current_atr_num) or np.isinf(avg_atr_num) or avg_atr_num < 1e - 9:
         return default_step
     try:
         ratio = current_atr_num / avg_atr_num

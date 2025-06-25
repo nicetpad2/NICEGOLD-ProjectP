@@ -1,8 +1,8 @@
+
 import importlib
-import sys
 import os
 import pytest
-
+import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 
@@ -51,8 +51,8 @@ def test_config_invalid_float(monkeypatch):
         _reload_config()
 
 def test_config_defaults(monkeypatch, tmp_path):
-    monkeypatch.delenv('NUM_WORKERS', raising=False)
-    monkeypatch.delenv('LEARNING_RATE', raising=False)
+    monkeypatch.delenv('NUM_WORKERS', raising = False)
+    monkeypatch.delenv('LEARNING_RATE', raising = False)
     monkeypatch.setenv('LOG_DIR', str(tmp_path / 'logs'))
     cfg_module = _reload_config()
     cfg = cfg_module.Config()

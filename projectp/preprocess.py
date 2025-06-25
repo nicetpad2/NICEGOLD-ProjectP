@@ -1,9 +1,9 @@
-import os
-import sys
-import pandas as pd
-from projectp.utils_feature import ensure_super_features_file, get_feature_target_columns
 
 # NOTE: SELECTED_FEATURES จะถูก set จาก pipeline หลัก (global)
+from projectp.utils_feature import ensure_super_features_file, get_feature_target_columns
+import os
+import pandas as pd
+import sys
 SELECTED_FEATURES = None
 
 def _safe_unique(val) -> list[str]:
@@ -20,7 +20,7 @@ def run_preprocess():
     feature_cols, target_col = get_feature_target_columns(df)
     print(f'ใช้ feature: {feature_cols}')
     print(f'ใช้ target: {target_col}')
-    df_out = df[feature_cols + [target_col]].dropna().reset_index(drop=True)
+    df_out = df[feature_cols + [target_col]].dropna().reset_index(drop = True)
     # ไม่สร้างคอลัมน์ 'target' ซ้ำถ้ามี target อยู่แล้ว
     if 'target' not in df_out.columns:
         df_out['target'] = df_out[target_col]

@@ -1,7 +1,7 @@
-import pandas as pd
+
+
 from src.features import save_features, load_features
-
-
+import pandas as pd
 def test_save_load_parquet_generic(tmp_path):
     df = pd.DataFrame({'A': [1, 2]})
     path = tmp_path / 'd.parquet'

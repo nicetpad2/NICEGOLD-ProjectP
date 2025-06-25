@@ -1,13 +1,13 @@
-import os
-import sys
-import pandas as pd
 
+import os
+import pandas as pd
+import src.main_helpers as helpers
+import src.model_helpers as models
+import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 sys.path.insert(1, os.path.join(ROOT_DIR, 'src'))
 
-import src.main_helpers as helpers
-import src.model_helpers as models
 # import src.pipeline_helpers as pipe  # Disabled due to circular import issues
 
 
@@ -34,7 +34,7 @@ def test_model_helpers(tmp_path):
 # def test_pipeline_prepare_train(monkeypatch):
 #     called = {}
 #     import src.main as main_mod
-#     def fake_main(run_mode="FULL_PIPELINE", skip_prepare=False, suffix_from_prev_step=None):
+#     def fake_main(run_mode = "FULL_PIPELINE", skip_prepare = False, suffix_from_prev_step = None):
 #         called['mode'] = run_mode
 #         return '_ok'
 #     monkeypatch.setattr(main_mod, 'main', fake_main)

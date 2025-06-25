@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
-"""Walk-forward validation with KPI checks."""
-
+# -*- coding: utf - 8 -* - 
 from __future__ import annotations
-
-import logging
-from typing import Callable, Dict, Iterable
-
-from src.evaluation import calculate_drift_by_period
 from pathlib import Path
-
-import pandas as pd
-from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import TimeSeriesSplit
+from src.evaluation import calculate_drift_by_period
+    from src.evaluation import calculate_drift_summary
+from typing import Callable, Dict, Iterable
+import logging
+import pandas as pd
+"""Walk - forward validation with KPI checks."""
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,16 +17,16 @@ MetricDict = Dict[str, float]
 
 
 def walk_forward_validate(
-    df: pd.DataFrame,
-    backtest_func: Callable[[pd.DataFrame, pd.DataFrame], MetricDict],
-    kpi: Dict[str, float],
-    n_splits: int = 5,
-    retrain_func: Callable[[int, MetricDict], None] | None = None,
+    df: pd.DataFrame, 
+    backtest_func: Callable[[pd.DataFrame, pd.DataFrame], MetricDict], 
+    kpi: Dict[str, float], 
+    n_splits: int = 5, 
+    retrain_func: Callable[[int, MetricDict], None] | None = None, 
 ) -> pd.DataFrame:
-    """Perform walk-forward validation and trigger retraining on KPI failure.
+    """Perform walk - forward validation and trigger retraining on KPI failure.
 
     Parameters
-    ----------
+    - -  -  -  -  -  -  -  -  - 
     df : pd.DataFrame
         Time ordered dataframe containing features and target.
     backtest_func : Callable
@@ -43,7 +41,7 @@ def walk_forward_validate(
         ``metrics`` dict. Defaults to ``None``.
 
     Returns
-    -------
+    - -  -  -  -  -  - 
     pd.DataFrame
         Metrics per fold with a ``failed`` column indicating KPI breaches.
     """
@@ -51,14 +49,14 @@ def walk_forward_validate(
         raise ValueError("DataFrame index must be sorted")
 
     results = []
-    tscv = TimeSeriesSplit(n_splits=n_splits)
+    tscv = TimeSeriesSplit(n_splits = n_splits)
     for fold, (train_idx, test_idx) in enumerate(tscv.split(df)):
         train_df = df.iloc[train_idx]
         test_df = df.iloc[test_idx]
         metrics = backtest_func(train_df, test_df)
 
         fail = (
-            metrics.get("pnl", 0.0) < kpi.get("profit", float("-inf"))
+            metrics.get("pnl", 0.0) < kpi.get("profit", float(" - inf"))
             or metrics.get("winrate", 0.0) < kpi.get("winrate", 0.0)
             or metrics.get("maxdd", 0.0) > kpi.get("maxdd", float("inf"))
             or metrics.get("auc", 0.0) < kpi.get("auc", 0.0)
@@ -74,18 +72,18 @@ def walk_forward_validate(
 
 
 def walk_forward_loop(
-    df: pd.DataFrame,
-    backtest_func: Callable[[pd.DataFrame, pd.DataFrame], MetricDict],
-    kpi: Dict[str, float],
-    train_window: int,
-    test_window: int,
-    step: int,
-    output_path: str | None = None,
+    df: pd.DataFrame, 
+    backtest_func: Callable[[pd.DataFrame, pd.DataFrame], MetricDict], 
+    kpi: Dict[str, float], 
+    train_window: int, 
+    test_window: int, 
+    step: int, 
+    output_path: str | None = None, 
 ) -> pd.DataFrame:
-    """Run sliding-window walk-forward validation and log each fold.
+    """Run sliding - window walk - forward validation and log each fold.
 
     Parameters
-    ----------
+    - -  -  -  -  -  -  -  -  - 
     df : pd.DataFrame
         DataFrame ที่จัดเรียงตามเวลา
     backtest_func : Callable
@@ -102,7 +100,7 @@ def walk_forward_loop(
         หากระบุจะบันทึกผลแต่ละ fold ลง CSV
 
     Returns
-    -------
+    - -  -  -  -  -  - 
     pd.DataFrame
         สรุปผลลัพธ์ของแต่ละ fold
     """
@@ -119,7 +117,7 @@ def walk_forward_loop(
         metrics = backtest_func(train_df, test_df)
 
         failed = (
-            metrics.get("pnl", 0.0) < kpi.get("profit", float("-inf"))
+            metrics.get("pnl", 0.0) < kpi.get("profit", float(" - inf"))
             or metrics.get("winrate", 0.0) < kpi.get("winrate", 0.0)
             or metrics.get("maxdd", 0.0) > kpi.get("maxdd", float("inf"))
             or metrics.get("auc", 0.0) < kpi.get("auc", 0.0)
@@ -130,7 +128,7 @@ def walk_forward_loop(
         if output_path:
             safe_path = output_path if output_path else "output_default/wfv_monitor.csv"
             df_out = pd.DataFrame([row])
-            df_out.to_csv(safe_path, mode="a", header=not Path(safe_path).exists(), index=False)
+            df_out.to_csv(safe_path, mode = "a", header = not Path(safe_path).exists(), index = False)
 
         start += step
         fold += 1
@@ -140,14 +138,14 @@ def walk_forward_loop(
 
 # [Patch v6.1.8] Drift monitoring helper
 def monitor_drift(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    period: str = "D",
-    threshold: float | None = None,
+    train_df: pd.DataFrame, 
+    test_df: pd.DataFrame, 
+    period: str = "D", 
+    threshold: float | None = None, 
 ) -> pd.DataFrame:
     """Calculate drift by period and log warnings if exceeded."""
 
-    res = calculate_drift_by_period(train_df, test_df, period=period, threshold=threshold)
+    res = calculate_drift_by_period(train_df, test_df, period = period, threshold = threshold)
     if not res.empty and res["drift"].any():
         features = sorted(res.loc[res["drift"], "feature"].unique())
         logger.warning("Data drift detected for features: %s", features)
@@ -156,15 +154,14 @@ def monitor_drift(
 
 # [Patch v6.2.1] Daily/weekly drift monitoring summary
 def monitor_drift_summary(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    threshold: float | None = None,
+    train_df: pd.DataFrame, 
+    test_df: pd.DataFrame, 
+    threshold: float | None = None, 
 ) -> pd.DataFrame:
     """Calculate daily and weekly drift summary and log warnings."""
 
-    from src.evaluation import calculate_drift_summary
 
-    res = calculate_drift_summary(train_df, test_df, threshold=threshold)
+    res = calculate_drift_summary(train_df, test_df, threshold = threshold)
     if not res.empty and res["drift"].any():
         feats = sorted(res.loc[res["drift"], "feature"].unique())
         logger.warning("Data drift summary detected for features: %s", feats)
@@ -173,11 +170,11 @@ def monitor_drift_summary(
 
 # [Patch v6.2.2] Monitor AUC drop by period
 def monitor_auc_drop(
-    df: pd.DataFrame,
-    threshold: float,
-    period: str = "D",
-    proba_col: str = "proba",
-    target_col: str = "target",
+    df: pd.DataFrame, 
+    threshold: float, 
+    period: str = "D", 
+    proba_col: str = "proba", 
+    target_col: str = "target", 
 ) -> pd.DataFrame:
     """Compute AUC per period and warn when below threshold."""
 

@@ -1,0 +1,93 @@
+{
+  "total_features": 50,
+  "feature_categories": {
+    "price_features": [
+      "high_low_ratio",
+      "open_close_ratio",
+      "price_range",
+      "typical_price",
+      "weighted_close"
+    ],
+    "trend_indicators": [
+      "sma_5",
+      "sma_10",
+      "sma_20",
+      "sma_50",
+      "ema_5",
+      "ema_10",
+      "ema_20",
+      "ema_50",
+      "trend_strength",
+      "trend_direction"
+    ],
+    "momentum_indicators": [
+      "rsi_14",
+      "rsi_21",
+      "macd",
+      "macd_signal",
+      "macd_histogram",
+      "williams_r",
+      "cci",
+      "momentum",
+      "rate_of_change"
+    ],
+    "volatility_indicators": [
+      "bb_upper",
+      "bb_middle",
+      "bb_lower",
+      "bb_width",
+      "bb_position",
+      "atr",
+      "true_range",
+      "volatility"
+    ],
+    "volume_features": [
+      "volume_sma",
+      "volume_ratio",
+      "price_volume",
+      "volume_trend",
+      "obv"
+    ],
+    "statistical_features": [
+      "rolling_mean",
+      "rolling_std",
+      "rolling_min",
+      "rolling_max",
+      "z_score",
+      "percentile_rank"
+    ],
+    "time_features": [
+      "hour",
+      "day_of_week",
+      "is_weekend",
+      "trading_session",
+      "time_since_start"
+    ],
+    "lagged_features": [
+      "close_lag_1",
+      "close_lag_2",
+      "close_lag_3",
+      "volume_lag_1",
+      "returns_lag_1",
+      "returns_lag_2"
+    ]
+  },
+  "processing_status": "completed",
+  "last_updated": "2025-06-25T03:23:30.659809",
+  "config_used": {
+    "technical_indicators": [
+      "sma",
+      "rsi",
+      "macd",
+      "bollinger"
+    ],
+    "lookback_periods": [
+      5,
+      10,
+      20,
+      50
+    ],
+    "create_target": true
+  },
+  "description": "Comprehensive feature engineering for trading data including technical indicators, statistical features, and time-based features"
+}

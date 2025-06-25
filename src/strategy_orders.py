@@ -8,7 +8,7 @@ def process_active_orders(*args, **kwargs):
     # ...moved from strategy.py...
     pass
 
-# TODO: Move order-related logic from strategy.py
+# TODO: Move order - related logic from strategy.py
 
 def update_open_order_state(order, current_high, current_low, current_atr, avg_atr, now, base_be_r_thresh, fold_sl_multiplier_base, base_tp_multiplier_config, be_sl_counter, tsl_counter):
     """

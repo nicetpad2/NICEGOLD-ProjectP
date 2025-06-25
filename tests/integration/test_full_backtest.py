@@ -1,11 +1,10 @@
-import os
-import sys
-import pandas as pd
-
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, ROOT_DIR)
 
 from strategy import metrics
+import os
+import pandas as pd
+import sys
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, ROOT_DIR)
 
 
 def test_regression_metrics():

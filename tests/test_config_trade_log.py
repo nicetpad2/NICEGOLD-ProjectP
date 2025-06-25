@@ -1,8 +1,8 @@
+
 import importlib
 import os
-import sys
 import pytest
-
+import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 
@@ -14,7 +14,7 @@ def _reload_config(monkeypatch):
 
 
 def test_min_trade_rows_default(monkeypatch, tmp_path):
-    monkeypatch.delenv('MIN_TRADE_ROWS', raising=False)
+    monkeypatch.delenv('MIN_TRADE_ROWS', raising = False)
     monkeypatch.setenv('LOG_DIR', str(tmp_path / 'logs'))
     cfg_module = _reload_config(monkeypatch)
     cfg = cfg_module.Config()

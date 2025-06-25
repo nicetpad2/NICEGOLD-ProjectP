@@ -1,6 +1,8 @@
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning)
+        import mlflow
+        import optuna
 import os
+import warnings
+warnings.filterwarnings("ignore", category = UserWarning)
 
 # automation.py
 # ฟังก์ชันเกี่ยวกับ Production & Automation, Research & Experimentation
@@ -24,20 +26,18 @@ def run_alert_notification():
 def run_experiment_tracking():
     """Experiment tracking (Optuna dashboard, MLflow)"""
     try:
-        import optuna
-        print('[Experiment] Optuna dashboard: รัน optuna dashboard --storage sqlite:///example.db')
+        print('[Experiment] Optuna dashboard: รัน optuna dashboard - - storage sqlite:///example.db')
     except ImportError:
         print('[Experiment] ไม่พบ optuna ข้ามขั้นตอนนี้')
     try:
-        import mlflow
-        print('[Experiment] MLflow: รัน mlflow ui --backend-store-uri sqlite:///mlruns.db')
+        print('[Experiment] MLflow: รัน mlflow ui - - backend - store - uri sqlite:///mlruns.db')
     except ImportError:
         print('[Experiment] ไม่พบ mlflow ข้ามขั้นตอนนี้')
 
 def run_hyperparam_auto_tuning():
-    """Hyperparameter search space auto-tuning (stub)"""
-    print('[Auto-tuning] แนะนำใช้ Optuna/FLAML/AutoGluon ที่ปรับ search space อัตโนมัติได้')
+    """Hyperparameter search space auto - tuning (stub)"""
+    print('[Auto - tuning] แนะนำใช้ Optuna/FLAML/AutoGluon ที่ปรับ search space อัตโนมัติได้')
 
 def run_meta_learning():
-    """Meta-learning: ใช้ผลลัพธ์เก่าแนะนำ config ใหม่ (stub)"""
-    print('[Meta-learning] แนะนำใช้ meta-learning library หรือ custom logic เพื่อแนะนำ config ใหม่จากผลลัพธ์เก่า')
+    """Meta - learning: ใช้ผลลัพธ์เก่าแนะนำ config ใหม่ (stub)"""
+    print('[Meta - learning] แนะนำใช้ meta - learning library หรือ custom logic เพื่อแนะนำ config ใหม่จากผลลัพธ์เก่า')

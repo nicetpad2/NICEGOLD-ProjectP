@@ -1,11 +1,10 @@
-import os
-import sys
-
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, ROOT_DIR)
 
 from src.pipeline_manager import PipelineManager
 from src.utils.pipeline_config import PipelineConfig
+import os
+import sys
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, ROOT_DIR)
 
 
 class DummyStage:
@@ -18,7 +17,7 @@ class DummyStage:
 
 
 def test_run_all_invokes_stages(monkeypatch, tmp_path):
-    cfg = PipelineConfig(model_dir=str(tmp_path))
+    cfg = PipelineConfig(model_dir = str(tmp_path))
     order = []
     pm = PipelineManager(cfg)
     monkeypatch.setattr(pm, 'prepare_data_environment', DummyStage(order, 'prep'))

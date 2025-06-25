@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
+    from projectp.steps.predict import run_predict
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+import joblib
+import numpy as np
+import os
+import pandas as pd
+import sys
+    import traceback
 """
 Test predict.py multi_class issue specifically
 ทดสอบปัญหา multi_class ในขั้นตอน predict
 """
 
-import os
-import sys
-import pandas as pd
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-import joblib
 
 print("🔧 Testing predict.py multi_class fix...")
 
@@ -21,14 +23,14 @@ n_samples = 1000
 
 # Create features similar to your data
 data = {
-    'open': np.random.randn(n_samples),
-    'volume': np.random.randn(n_samples),
-    'returns': np.random.randn(n_samples),
-    'volatility': np.random.randn(n_samples),
-    'momentum': np.random.randn(n_samples),
-    'rsi': np.random.randn(n_samples),
-    'macd': np.random.randn(n_samples),
-    'target': np.random.choice([0, 1, -1], n_samples, p=[0.8, 0.15, 0.05])
+    'open': np.random.randn(n_samples), 
+    'volume': np.random.randn(n_samples), 
+    'returns': np.random.randn(n_samples), 
+    'volatility': np.random.randn(n_samples), 
+    'momentum': np.random.randn(n_samples), 
+    'rsi': np.random.randn(n_samples), 
+    'macd': np.random.randn(n_samples), 
+    'target': np.random.choice([0, 1, -1], n_samples, p = [0.8, 0.15, 0.05])
 }
 
 df = pd.DataFrame(data)
@@ -36,7 +38,7 @@ print(f"✅ Test data created: {df.shape}")
 print(f"📊 Target distribution: {df['target'].value_counts().to_dict()}")
 
 # Create and save test models
-os.makedirs("output_default", exist_ok=True)
+os.makedirs("output_default", exist_ok = True)
 
 # Model 1: LogisticRegression (เป็นโมเดลที่มีปัญหา multi_class)
 features = ['open', 'volume', 'returns', 'volatility', 'momentum', 'rsi', 'macd']
@@ -46,11 +48,11 @@ y = df['target']
 print("🤖 Training test models...")
 
 # Train LogisticRegression
-lr_model = LogisticRegression(random_state=42, max_iter=1000)
+lr_model = LogisticRegression(random_state = 42, max_iter = 1000)
 lr_model.fit(X, y)
 
 # Train RandomForest
-rf_model = RandomForestClassifier(n_estimators=10, random_state=42)
+rf_model = RandomForestClassifier(n_estimators = 10, random_state = 42)
 rf_model.fit(X, y)
 
 # Save models
@@ -79,12 +81,12 @@ print("\n🧪 Testing prediction functions...")
 
 def test_model_prediction(model_path, model_name):
     print(f"\n🔍 Testing {model_name}...")
-    
+
     try:
         # Load model
         model = joblib.load(model_path)
         print(f"✅ Loaded {model_name}")
-        
+
         # Test normal predict_proba
         try:
             pred_proba = model.predict_proba(X)
@@ -93,7 +95,7 @@ def test_model_prediction(model_path, model_name):
         except Exception as e:
             if "multi_class" in str(e):
                 print(f"❌ {model_name} has multi_class issue: {e}")
-                
+
                 # Test fallback methods
                 try:
                     if hasattr(model, 'decision_function'):
@@ -110,7 +112,7 @@ def test_model_prediction(model_path, model_name):
             else:
                 print(f"❌ {model_name} unknown error: {e}")
                 return False
-                
+
     except Exception as e:
         print(f"❌ {model_name} loading failed: {e}")
         return False
@@ -129,38 +131,36 @@ print(f"\n🚀 Testing actual predict.py function...")
 try:
     # Import and run predict function
     sys.path.append('.')
-    from projectp.steps.predict import run_predict
-    
+
     # Test with LogisticRegression (problematic model)
     print(f"🔧 Testing with LogisticRegression model...")
-    
+
     # Copy LR model to expected location
     expected_model_path = os.path.join("output_default", "catboost_model_best_cv.pkl")
     joblib.dump(lr_model, expected_model_path)
-    
+
     # Run predict
     result = run_predict()
     print(f"✅ predict.py completed successfully!")
     print(f"📁 Output: {result}")
-    
+
     # Check if predictions.csv exists and has correct columns
     if os.path.exists(result):
         pred_df = pd.read_csv(result)
         print(f"✅ Predictions file created: {pred_df.shape}")
         print(f"📊 Columns: {list(pred_df.columns)}")
-        
+
         if 'pred_proba' in pred_df.columns:
             print(f"✅ pred_proba column exists")
-            print(f"📊 pred_proba stats: min={pred_df['pred_proba'].min():.3f}, max={pred_df['pred_proba'].max():.3f}, mean={pred_df['pred_proba'].mean():.3f}")
+            print(f"📊 pred_proba stats: min = {pred_df['pred_proba'].min():.3f}, max = {pred_df['pred_proba'].max():.3f}, mean = {pred_df['pred_proba'].mean():.3f}")
         else:
             print(f"❌ pred_proba column missing")
-            
+
     else:
         print(f"❌ Predictions file not created")
-    
+
 except Exception as e:
     print(f"❌ predict.py test failed: {e}")
-    import traceback
     traceback.print_exc()
 
-print(f"\n🎉 Multi-class test completed!")
+print(f"\n🎉 Multi - class test completed!")

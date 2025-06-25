@@ -1,14 +1,14 @@
-"""Utility plotting functions for strategy visuals."""
 from __future__ import annotations
-
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence
-
 import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
+"""Utility plotting functions for strategy visuals."""
+
+
+matplotlib.use("Agg")
 
 
 def plot_equity_curve(
@@ -17,14 +17,14 @@ def plot_equity_curve(
     """Plot an equity curve and optionally save it.
 
     Parameters
-    ----------
+    - -  -  -  -  -  -  -  -  - 
     trade_df : pd.DataFrame
         DataFrame ที่ประกอบด้วยคอลัมน์ตัวเลขของค่า equity
     output_path : Path
         โฟลเดอร์ปลายทางสำหรับบันทึกไฟล์รูป
 
     Returns
-    -------
+    - -  -  -  -  -  - 
     Path
         พาธไฟล์ PNG ที่สร้างขึ้น
     """
@@ -39,7 +39,7 @@ def plot_equity_curve(
     ax.set_title("Equity Curve")
 
     if output_path is not None:
-        output_path.mkdir(parents=True, exist_ok=True)
+        output_path.mkdir(parents = True, exist_ok = True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filepath = output_path / f"equity_{timestamp}.png"
         fig.savefig(filepath)

@@ -1,13 +1,13 @@
+
+from dataclasses import dataclass
+from src.adaptive import update_signal_threshold
+from unittest.mock import patch
+import logging
 import os
 import sys
-import logging
-from unittest.mock import patch
-from dataclasses import dataclass
-
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 
-from src.adaptive import update_signal_threshold
 
 @dataclass
 class DummyParams:

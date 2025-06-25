@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+import joblib
+import os
+import pandas as pd
 """
 Test feature names fix for prediction
 """
 
-import pandas as pd
-import joblib
-import os
 
 print("🔧 Testing Feature Names Fix...")
 
@@ -32,7 +32,7 @@ else:
 # Load the train_features.txt file
 features_path = os.path.join("output_default", "train_features.txt")
 if os.path.exists(features_path):
-    with open(features_path, "r", encoding="utf-8") as f:
+    with open(features_path, "r", encoding = "utf - 8") as f:
         feature_list = [line.strip() for line in f if line.strip()]
     print(f"✅ train_features.txt contains: {feature_list}")
 else:
@@ -46,35 +46,35 @@ if os.path.exists(data_path):
     df.columns = [c.lower() for c in df.columns]  # Lowercase columns as done in predict.py
     print(f"✅ Data loaded: {df.shape}")
     print(f"✅ Data columns: {list(df.columns)}")
-    
+
     # Apply the same feature mapping logic as in predict.py
     original_features = feature_list
-    
+
     for orig_feat in original_features:
         lower_feat = orig_feat.lower()
         if lower_feat in df.columns and orig_feat not in df.columns:
-            df.rename(columns={lower_feat: orig_feat}, inplace=True)
+            df.rename(columns = {lower_feat: orig_feat}, inplace = True)
             print(f"✅ Renamed '{lower_feat}' -> '{orig_feat}'")
         elif orig_feat not in df.columns:
             df[orig_feat] = float('nan')
             print(f"⚠️ Added missing feature '{orig_feat}' with NaN")
-    
+
     # Check if we have all features needed
     missing_features = [f for f in original_features if f not in df.columns]
     if missing_features:
         print(f"❌ Missing features: {missing_features}")
     else:
         print(f"✅ All features available: {original_features}")
-    
+
     # Try prediction on a small sample
     try:
         test_data = df[original_features].head(5)
         test_data = test_data.fillna(0)  # Fill NaN for testing
-        
+
         pred_proba = model.predict_proba(test_data)
         print(f"✅ Prediction successful! Shape: {pred_proba.shape}")
         print(f"✅ Sample probabilities: {pred_proba[:3, 1] if pred_proba.shape[1] > 1 else pred_proba[:3]}")
-        
+
     except Exception as e:
         print(f"❌ Prediction failed: {e}")
 else:

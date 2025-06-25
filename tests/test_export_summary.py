@@ -1,11 +1,10 @@
-import os
-import sys
-import pandas as pd
 
+import os
+import pandas as pd
+import sys
+import tuning.hyperparameter_sweep as hs
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
-
-import tuning.hyperparameter_sweep as hs
 
 
 def test_export_summary_adds_columns(tmp_path):

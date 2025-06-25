@@ -1,35 +1,37 @@
-import os
-import json
-from typing import Iterable, Tuple, Dict, Callable, List
-import numpy as np
-import pandas as pd
 from joblib import load
-from sklearn.metrics import (
-    accuracy_score,
-    roc_auc_score,
-    f1_score,
-    precision_score,
-    recall_score,
-)
 from scipy.stats import wasserstein_distance
-try:
-    import shap
-except Exception:  # pragma: no cover - optional dependency
-    shap = None
+from sklearn.metrics import (
+        from src.config import DRIFT_WASSERSTEIN_THRESHOLD as _thr
 from src.config import logger
 from src.utils import load_json_with_comments
 from src.utils.auto_train_meta_classifiers import (
-    auto_train_meta_classifiers,
+        from src.utils.data_utils import safe_read_csv
+from typing import Iterable, Tuple, Dict, Callable, List
+import json
+import numpy as np
+import os
+import pandas as pd
+    import shap
+    accuracy_score, 
+    roc_auc_score, 
+    f1_score, 
+    precision_score, 
+    recall_score, 
+)
+try:
+except Exception:  # pragma: no cover - optional dependency
+    shap = None
+    auto_train_meta_classifiers, 
 )
 
 
 def sortino_ratio(returns: Iterable[float]) -> float:
     """Calculate Sortino ratio of series of returns."""
-    r = np.asarray(list(returns), dtype=float)
+    r = np.asarray(list(returns), dtype = float)
     if r.size == 0:
         return float('nan')
     downside = r[r < 0]
-    downside_std = downside.std(ddof=1)
+    downside_std = downside.std(ddof = 1)
     mean_ret = r.mean()
     if downside_std == 0:
         return float('inf') if mean_ret > 0 else 0.0
@@ -38,10 +40,10 @@ def sortino_ratio(returns: Iterable[float]) -> float:
 
 def calmar_ratio(equity: Iterable[float]) -> float:
     """Calculate Calmar ratio from equity curve."""
-    eq = np.asarray(list(equity), dtype=float)
+    eq = np.asarray(list(equity), dtype = float)
     if eq.size < 2:
         return float('nan')
-    returns = np.diff(eq) / eq[:-1]
+    returns = np.diff(eq) / eq[: - 1]
     max_dd = 0.0
     peak = eq[0]
     for val in eq:
@@ -71,9 +73,9 @@ def compute_shap_values(model, X: pd.DataFrame) -> np.ndarray | None:
 
 
 def find_best_threshold(
-    proba: Iterable[float],
-    y_true: Iterable[int],
-    step: float = 0.05,
+    proba: Iterable[float], 
+    y_true: Iterable[int], 
+    step: float = 0.05, 
 ) -> Dict[str, float]:
     """Find threshold that maximizes F1 score and return summary metrics."""
     proba = np.array(list(proba))
@@ -89,20 +91,20 @@ def find_best_threshold(
         if score > best_s:
             best_s = score
             best_t = t
-            best_prec = precision_score(y_true, preds, zero_division=0)
-            best_rec = recall_score(y_true, preds, zero_division=0)
+            best_prec = precision_score(y_true, preds, zero_division = 0)
+            best_rec = recall_score(y_true, preds, zero_division = 0)
     return {
-        "best_threshold": best_t,
-        "best_f1": best_s,
-        "precision": best_prec,
-        "recall": best_rec,
+        "best_threshold": best_t, 
+        "best_f1": best_s, 
+        "precision": best_prec, 
+        "recall": best_rec, 
     }
 
 
 def evaluate_meta_classifier(
     model_path: str, validation_path: str, features_path: str | None = None
 ):
-    """Evaluate a saved meta-classifier using validation data."""
+    """Evaluate a saved meta - classifier using validation data."""
     if not os.path.exists(model_path):
         logger.error(f"Model file not found: {model_path}")
         return None
@@ -126,11 +128,10 @@ def evaluate_meta_classifier(
 
     dtype_map = {c: "float32" for c in features}
     try:
-        from src.utils.data_utils import safe_read_csv
 
         df = safe_read_csv(validation_path)
         for col in features:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+            df[col] = pd.to_numeric(df[col], errors = "coerce")
     except Exception as e:
         logger.error(f"Failed to load validation data: {e}")
         return None
@@ -162,20 +163,20 @@ def evaluate_meta_classifier(
     preds = (proba >= 0.5).astype(int)
     acc = accuracy_score(y, preds)
     auc = roc_auc_score(y, proba)
-    logger.info(f"[QA] Meta model evaluation AUC={auc:.4f}, ACC={acc:.4f}")
+    logger.info(f"[QA] Meta model evaluation AUC = {auc:.4f}, ACC = {acc:.4f}")
     return {"accuracy": acc, "auc": auc}
 
 
-# --- Walk-Forward Overfitting Utilities ---
+# - - - Walk - Forward Overfitting Utilities - -  - 
 
 
 def walk_forward_yearly_validation(
-    df: pd.DataFrame,
-    backtest_func: Callable[[pd.DataFrame], Dict[str, float]],
-    train_years: int = 3,
-    test_years: int = 1,
+    df: pd.DataFrame, 
+    backtest_func: Callable[[pd.DataFrame], Dict[str, float]], 
+    train_years: int = 3, 
+    test_years: int = 1, 
 ) -> pd.DataFrame:
-    """Run walk-forward validation by year windows."""
+    """Run walk - forward validation by year windows."""
     if df.empty or not isinstance(df.index, pd.DatetimeIndex):
         raise ValueError("df must have DatetimeIndex and not be empty")
     if not df.index.is_monotonic_increasing:
@@ -197,14 +198,14 @@ def walk_forward_yearly_validation(
         test_m = backtest_func(test_df)
         results.append(
             {
-                "fold": fold,
-                "train_period": f"{train_start}-{train_end}",
-                "test_period": f"{test_start}-{test_end}",
-                "train_winrate": float(train_m.get("winrate", float("nan"))),
-                "train_pnl": float(train_m.get("pnl", float("nan"))),
-                "test_winrate": float(test_m.get("winrate", float("nan"))),
-                "test_pnl": float(test_m.get("pnl", float("nan"))),
-                "test_maxdd": float(test_m.get("maxdd", float("nan"))),
+                "fold": fold, 
+                "train_period": f"{train_start} - {train_end}", 
+                "test_period": f"{test_start} - {test_end}", 
+                "train_winrate": float(train_m.get("winrate", float("nan"))), 
+                "train_pnl": float(train_m.get("pnl", float("nan"))), 
+                "test_winrate": float(test_m.get("winrate", float("nan"))), 
+                "test_pnl": float(test_m.get("pnl", float("nan"))), 
+                "test_maxdd": float(test_m.get("maxdd", float("nan"))), 
             }
         )
         fold += 1
@@ -219,24 +220,23 @@ def detect_overfit_wfv(results: pd.DataFrame, threshold: float = 0.2) -> bool:
     test_avg = results["test_pnl"].mean()
     if train_avg <= 0:
         return False
-    drop_ratio = (train_avg - test_avg) / (abs(train_avg) + 1e-9)
+    drop_ratio = (train_avg - test_avg) / (abs(train_avg) + 1e - 9)
     return drop_ratio > threshold and test_avg <= 0
 
 
 # [Patch v6.1.7] Calculate Wasserstein drift by time period
 def calculate_drift_by_period(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    period: str = "D",
-    threshold: float | None = None,
+    train_df: pd.DataFrame, 
+    test_df: pd.DataFrame, 
+    period: str = "D", 
+    threshold: float | None = None, 
 ) -> pd.DataFrame:
-    """Return per-period Wasserstein distances for numeric features."""
+    """Return per - period Wasserstein distances for numeric features."""
     if not isinstance(train_df.index, pd.DatetimeIndex) or not isinstance(
         test_df.index, pd.DatetimeIndex
     ):
         raise ValueError("DataFrames must have DatetimeIndex")
     if threshold is None:
-        from src.config import DRIFT_WASSERSTEIN_THRESHOLD as _thr
 
         threshold = _thr
 
@@ -253,10 +253,10 @@ def calculate_drift_by_period(
             w = wasserstein_distance([train_grp[p]], [test_grp[p]])
             records.append(
                 {
-                    "period": str(p),
-                    "feature": col,
-                    "wasserstein": float(w),
-                    "drift": bool(w > threshold),
+                    "period": str(p), 
+                    "feature": col, 
+                    "wasserstein": float(w), 
+                    "drift": bool(w > threshold), 
                 }
             )
     return pd.DataFrame(records)
@@ -268,14 +268,14 @@ def calculate_drift_summary(
 ) -> pd.DataFrame:
     """Return combined daily and weekly drift report."""
     daily = calculate_drift_by_period(
-        train_df, test_df, period="D", threshold=threshold
+        train_df, test_df, period = "D", threshold = threshold
     )
     daily["period_type"] = "D"
     weekly = calculate_drift_by_period(
-        train_df, test_df, period="W", threshold=threshold
+        train_df, test_df, period = "W", threshold = threshold
     )
     weekly["period_type"] = "W"
-    report = pd.concat([daily, weekly], ignore_index=True)
+    report = pd.concat([daily, weekly], ignore_index = True)
     if not report.empty and report["drift"].any():
         drift_feats = sorted(report.loc[report["drift"], "feature"].unique())
         logger.warning("Drift detected: %s", drift_feats)
@@ -287,13 +287,13 @@ def calculate_sortino_ratio(returns: pd.Series) -> float:
     """Return Sortino ratio from a series of returns."""
     if returns is None or returns.empty:
         return 0.0
-    returns = pd.to_numeric(returns, errors="coerce").dropna()
+    returns = pd.to_numeric(returns, errors = "coerce").dropna()
     if returns.empty:
         return 0.0
     downside = returns[returns < 0]
-    downside_std = downside.std(ddof=1)
+    downside_std = downside.std(ddof = 1)
     mean_ret = returns.mean()
-    if downside_std is None or pd.isna(downside_std) or downside_std <= 1e-9:
+    if downside_std is None or pd.isna(downside_std) or downside_std <= 1e - 9:
         return float(np.inf if mean_ret > 0 else 0.0)
     ratio = mean_ret / downside_std
     if isinstance(ratio, complex):
@@ -305,7 +305,7 @@ def calculate_max_drawdown(equity: pd.Series) -> float:
     """Return maximum drawdown from an equity curve."""
     if equity is None or equity.empty:
         return 0.0
-    equity = pd.to_numeric(equity, errors="coerce").ffill()
+    equity = pd.to_numeric(equity, errors = "coerce").ffill()
     running_max = equity.cummax()
     drawdown = equity - running_max
     return float(drawdown.min())
@@ -315,11 +315,11 @@ def calculate_calmar_ratio(returns: pd.Series, max_drawdown: float) -> float:
     """Return Calmar ratio using annualized returns and max drawdown."""
     if returns is None or returns.empty:
         return 0.0
-    returns = pd.to_numeric(returns, errors="coerce").dropna()
+    returns = pd.to_numeric(returns, errors = "coerce").dropna()
     if returns.empty:
         return 0.0
     annualized_return = returns.mean() * 252
-    if max_drawdown > 1e-9:
+    if max_drawdown > 1e - 9:
         ratio = annualized_return / abs(max_drawdown)
     else:
         ratio = np.inf if annualized_return > 0 else 0.0
@@ -331,9 +331,8 @@ def calculate_calmar_ratio(returns: pd.Series, max_drawdown: float) -> float:
 def compute_underwater_curve(equity: pd.Series) -> pd.Series:
     """Return underwater drawdown curve from equity series."""
     if equity is None or equity.empty:
-        return pd.Series(dtype=float)
-    equity = pd.to_numeric(equity, errors="coerce").ffill()
+        return pd.Series(dtype = float)
+    equity = pd.to_numeric(equity, errors = "coerce").ffill()
     running_max = equity.cummax()
     underwater = (equity - running_max) / running_max
     return underwater.fillna(0.0)
-

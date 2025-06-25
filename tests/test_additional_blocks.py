@@ -1,52 +1,51 @@
-import os
-import sys
-import pandas as pd
-import numpy as np
-import pytest
 
+import numpy as np
+import os
+import pandas as pd
+import pytest
+import src.data_loader as dl
+import src.features as features
+import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 
-import src.features as features
-import src.data_loader as dl
-
 
 def test_preview_datetime_format_returns_none(capsys):
-    df = pd.DataFrame({'Date': ['2024-01-01'], 'Timestamp': ['12:00']})
-    result = dl.preview_datetime_format(df, n=1)
+    df = pd.DataFrame({'Date': ['2024 - 01 - 01'], 'Timestamp': ['12:00']})
+    result = dl.preview_datetime_format(df, n = 1)
     assert result is None
 
 
 def test_ema_returns_float32_series():
-    series = pd.Series([1, 2, 3], dtype='float32')
+    series = pd.Series([1, 2, 3], dtype = 'float32')
     result = features.ema(series, 2)
     assert result.dtype == 'float32'
     assert len(result) == len(series)
 
 
 def test_sma_handles_nan():
-    series = pd.Series([1, np.nan, 3], dtype='float32')
+    series = pd.Series([1, np.nan, 3], dtype = 'float32')
     result = features.sma(series, 2)
     assert len(result) == len(series)
 
 
 def test_rsi_returns_series(monkeypatch):
-    monkeypatch.setattr(features, 'ta', None, raising=False)
-    series = pd.Series([1, 2, 3], dtype='float32')
-    result = features.rsi(series, period=5)
+    monkeypatch.setattr(features, 'ta', None, raising = False)
+    series = pd.Series([1, 2, 3], dtype = 'float32')
+    result = features.rsi(series, period = 5)
     assert isinstance(result, pd.Series)
     assert len(result) == len(series)
 
 
 def test_atr_missing_columns():
     df = pd.DataFrame({'High': [], 'Low': [], 'Close': []})
-    result = features.atr(df, period=14)
+    result = features.atr(df, period = 14)
     assert 'ATR_14' in result.columns
 
 
 def test_macd_returns_three_series(monkeypatch):
-    monkeypatch.setattr(features, 'ta', None, raising=False)
-    series = pd.Series([1, 2, 3], dtype='float32')
+    monkeypatch.setattr(features, 'ta', None, raising = False)
+    series = pd.Series([1, 2, 3], dtype = 'float32')
     line, signal, diff = features.macd(series)
     assert len(line) == len(series)
     assert len(signal) == len(series)
@@ -60,7 +59,7 @@ def test_tag_price_structure_patterns_empty_df():
 
 
 def test_get_session_tag_timezone_naive():
-    ts = pd.Timestamp('2024-01-01 10:00')
+    ts = pd.Timestamp('2024 - 01 - 01 10:00')
     tag = features.get_session_tag(ts)
     assert isinstance(tag, str)
 
@@ -80,7 +79,7 @@ def test_ema_raises_type_error_non_series():
 
 
 def test_sma_invalid_period_returns_nan_series():
-    series = pd.Series([1, 2, 3], dtype='float32')
+    series = pd.Series([1, 2, 3], dtype = 'float32')
     result = features.sma(series, -1)
     assert result.isna().all()
 
@@ -88,7 +87,6 @@ def test_sma_invalid_period_returns_nan_series():
 def test_rolling_zscore_non_series_raises():
     with pytest.raises(TypeError):
         features.rolling_zscore([1, 2, 3], 3)
-
 
 
 def test_tag_price_structure_patterns_missing_columns():
@@ -104,7 +102,7 @@ def test_calculate_m15_trend_zone_empty_df_returns_neutral():
 
 
 def test_get_session_tag_midnight():
-    ts = pd.Timestamp('2024-01-01 00:00', tz='UTC')
+    ts = pd.Timestamp('2024 - 01 - 01 00:00', tz = 'UTC')
     tag = features.get_session_tag(ts)
     assert isinstance(tag, str)
 
@@ -120,11 +118,11 @@ def test_setup_output_directory_returns_absolute(tmp_path):
 
 
 def test_preview_datetime_format_missing_columns():
-    df = pd.DataFrame({'Date': ['2024-01-01']})
+    df = pd.DataFrame({'Date': ['2024 - 01 - 01']})
     assert dl.preview_datetime_format(df) is None
 
 
 def test_safe_set_datetime_invalid_value_results_nat():
-    df = pd.DataFrame(index=[0])
+    df = pd.DataFrame(index = [0])
     dl.safe_set_datetime(df, 0, 'Date', 'invalid')
     assert pd.isna(df.loc[0, 'Date'])

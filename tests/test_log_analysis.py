@@ -1,34 +1,34 @@
-import os
-import sys
-import gzip
-import pandas as pd
-import tempfile
-import pytest
 
+from src.log_analysis import (
+import gzip
+import os
+import pandas as pd
+import pytest
+import sys
+import tempfile
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
-from src.log_analysis import (
-    parse_trade_logs,
-    calculate_hourly_summary,
-    calculate_position_size,
-    calculate_reason_summary,
-    calculate_duration_stats,
-    calculate_drawdown_stats,
-    calculate_expectancy,
-    parse_alerts,
-    calculate_alert_summary,
-    export_summary_to_csv,
-    plot_summary,
+    parse_trade_logs, 
+    calculate_hourly_summary, 
+    calculate_position_size, 
+    calculate_reason_summary, 
+    calculate_duration_stats, 
+    calculate_drawdown_stats, 
+    calculate_expectancy, 
+    parse_alerts, 
+    calculate_alert_summary, 
+    export_summary_to_csv, 
+    plot_summary, 
 )
 
 SAMPLE_LOG = """
-INFO:root:   Attempting to Open New Order (Standard) for SELL at 2023-01-01 10:00:00+00:00...
-INFO:root:      Order Closing: Time=2023-01-01 10:10:00+00:00, Final Reason=SL, ExitPrice=1900, EntryTime=2023-01-01 10:00:00+00:00
-INFO:root:         [Patch PnL Final] Closed Lot=0.01, PnL(Net USD)=-1.0 (Raw PNL=-0.5, Comm=0.1, SpreadCost=0.2, Slip=-0.4)
-INFO:root:   Attempting to Open New Order (Standard) for SELL at 2023-01-01 11:00:00+00:00...
-INFO:root:      Order Closing: Time=2023-01-01 11:20:00+00:00, Final Reason=Full Close on Partial TP 1, ExitPrice=1890, EntryTime=2023-01-01 11:00:00+00:00
-INFO:root:         [Patch PnL Final] Closed Lot=0.01, PnL(Net USD)=2.5 (Raw PNL=2.8, Comm=0.1, SpreadCost=0.2, Slip=-0.2)
+INFO:root:   Attempting to Open New Order (Standard) for SELL at 2023 - 01 - 01 10:00:00 + 00:00...
+INFO:root:      Order Closing: Time = 2023 - 01 - 01 10:10:00 + 00:00, Final Reason = SL, ExitPrice = 1900, EntryTime = 2023 - 01 - 01 10:00:00 + 00:00
+INFO:root:         [Patch PnL Final] Closed Lot = 0.01, PnL(Net USD) = -1.0 (Raw PNL = -0.5, Comm = 0.1, SpreadCost = 0.2, Slip = -0.4)
+INFO:root:   Attempting to Open New Order (Standard) for SELL at 2023 - 01 - 01 11:00:00 + 00:00...
+INFO:root:      Order Closing: Time = 2023 - 01 - 01 11:20:00 + 00:00, Final Reason = Full Close on Partial TP 1, ExitPrice = 1890, EntryTime = 2023 - 01 - 01 11:00:00 + 00:00
+INFO:root:         [Patch PnL Final] Closed Lot = 0.01, PnL(Net USD) = 2.5 (Raw PNL = 2.8, Comm = 0.1, SpreadCost = 0.2, Slip = -0.2)
 WARNING:root:Potential issue detected
 CRITICAL:root:Critical failure occurred
 """
@@ -54,7 +54,7 @@ def test_calculate_position_size():
     lot = calculate_position_size(1000, 2, 50)
     assert lot > 0
     with pytest.raises(ValueError):
-        calculate_position_size(-1, 2, 50)
+        calculate_position_size( - 1, 2, 50)
 
 
 def test_additional_log_metrics(tmp_path):
@@ -89,7 +89,7 @@ def test_invalid_log_path(tmp_path):
 
 def test_parse_gz_log(tmp_path):
     log_file = tmp_path / "test.log.gz"
-    with gzip.open(log_file, "wt", encoding="utf-8") as fh:
+    with gzip.open(log_file, "wt", encoding = "utf - 8") as fh:
         fh.write(SAMPLE_LOG)
     df = parse_trade_logs(str(log_file))
     assert len(df) == 2
@@ -113,4 +113,3 @@ def test_calculate_expectancy():
     exp = calculate_expectancy(df)
     # Win% = 0.5, AvgWin = 2.5, Loss% = 0.5, AvgLoss = 1.5 -> Expectancy = 0.5
     assert exp == pytest.approx(0.5)
-

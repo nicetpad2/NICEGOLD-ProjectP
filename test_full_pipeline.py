@@ -1,27 +1,26 @@
 #!/usr/bin/env python3
+    from projectp.steps.predict import run_predict
+    import ProjectP  # This will test all syntax
+import subprocess
+import sys
+import time
 """
 Quick test to verify pipeline runs without syntax errors
 """
-
-import sys
-import subprocess
-import time
 
 print("🔧 Testing full pipeline without syntax errors...")
 
 try:
     # Test that we can import the main modules
     print("Testing imports...")
-    import ProjectP  # This will test all syntax
     print("✅ Main imports successful - no syntax errors")
-    
+
     # Test that prediction step works
     print("Testing prediction step...")
-    from projectp.steps.predict import run_predict
     print("✅ Prediction step import successful")
-    
+
     print("🎉 All syntax tests passed!")
-    
+
 except SyntaxError as e:
     print(f"❌ SYNTAX ERROR: {e}")
     sys.exit(1)

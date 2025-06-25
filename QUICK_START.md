@@ -1,26 +1,76 @@
-# Quick Start Guide
+# 🚀 NICEGOLD ProjectP - Quick Start
 
-## 🚀 Your tracking system is ready!
+## Main Entry Points
 
-### Basic Usage:
-```python
-from tracking import start_experiment
-
-with start_experiment("my_experiment", "test_run") as exp:
-    exp.log_params({"lr": 0.01})
-    exp.log_metric("accuracy", 0.95)
-```
-
-### CLI Commands:
+### Method 1: Direct Python Execution (Recommended)
 ```bash
-python tracking_cli.py list-experiments
-python tracking_cli.py best-runs --metric accuracy
-python tracking_cli.py generate-report --days 7
+python ProjectP_refactored.py
 ```
 
-### Next Steps:
-1. Check examples: `python tracking_examples.py all`
-2. Read documentation: `TRACKING_DOCUMENTATION.md`
-3. Customize config: `tracking_config.yaml`
+### Method 2: Easy Startup Script
+```bash
+./start_nicegold.sh
+```
 
-Happy tracking! 🎉
+### Method 3: Command Line Options
+```bash
+# Show help
+python ProjectP_refactored.py --help
+
+# Show version
+python ProjectP_refactored.py --version
+```
+
+## 📋 What Each Method Does
+
+### `ProjectP_refactored.py`
+- **Main system file** - The primary entry point
+- Beautiful startup banner with system information
+- Comprehensive health check before starting
+- Interactive bilingual menu (Thai/English)
+- Full error handling and recovery
+- Modular architecture coordination
+
+### `start_nicegold.sh`
+- **Convenience script** - User-friendly wrapper
+- Automatic dependency checking
+- Interactive menu for common tasks
+- System health verification
+- Easy installation assistance
+
+## 🎯 Quick Commands
+
+| Command | Description |
+|---------|-------------|
+| `python ProjectP_refactored.py` | Start the full system |
+| `python ProjectP_refactored.py --help` | Show usage guide |
+| `python ProjectP_refactored.py --version` | Show version info |
+| `./start_nicegold.sh` | Interactive startup menu |
+| `./start_nicegold.sh start` | Direct system start |
+| `./start_nicegold.sh help` | Show help via script |
+
+## 🔧 First-Time Setup
+
+1. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Make scripts executable:**
+   ```bash
+   chmod +x ProjectP_refactored.py
+   chmod +x start_nicegold.sh
+   ```
+
+3. **Test the system:**
+   ```bash
+   python ProjectP_refactored.py --version
+   ```
+
+## 🎉 You're Ready!
+
+Choose your preferred method and start trading with NICEGOLD ProjectP! 
+
+**Recommended for new users:** Start with `./start_nicegold.sh` for guided setup.
+
+**Recommended for experienced users:** Use `python ProjectP_refactored.py` directly.

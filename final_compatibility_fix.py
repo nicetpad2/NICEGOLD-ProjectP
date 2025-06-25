@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
+        from basic_auc_fix import create_optimized_model
+from pathlib import Path
+        from src.data_loader.csv_loader import CSVLoader
+        from src.evidently_compat import DataDrift, ValueDrift, get_drift_detector
+        from src.pydantic_v2_compat import BaseModel, Field, SecretField
+import logging
+import os
+        import ProjectP
+import subprocess
+import sys
 """
 Final Compatibility Fix Script
-=============================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 
 This script performs the final compatibility fixes for the ML Pipeline project:
 1. Ensures all SecretField imports use the compatibility layer
@@ -12,15 +22,10 @@ This script performs the final compatibility fixes for the ML Pipeline project:
 เสร็จสิ้นการแก้ไขความเข้ากันได้สำหรับโปรเจค ML Pipeline
 """
 
-import logging
-import os
-import subprocess
-import sys
-from pathlib import Path
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level = logging.INFO, format = "%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -31,14 +36,13 @@ def test_pydantic_compatibility():
 
     try:
         # Test our compatibility layer
-        from src.pydantic_v2_compat import BaseModel, Field, SecretField
 
         logger.info("✅ Pydantic compatibility layer imported successfully")
 
         # Test creating a model with SecretField
         class TestModel(BaseModel):
-            secret: str = SecretField(default="test")
-            normal: str = Field(default="normal")
+            secret: str = SecretField(default = "test")
+            normal: str = Field(default = "normal")
 
         # Test instantiation
         model = TestModel()
@@ -56,7 +60,6 @@ def test_evidently_compatibility():
     logger.info("🔍 Testing Evidently compatibility...")
 
     try:
-        from src.evidently_compat import DataDrift, ValueDrift, get_drift_detector
 
         logger.info("✅ Evidently compatibility layer imported successfully")
 
@@ -76,7 +79,6 @@ def test_basic_auc_fix():
     logger.info("🔍 Testing basic_auc_fix integration...")
 
     try:
-        from basic_auc_fix import create_optimized_model
 
         logger.info("✅ basic_auc_fix imported successfully")
 
@@ -102,12 +104,10 @@ def test_circular_imports():
 
     try:
         # Test CSV loader with delayed imports
-        from src.data_loader.csv_loader import CSVLoader
 
         logger.info("✅ CSV loader imported successfully (no circular imports)")
 
         # Test other critical imports
-        import ProjectP
 
         logger.info("✅ ProjectP imported successfully")
 
@@ -124,7 +124,6 @@ def run_quick_pipeline_test():
 
     try:
         # Import and test basic pipeline functionality
-        import ProjectP
 
         # Check if ProjectP has the required functions
         if hasattr(ProjectP, "main"):
@@ -147,11 +146,11 @@ def check_required_files():
     logger.info("🔍 Checking required files...")
 
     required_files = [
-        "src/pydantic_v2_compat.py",
-        "src/evidently_compat.py",
-        "basic_auc_fix.py",
-        "ProjectP.py",
-        "src/data_loader/csv_loader.py",
+        "src/pydantic_v2_compat.py", 
+        "src/evidently_compat.py", 
+        "basic_auc_fix.py", 
+        "ProjectP.py", 
+        "src/data_loader/csv_loader.py", 
     ]
 
     all_exist = True
@@ -168,7 +167,7 @@ def check_required_files():
 def main():
     """Main compatibility verification function"""
     logger.info("🚀 Starting Final Compatibility Fix and Verification")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     # Track test results
     test_results = {}
@@ -192,9 +191,9 @@ def main():
     test_results["pipeline"] = run_quick_pipeline_test()
 
     # Report results
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
     logger.info("📊 FINAL COMPATIBILITY TEST RESULTS")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     all_passed = True
     for test_name, result in test_results.items():
@@ -203,12 +202,12 @@ def main():
         if not result:
             all_passed = False
 
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     if all_passed:
         logger.info("🎉 ALL COMPATIBILITY TESTS PASSED!")
         logger.info("✅ Project is ready for full pipeline execution")
-        logger.info("💡 You can now run: python ProjectP.py --run_full_pipeline")
+        logger.info("💡 You can now run: python ProjectP.py - - run_full_pipeline")
         return True
     else:
         logger.error("❌ Some compatibility tests failed")

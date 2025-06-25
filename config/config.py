@@ -1,8 +1,8 @@
+
+from pathlib import Path
+import logging
 import os
 import sys
-import logging
-from pathlib import Path
-
 class Config:
     """Basic configuration loader with type checking."""
 
@@ -40,7 +40,7 @@ class Config:
 
     def _ensure_dirs(self) -> None:
         for directory in (self.DATA_DIR, self.MODEL_DIR, self.LOG_DIR):
-            directory.mkdir(parents=True, exist_ok=True)
+            directory.mkdir(parents = True, exist_ok = True)
 
 
 config = Config()

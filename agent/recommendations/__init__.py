@@ -1,16 +1,16 @@
+from .action_prioritizer import ActionPrioritizer
+from .improvement_planner import ImprovementPlanner
+from .recommendation_engine import RecommendationEngine
 """
 Intelligent Recommendations Engine
-=================================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 
-AI-powered recommendations for project improvement and optimization.
+AI - powered recommendations for project improvement and optimization.
 """
 
-from .recommendation_engine import RecommendationEngine
-from .improvement_planner import ImprovementPlanner
-from .action_prioritizer import ActionPrioritizer
 
 __all__ = [
-    'RecommendationEngine',
-    'ImprovementPlanner',
+    'RecommendationEngine', 
+    'ImprovementPlanner', 
     'ActionPrioritizer'
 ]

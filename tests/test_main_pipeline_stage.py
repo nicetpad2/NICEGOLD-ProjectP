@@ -1,16 +1,15 @@
-import os
-import sys
-import pandas as pd
-import logging
-from pathlib import Path
-import pytest
-# pytest.skip("Disabled: expects non-existent functionality", allow_module_level=True)
 
+# pytest.skip("Disabled: expects non - existent functionality", allow_module_level = True)
+from pathlib import Path
+import logging
+import os
+import pandas as pd
+import pytest
+import src.main as main
+import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 sys.path.insert(1, os.path.join(ROOT_DIR, 'src'))
-
-import src.main as main
 
 
 def test_parse_arguments_returns_empty_dict():
@@ -59,7 +58,7 @@ def test_run_pipeline_stage_report_missing(monkeypatch, tmp_path):
 def test_run_pipeline_stage_report_with_metrics(monkeypatch, tmp_path):
     monkeypatch.setattr(main, 'OUTPUT_DIR', str(tmp_path))
     metrics = Path(tmp_path) / 'metrics_summary.csv'
-    metrics.write_text('a,1\n')
+    metrics.write_text('a, 1\n')
     monkeypatch.setattr(pd, 'read_csv', lambda p: pd.DataFrame({'a': [1]}))
     called = {}
     monkeypatch.setattr(main, 'plot_equity_curve', lambda *a, **k: called.setdefault('plot', True))

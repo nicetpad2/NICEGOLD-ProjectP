@@ -1,27 +1,45 @@
+
+
+# Enhanced evidently compatibility check with production - ready fallbacks
+# Import the data validator to enforce real data usage
 # Step: Preprocess (เทพ)
+    from backtest_engine import validate_config_yaml
+            from evidently import Report
+        from evidently.report import Report
+    from feature_engineering import (
+    from pandera import Column, DataFrameSchema
+from projectp.data_validator import RealDataValidator, enforce_real_data_only, prevent_dummy_data_creation
+    from projectp.model_guard import check_no_data_leak
+    from projectp.pro_log import pro_log
+    from projectp.steps.backtest import load_and_prepare_main_csv
+    from rich import box
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.progress import (
+    from rich.table import Table
+    from rich.text import Text
+    from src.evidently_compat import EVIDENTLY_AVAILABLE as COMPAT_AVAILABLE
+    from src.evidently_compat import ValueDrift
+    from src.utils.log_utils import export_log_to, pro_log_json, set_log_context
+    from src.utils.resource_auto import (
+from typing import Any, Dict, List, Optional
+    import dask.dataframe as dd
 import json
+import numpy as np
 import os
+import pandas as pd
+    import pandera as pa
+import psutil
+                import pynvml
 import shutil
 import sys
 import time
 import uuid
-from typing import Any, Dict, List, Optional
-
-import numpy as np
-import pandas as pd
-import psutil
-
-# Import the data validator to enforce real data usage
-from projectp.data_validator import RealDataValidator, enforce_real_data_only, prevent_dummy_data_creation
-
-# Enhanced evidently compatibility check with production-ready fallbacks
 EVIDENTLY_AVAILABLE = False
 EVIDENTLY_ERROR = None
 
 try:
     # Try importing from the compatibility layer first
-    from src.evidently_compat import EVIDENTLY_AVAILABLE as COMPAT_AVAILABLE
-    from src.evidently_compat import ValueDrift
 
     if COMPAT_AVAILABLE:
         EVIDENTLY_AVAILABLE = True
@@ -31,12 +49,10 @@ try:
 
     # Try to import Report separately
     try:
-        from evidently.report import Report
 
         print("✅ Evidently Report successfully imported")
     except ImportError:
         try:
-            from evidently import Report
 
             print("✅ Evidently Report imported from main module")
         except ImportError:
@@ -44,10 +60,10 @@ try:
             class Report:
                 """Fallback Report class"""
 
-                def __init__(self, metrics=None):
+                def __init__(self, metrics = None):
                     self.metrics = metrics or []
 
-                def run(self, reference_data=None, current_data=None):
+                def run(self, reference_data = None, current_data = None):
                     print("Fallback Report: Basic drift analysis performed")
 
                 def show(self):
@@ -62,14 +78,14 @@ except ImportError as e:
     EVIDENTLY_ERROR = str(e)
     print(f"⚠️ Evidently import failed: {e} - Using production fallback")
 
-    # Production-grade fallback classes
+    # Production - grade fallback classes
     class Report:
         """Production fallback for evidently Report"""
 
-        def __init__(self, metrics=None):
+        def __init__(self, metrics = None):
             self.metrics = metrics or []
 
-        def run(self, reference_data=None, current_data=None):
+        def run(self, reference_data = None, current_data = None):
             print("Fallback Report: Basic drift analysis performed")
 
         def show(self):
@@ -81,15 +97,15 @@ except ImportError as e:
     class ValueDrift:
         """Production fallback for evidently ValueDrift"""
 
-        def __init__(self, column_name=None):
+        def __init__(self, column_name = None):
             self.column_name = column_name
 
         def calculate(self, reference_data, current_data):
             return {
-                "drift_score": 0.0,
-                "drift_detected": False,
-                "method": "fallback",
-                "column": self.column_name or "unknown",
+                "drift_score": 0.0, 
+                "drift_detected": False, 
+                "method": "fallback", 
+                "column": self.column_name or "unknown", 
             }
 
 except Exception as e:
@@ -97,10 +113,10 @@ except Exception as e:
     print(f"❌ Evidently critical error: {e} - Creating minimal fallbacks")
 
     class Report:
-        def __init__(self, metrics=None):
+        def __init__(self, metrics = None):
             self.metrics = metrics or []
 
-        def run(self, reference_data=None, current_data=None):
+        def run(self, reference_data = None, current_data = None):
             pass
 
         def show(self):
@@ -110,13 +126,11 @@ except Exception as e:
             pass
 
     class ValueDrift:
-        def __init__(self, column_name=None):
+        def __init__(self, column_name = None):
             self.column_name = column_name
 
 
 try:
-    import pandera as pa
-    from pandera import Column, DataFrameSchema
 
     PANDERA_AVAILABLE = True
 except ImportError:
@@ -128,15 +142,13 @@ except ImportError:
 
 # Import required modules with fallbacks
 try:
-    from projectp.pro_log import pro_log
 except ImportError:
 
-    def pro_log(msg, tag=None, level="info"):
+    def pro_log(msg, tag = None, level = "info"):
         print(f"[{level.upper()}] {tag or 'LOG'}: {msg}")
 
 
 try:
-    from projectp.model_guard import check_no_data_leak
 except ImportError:
 
     def check_no_data_leak(df_train, df_test):
@@ -144,9 +156,8 @@ except ImportError:
 
 
 try:
-    from feature_engineering import (
-        add_domain_and_lagged_features,
-        check_feature_collinearity,
+        add_domain_and_lagged_features, 
+        check_feature_collinearity, 
     )
 except ImportError:
 
@@ -159,13 +170,12 @@ except ImportError:
 
 
 try:
-    from src.utils.log_utils import export_log_to, pro_log_json, set_log_context
 except ImportError:
 
     def set_log_context(**kwargs):
         pass
 
-    def pro_log_json(data, tag=None, level="INFO"):
+    def pro_log_json(data, tag = None, level = "INFO"):
         print(f"[{level}] {tag}: {data}")
 
     def export_log_to(path):
@@ -173,7 +183,6 @@ except ImportError:
 
 
 try:
-    from backtest_engine import validate_config_yaml
 except ImportError:
 
     def validate_config_yaml(path):
@@ -181,18 +190,16 @@ except ImportError:
 
 
 try:
-    from projectp.steps.backtest import load_and_prepare_main_csv
 except ImportError:
 
-    def load_and_prepare_main_csv(path, add_target=True):
+    def load_and_prepare_main_csv(path, add_target = True):
         print(f"Loading CSV from {path}")
         return pd.read_csv(path)
 
 
 try:
-    from src.utils.resource_auto import (
-        get_optimal_resource_fraction,
-        print_resource_summary,
+        get_optimal_resource_fraction, 
+        print_resource_summary, 
     )
 except ImportError:
 
@@ -204,25 +211,18 @@ except ImportError:
 
 
 try:
-    import dask.dataframe as dd
 
     DASK_AVAILABLE = True
 except ImportError:
     DASK_AVAILABLE = False
 
 try:
-    from rich import box
-    from rich.console import Console
-    from rich.panel import Panel
-    from rich.progress import (
-        BarColumn,
-        Progress,
-        SpinnerColumn,
-        TextColumn,
-        TimeElapsedColumn,
+        BarColumn, 
+        Progress, 
+        SpinnerColumn, 
+        TextColumn, 
+        TimeElapsedColumn, 
     )
-    from rich.table import Table
-    from rich.text import Text
 
     RICH_AVAILABLE = True
 except ImportError:
@@ -238,10 +238,10 @@ except ImportError:
         def __exit__(self, *args):
             pass
 
-        def add_task(self, description, total=100):
+        def add_task(self, description, total = 100):
             return 0
 
-        def update(self, task_id, advance=0, description=None, completed=None):
+        def update(self, task_id, advance = 0, description = None, completed = None):
             if description:
                 print(description)
 
@@ -250,7 +250,7 @@ except ImportError:
             print(*args)
 
     class Panel:
-        def __init__(self, content, title=None, **kwargs):
+        def __init__(self, content, title = None, **kwargs):
             self.content = content
             self.title = title
 
@@ -269,25 +269,25 @@ except ImportError:
 if PANDERA_AVAILABLE and DataFrameSchema is not None and Column is not None:
     schema = DataFrameSchema(
         {
-            "Open": Column(float, nullable=False),
-            "High": Column(float, nullable=False),
-            "Low": Column(float, nullable=False),
-            "Close": Column(float, nullable=False),
-            "Volume": Column(float, nullable=False),
+            "Open": Column(float, nullable = False), 
+            "High": Column(float, nullable = False), 
+            "Low": Column(float, nullable = False), 
+            "Close": Column(float, nullable = False), 
+            "Volume": Column(float, nullable = False), 
         }
     )
 else:
     schema = None
 
 
-def run_drift_monitor(ref_df, new_df, out_html="output_default/drift_report.html"):
-    """Production-grade drift monitoring with comprehensive fallbacks"""
+def run_drift_monitor(ref_df, new_df, out_html = "output_default/drift_report.html"):
+    """Production - grade drift monitoring with comprehensive fallbacks"""
     if not EVIDENTLY_AVAILABLE or Report is None or ValueDrift is None:
         pro_log("⚠️ Evidently not available - creating basic drift report")
 
-        os.makedirs(os.path.dirname(out_html), exist_ok=True)
+        os.makedirs(os.path.dirname(out_html), exist_ok = True)
         try:
-            with open(out_html, "w", encoding="utf-8") as f:
+            with open(out_html, "w", encoding = "utf - 8") as f:
                 f.write(
                     f"""
                 <html><head><title>Basic Drift Report</title></head>
@@ -305,18 +305,18 @@ def run_drift_monitor(ref_df, new_df, out_html="output_default/drift_report.html
         return
 
     try:
-        report = Report(metrics=[ValueDrift()])
-        report.run(reference_data=ref_df, current_data=new_df)
-        os.makedirs(os.path.dirname(out_html), exist_ok=True)
+        report = Report(metrics = [ValueDrift()])
+        report.run(reference_data = ref_df, current_data = new_df)
+        os.makedirs(os.path.dirname(out_html), exist_ok = True)
         report.save_html(out_html)
         pro_log(f"✅ Evidently drift report saved to {out_html}")
     except Exception as e:
         pro_log(f"❌ Evidently drift report failed: {e}")
 
 
-def run_preprocess(config=None, mode="default"):
+def run_preprocess(config = None, mode = "default"):
     """
-    Production-grade preprocessing with comprehensive multi-mode support
+    Production - grade preprocessing with comprehensive multi - mode support
     ENFORCES REAL DATA ONLY from datacsv folder - no dummy/synthetic data allowed
 
     Args:
@@ -328,73 +328,73 @@ def run_preprocess(config=None, mode="default"):
     """
     console = Console()
     trace_id = str(uuid.uuid4())
-    set_log_context(trace_id=trace_id, pipeline_step="preprocess")
+    set_log_context(trace_id = trace_id, pipeline_step = "preprocess")
 
     # ENFORCE REAL DATA ONLY - Critical validation
     try:
         data_validator = enforce_real_data_only()
-        pro_log("🛡️ Real data enforcement activated - only datacsv data allowed", tag="Preprocess")
+        pro_log("🛡️ Real data enforcement activated - only datacsv data allowed", tag = "Preprocess")
     except Exception as e:
         error_msg = f"❌ CRITICAL: Real data validation failed: {e}"
-        pro_log(error_msg, level="error", tag="Preprocess")
+        pro_log(error_msg, level = "error", tag = "Preprocess")
         raise ValueError(error_msg)
 
-    # Enhanced production-grade mode configuration
+    # Enhanced production - grade mode configuration
     mode_config = {
         "default": {
-            "use_drift_monitor": True,
-            "schema_validation": True,
-            "resource_logging": True,
-            "performance_logging": True,
-            "export_summary": True,
-            "timeout_seconds": 300,
-            "retry_count": 1,
-        },
+            "use_drift_monitor": True, 
+            "schema_validation": True, 
+            "resource_logging": True, 
+            "performance_logging": True, 
+            "export_summary": True, 
+            "timeout_seconds": 300, 
+            "retry_count": 1, 
+        }, 
         "debug": {
-            "use_drift_monitor": True,
-            "schema_validation": True,
-            "resource_logging": True,
-            "performance_logging": True,
-            "export_summary": True,
-            "verbose_logging": True,
-            "debug_outputs": True,
-            "timeout_seconds": 600,
-            "retry_count": 2,
-        },
+            "use_drift_monitor": True, 
+            "schema_validation": True, 
+            "resource_logging": True, 
+            "performance_logging": True, 
+            "export_summary": True, 
+            "verbose_logging": True, 
+            "debug_outputs": True, 
+            "timeout_seconds": 600, 
+            "retry_count": 2, 
+        }, 
         "fast": {
-            "use_drift_monitor": False,
-            "schema_validation": False,
-            "resource_logging": False,
-            "performance_logging": False,
-            "export_summary": False,
-            "timeout_seconds": 60,
-            "retry_count": 0,
-        },
+            "use_drift_monitor": False, 
+            "schema_validation": False, 
+            "resource_logging": False, 
+            "performance_logging": False, 
+            "export_summary": False, 
+            "timeout_seconds": 60, 
+            "retry_count": 0, 
+        }, 
         "ultimate": {
-            "use_drift_monitor": True,
-            "schema_validation": True,
-            "resource_logging": True,
-            "performance_logging": True,
-            "export_summary": True,
-            "advanced_features": True,
-            "quality_checks": True,
-            "comprehensive_logging": True,
-            "timeout_seconds": 900,
-            "retry_count": 3,
-        },
+            "use_drift_monitor": True, 
+            "schema_validation": True, 
+            "resource_logging": True, 
+            "performance_logging": True, 
+            "export_summary": True, 
+            "advanced_features": True, 
+            "quality_checks": True, 
+            "comprehensive_logging": True, 
+            "timeout_seconds": 900, 
+            "retry_count": 3, 
+        }, 
         "production": {
-            "use_drift_monitor": True,
-            "schema_validation": True,
-            "resource_logging": True,
-            "performance_logging": True,
-            "export_summary": True,
-            "error_handling": "strict",
-            "backup_enabled": True,
-            "monitoring": True,
-            "timeout_seconds": 450,
-            "retry_count": 2,
-            "health_checks": True,
-        },
+            "use_drift_monitor": True, 
+            "schema_validation": True, 
+            "resource_logging": True, 
+            "performance_logging": True, 
+            "export_summary": True, 
+            "error_handling": "strict", 
+            "backup_enabled": True, 
+            "monitoring": True, 
+            "timeout_seconds": 450, 
+            "retry_count": 2, 
+            "health_checks": True, 
+        }, 
     }
 
     current_mode = mode_config.get(mode, mode_config["default"])
@@ -403,36 +403,36 @@ def run_preprocess(config=None, mode="default"):
     if RICH_AVAILABLE:
         console.print(
             Panel(
-                f"🚀 Running Preprocessing in {mode.upper()} Mode", style="bold green"
+                f"🚀 Running Preprocessing in {mode.upper()} Mode", style = "bold green"
             )
         )
     pro_log(f"🚀 Running preprocess in {mode.upper()} mode with trace_id: {trace_id}")
 
     # Initialize processing metrics
     processing_metrics = {
-        "mode": mode,
-        "start_time": start_time,
-        "trace_id": trace_id,
-        "status": "running",
+        "mode": mode, 
+        "start_time": start_time, 
+        "trace_id": trace_id, 
+        "status": "running", 
     }
 
     try:
         pro_log_json(
-            {"event": "start_preprocess", "mode": mode, "config": current_mode},
-            tag="Preprocess",
-            level="INFO",
+            {"event": "start_preprocess", "mode": mode, "config": current_mode}, 
+            tag = "Preprocess", 
+            level = "INFO", 
         )
         validate_config_yaml("config.yaml")
-        pro_log("[Preprocess] Loading and feature engineering...", tag="Preprocess")
+        pro_log("[Preprocess] Loading and feature engineering...", tag = "Preprocess")
 
         with Progress(
-            SpinnerColumn(),
-            BarColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            TimeElapsedColumn(),
-            console=console,
+            SpinnerColumn(), 
+            BarColumn(), 
+            TextColumn("[progress.description]{task.description}"), 
+            TimeElapsedColumn(), 
+            console = console, 
         ) as progress:
-            task = progress.add_task("[cyan]Preprocessing data...", total=100)
+            task = progress.add_task("[cyan]Preprocessing data...", total = 100)
 
             # Enhanced resource optimization for production
             if current_mode.get("resource_logging"):
@@ -440,17 +440,17 @@ def run_preprocess(config=None, mode="default"):
                 print_resource_summary()
                 processing_metrics["resource_info"] = resource_info
 
-            # Auto-enable Dask if available for performance
+            # Auto - enable Dask if available for performance
             use_dask = DASK_AVAILABLE
             if use_dask:
                 pro_log(
-                    "[Preprocess] Dask is available and will be used for processing.",
-                    tag="Preprocess",
+                    "[Preprocess] Dask is available and will be used for processing.", 
+                    tag = "Preprocess", 
                 )
             else:
                 pro_log(
-                    "[Preprocess] Dask not found. Using pandas for processing.",
-                    tag="Preprocess",
+                    "[Preprocess] Dask not found. Using pandas for processing.", 
+                    tag = "Preprocess", 
                 )
 
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -476,32 +476,32 @@ def run_preprocess(config=None, mode="default"):
                 else:
                     return pd.read_csv(path)
 
-            # --- ENFORCED REAL DATA LOADING FROM DATACSV ONLY ---
+            # - - - ENFORCED REAL DATA LOADING FROM DATACSV ONLY - -  - 
             progress.update(
-                task, advance=10, description="[cyan]Loading REAL DATA from datacsv folder..."
+                task, advance = 10, description = "[cyan]Loading REAL DATA from datacsv folder..."
             )
 
             # Get available data files from datacsv folder
             available_files = data_validator.get_available_data_files()
             if not available_files:
                 error_msg = "❌ CRITICAL: No valid data files found in datacsv folder"
-                pro_log(error_msg, level="error", tag="Preprocess")
+                pro_log(error_msg, level = "error", tag = "Preprocess")
                 raise ValueError(error_msg)
-            
+
             df = None
-            
+
             # Check if specific file is requested in config
             if config and "data" in config and "file" in config["data"]:
                 requested_file = config["data"]["file"]
                 if requested_file in available_files:
                     df = data_validator.load_real_data(requested_file)
-                    pro_log(f"[Preprocess] Loaded requested real data file: {requested_file} {df.shape}", tag="Preprocess")
+                    pro_log(f"[Preprocess] Loaded requested real data file: {requested_file} {df.shape}", tag = "Preprocess")
                 else:
                     error_msg = f"❌ CRITICAL: Requested data file {requested_file} not found in datacsv"
-                    pro_log(error_msg, level="error", tag="Preprocess")
+                    pro_log(error_msg, level = "error", tag = "Preprocess")
                     raise FileNotFoundError(error_msg)
-            
-            # Multi-timeframe mode - load all available files from datacsv
+
+            # Multi - timeframe mode - load all available files from datacsv
             elif config and "data" in config and (config["data"].get("multi") or config["data"].get("path") == "all"):
                 dfs = []
                 for data_file in available_files:
@@ -510,23 +510,23 @@ def run_preprocess(config=None, mode="default"):
                     df_tmp["__src_timeframe"] = data_file
                     dfs.append(df_tmp)
                     progress.update(
-                        task,
-                        advance=20,
-                        description=f"[cyan]Loaded real data: {data_file}",
+                        task, 
+                        advance = 20, 
+                        description = f"[cyan]Loaded real data: {data_file}", 
                     )
                 if not dfs:
                     pro_log(
-                        f"[Preprocess] No data files found for multi timeframe",
-                        level="error",
-                        tag="Preprocess"
+                        f"[Preprocess] No data files found for multi timeframe", 
+                        level = "error", 
+                        tag = "Preprocess"
                     )
-                
+
                 if not dfs:
                     error_msg = "❌ CRITICAL: No valid data files loaded from datacsv folder"
-                    pro_log(error_msg, level="error", tag="Preprocess")
+                    pro_log(error_msg, level = "error", tag = "Preprocess")
                     raise ValueError(error_msg)
 
-                # Merge multi-timeframe data from real datacsv files
+                # Merge multi - timeframe data from real datacsv files
                 time_keys = [
                     c
                     for c in dfs[0].columns
@@ -536,11 +536,11 @@ def run_preprocess(config=None, mode="default"):
                 df_merged = dfs[0]
                 for df_next in dfs[1:]:
                     df_merged = pd.merge(
-                        df_merged, df_next, on=key, how="outer", suffixes=("", "_tf2")
+                        df_merged, df_next, on = key, how = "outer", suffixes = ("", "_tf2")
                     )
                 df = df_merged
                 progress.update(
-                    task, advance=20, description="[green]Merged real multi-timeframe data"
+                    task, advance = 20, description = "[green]Merged real multi - timeframe data"
                 )
             # Default: Load first available file from datacsv
             else:
@@ -548,31 +548,31 @@ def run_preprocess(config=None, mode="default"):
                 default_file = available_files[0]
                 df = data_validator.load_real_data(default_file)
                 df.columns = [c.lower() for c in df.columns]
-                
+
                 # Create backup of real data for safety
                 backup_dir = os.path.abspath(
                     os.path.join("output_default", "backup_preprocess")
                 )
-                os.makedirs(backup_dir, exist_ok=True)
+                os.makedirs(backup_dir, exist_ok = True)
                 backup_path = os.path.join(backup_dir, default_file)
                 shutil.copy2(data_validator.get_data_file_path(default_file), backup_path)
-                
-                pro_log(f"[Preprocess] Loaded default real data: {default_file} {df.shape}", tag="Preprocess")
+
+                pro_log(f"[Preprocess] Loaded default real data: {default_file} {df.shape}", tag = "Preprocess")
                 progress.update(
-                    task, advance=30, description=f"[green]Loaded real data: {default_file}"
+                    task, advance = 30, description = f"[green]Loaded real data: {default_file}"
                 )
 
             # Validate that we have real data loaded
             if df is None or len(df) == 0:
                 error_msg = "❌ CRITICAL: No real data loaded - pipeline cannot proceed"
-                pro_log(error_msg, level="error", tag="Preprocess")
+                pro_log(error_msg, level = "error", tag = "Preprocess")
                 raise ValueError(error_msg)
-            
-            pro_log(f"✅ Real data loaded successfully: {df.shape} rows, {len(df.columns)} columns", tag="Preprocess")
 
-            # --- Normalize & map columns to standard names ---
+            pro_log(f"✅ Real data loaded successfully: {df.shape} rows, {len(df.columns)} columns", tag = "Preprocess")
+
+            # - - - Normalize & map columns to standard names - -  - 
             progress.update(
-                task, advance=15, description="[cyan]Normalizing column names..."
+                task, advance = 15, description = "[cyan]Normalizing column names..."
             )
             col_map = {}
             for c in df.columns:
@@ -589,12 +589,12 @@ def run_preprocess(config=None, mode="default"):
                     col_map[c] = "Volume"
                 else:
                     col_map[c] = c
-            df = df.rename(columns=col_map)
+            df = df.rename(columns = col_map)
 
             # Remove duplicate columns
             for col in ["close", "volume", "open", "high", "low"]:
                 if col in df.columns and col.capitalize() in df.columns:
-                    df = df.drop(columns=[col])
+                    df = df.drop(columns = [col])
 
             # Check required columns
             expected_cols = ["Open", "High", "Low", "Close", "Volume"]
@@ -602,9 +602,9 @@ def run_preprocess(config=None, mode="default"):
             if missing:
                 raise ValueError(f"Missing columns: {missing} in input data")
 
-            # --- Feature Engineering ---
+            # - - - Feature Engineering - -  - 
             progress.update(
-                task, advance=20, description="[cyan]Adding technical indicators..."
+                task, advance = 20, description = "[cyan]Adding technical indicators..."
             )
             df["ma5"] = df["Close"].rolling(5).mean()
             df["ma10"] = df["Close"].rolling(10).mean()
@@ -627,26 +627,26 @@ def run_preprocess(config=None, mode="default"):
                 )
             )
             df["macd"] = (
-                df["Close"].ewm(span=12, adjust=False).mean()
-                - df["Close"].ewm(span=26, adjust=False).mean()
+                df["Close"].ewm(span = 12, adjust = False).mean()
+                - df["Close"].ewm(span = 26, adjust = False).mean()
             )
 
             # Create target
             threshold = 0.001
-            future_return = (df["Close"].shift(-1) - df["Close"]) / df["Close"]
+            future_return = (df["Close"].shift( - 1) - df["Close"]) / df["Close"]
             df["target"] = np.where(
-                future_return > threshold,
-                1,
-                np.where(future_return < -threshold, -1, 0),
+                future_return > threshold, 
+                1, 
+                np.where(future_return < -threshold, -1, 0), 
             )
 
-            # Add domain-specific features
+            # Add domain - specific features
             df = add_domain_and_lagged_features(df)
 
             # Cap outliers in volume
             if "Volume" in df.columns:
                 vol_cap = df["Volume"].quantile(0.99)
-                df["Volume"] = df["Volume"].clip(upper=vol_cap)
+                df["Volume"] = df["Volume"].clip(upper = vol_cap)
 
             # Check collinearity
             check_feature_collinearity(df)
@@ -660,28 +660,28 @@ def run_preprocess(config=None, mode="default"):
             main_cols = ["Open", "High", "Low", "Close", "Volume"]
             exclude_cols = ["target"] + datetime_cols + main_cols
             df, dropped_corr = remove_highly_correlated_features(
-                df, threshold=0.95, exclude_cols=exclude_cols
+                df, threshold = 0.95, exclude_cols = exclude_cols
             )
             if dropped_corr:
                 pro_log(
-                    f"[Preprocess] Dropped highly correlated features: {dropped_corr}",
-                    tag="Preprocess",
+                    f"[Preprocess] Dropped highly correlated features: {dropped_corr}", 
+                    tag = "Preprocess", 
                 )
 
             # Select final columns
             features = [
-                "Open",
-                "High",
-                "Low",
-                "Close",
-                "Volume",
-                "ma5",
-                "ma10",
-                "returns",
-                "volatility",
-                "momentum",
-                "rsi",
-                "macd",
+                "Open", 
+                "High", 
+                "Low", 
+                "Close", 
+                "Volume", 
+                "ma5", 
+                "ma10", 
+                "returns", 
+                "volatility", 
+                "momentum", 
+                "rsi", 
+                "macd", 
             ]
             target = "target"
             keep_cols = features + datetime_cols + [target]
@@ -691,38 +691,38 @@ def run_preprocess(config=None, mode="default"):
             if df.isnull().sum().sum() > 0:
                 df = df.ffill().bfill()
                 pro_log(
-                    f"[Preprocess] Filled missing values using ffill/bfill.",
-                    tag="Preprocess",
+                    f"[Preprocess] Filled missing values using ffill/bfill.", 
+                    tag = "Preprocess", 
                 )
 
-            df = df.dropna(subset=[c for c in features if c in df.columns] + [target])
+            df = df.dropna(subset = [c for c in features if c in df.columns] + [target])
             df_out = df[keep_cols].copy()
             pro_log(
-                f"[Preprocess] After feature engineering and cleaning: {df_out.shape}",
-                tag="Preprocess",
+                f"[Preprocess] After feature engineering and cleaning: {df_out.shape}", 
+                tag = "Preprocess", 
             )
 
             # Schema validation
             progress.update(
-                task, advance=15, description="[cyan]Validating data schema..."
+                task, advance = 15, description = "[cyan]Validating data schema..."
             )
             try:
                 if PANDERA_AVAILABLE and schema is not None:
                     schema.validate(df_out[expected_cols])
                     pro_log(
-                        "[Preprocess] Pandera schema validation PASSED.",
-                        tag="Preprocess",
+                        "[Preprocess] Pandera schema validation PASSED.", 
+                        tag = "Preprocess", 
                     )
                 else:
                     pro_log(
-                        "[Preprocess] Pandera not available, skipping schema validation.",
-                        tag="Preprocess",
+                        "[Preprocess] Pandera not available, skipping schema validation.", 
+                        tag = "Preprocess", 
                     )
             except Exception as e:
                 pro_log(
-                    f"[Preprocess] Schema validation failed: {e}",
-                    level="error",
-                    tag="Preprocess",
+                    f"[Preprocess] Schema validation failed: {e}", 
+                    level = "error", 
+                    tag = "Preprocess", 
                 )
 
             # Data leak check
@@ -733,45 +733,44 @@ def run_preprocess(config=None, mode="default"):
 
             # Save outputs
             progress.update(
-                task, advance=15, description="[cyan]Saving processed data..."
+                task, advance = 15, description = "[cyan]Saving processed data..."
             )
-            os.makedirs("output_default", exist_ok=True)
+            os.makedirs("output_default", exist_ok = True)
             out_path = os.path.abspath(
                 os.path.join("output_default", "preprocessed_super.parquet")
             )
-            df_out.to_parquet(out_path, index=False)
+            df_out.to_parquet(out_path, index = False)
 
             out_csv_path = os.path.abspath(
                 os.path.join("output_default", "preprocessed.csv")
             )
-            df_out.to_csv(out_csv_path, index=False)
+            df_out.to_csv(out_csv_path, index = False)
             pro_log(
-                f"[Preprocess] Saved feature engineered data to {out_csv_path}",
-                level="success",
-                tag="Preprocess",
+                f"[Preprocess] Saved feature engineered data to {out_csv_path}", 
+                level = "success", 
+                tag = "Preprocess", 
             )
 
             # Export logs and metrics
             pro_log_json(
-                {"event": "end_preprocess", "result": str(out_path)},
-                tag="Preprocess",
-                level="SUCCESS",
+                {"event": "end_preprocess", "result": str(out_path)}, 
+                tag = "Preprocess", 
+                level = "SUCCESS", 
             )
             export_log_to(f"logs/preprocess_{trace_id}.jsonl")
 
             # Resource logging
             end_time = time.time()
             resource_info = {
-                "ram_percent": psutil.virtual_memory().percent,
-                "ram_used_gb": psutil.virtual_memory().used / 1e9,
-                "ram_total_gb": psutil.virtual_memory().total / 1e9,
-                "cpu_percent": psutil.cpu_percent(),
-                "gpu_used_gb": 0.0,
-                "gpu_total_gb": 0.0,
+                "ram_percent": psutil.virtual_memory().percent, 
+                "ram_used_gb": psutil.virtual_memory().used / 1e9, 
+                "ram_total_gb": psutil.virtual_memory().total / 1e9, 
+                "cpu_percent": psutil.cpu_percent(), 
+                "gpu_used_gb": 0.0, 
+                "gpu_total_gb": 0.0, 
             }
 
             try:
-                import pynvml
 
                 pynvml.nvmlInit()
                 h = pynvml.nvmlDeviceGetHandleByIndex(0)
@@ -784,62 +783,62 @@ def run_preprocess(config=None, mode="default"):
             resource_log_path = os.path.join(
                 "output_default", "preprocess_resource_log.json"
             )
-            with open(resource_log_path, "w", encoding="utf-8") as f:
-                json.dump(resource_info, f, indent=2)
+            with open(resource_log_path, "w", encoding = "utf - 8") as f:
+                json.dump(resource_info, f, indent = 2)
             pro_log(
-                f"[Preprocess] Resource log exported to {resource_log_path}",
-                tag="Preprocess",
+                f"[Preprocess] Resource log exported to {resource_log_path}", 
+                tag = "Preprocess", 
             )
 
             # Summary metrics
             try:
                 summary = {}
-                for col in df_out.select_dtypes(include=[float, int]).columns:
+                for col in df_out.select_dtypes(include = [float, int]).columns:
                     summary[col] = {
-                        "mean": float(df_out[col].mean()),
-                        "std": float(df_out[col].std()),
-                        "min": float(df_out[col].min()),
-                        "max": float(df_out[col].max()),
+                        "mean": float(df_out[col].mean()), 
+                        "std": float(df_out[col].std()), 
+                        "min": float(df_out[col].min()), 
+                        "max": float(df_out[col].max()), 
                     }
                 summary_path = os.path.join(
                     "output_default", "preprocess_summary_metrics.json"
                 )
-                with open(summary_path, "w", encoding="utf-8") as f:
-                    json.dump(summary, f, indent=2)
+                with open(summary_path, "w", encoding = "utf - 8") as f:
+                    json.dump(summary, f, indent = 2)
                 pro_log(
-                    f"[Preprocess] Summary metrics exported to {summary_path}",
-                    tag="Preprocess",
+                    f"[Preprocess] Summary metrics exported to {summary_path}", 
+                    tag = "Preprocess", 
                 )
             except Exception as e:
                 pro_log(
-                    f"[Preprocess] Summary metrics export error: {e}",
-                    level="warn",
-                    tag="Preprocess",
+                    f"[Preprocess] Summary metrics export error: {e}", 
+                    level = "warn", 
+                    tag = "Preprocess", 
                 )
 
             progress.update(
-                task,
-                completed=100,
-                description="[green]Preprocessing completed successfully!",
+                task, 
+                completed = 100, 
+                description = "[green]Preprocessing completed successfully!", 
             )
 
         # Final summary
         if RICH_AVAILABLE:
             summary_table = Table(
-                title="[bold green]สรุปผล Preprocess",
-                show_header=True,
-                header_style="bold magenta",
+                title = "[bold green]สรุปผล Preprocess", 
+                show_header = True, 
+                header_style = "bold magenta", 
             )
-            summary_table.add_column("Metric", style="cyan", justify="right")
-            summary_table.add_column("Value", style="white")
+            summary_table.add_column("Metric", style = "cyan", justify = "right")
+            summary_table.add_column("Value", style = "white")
             summary_table.add_row("Rows", str(len(df_out)))
             summary_table.add_row("Columns", str(len(df_out.columns)))
             summary_table.add_row("Output Path", out_csv_path)
             console.print(
                 Panel(
-                    summary_table,
-                    title="[bold blue]✅ Preprocess เสร็จสมบูรณ์!",
-                    border_style="bright_green",
+                    summary_table, 
+                    title = "[bold blue]✅ Preprocess เสร็จสมบูรณ์!", 
+                    border_style = "bright_green", 
                 )
             )
 
@@ -852,28 +851,28 @@ def run_preprocess(config=None, mode="default"):
         return out_csv_path
 
     except Exception as e:
-        pro_log(f"[Preprocess] Critical error: {e}", level="error", tag="Preprocess")
+        pro_log(f"[Preprocess] Critical error: {e}", level = "error", tag = "Preprocess")
         processing_metrics["status"] = "failed"
         processing_metrics["error"] = str(e)
         return None
 
 
-def remove_highly_correlated_features(df, threshold=0.95, exclude_cols=None):
+def remove_highly_correlated_features(df, threshold = 0.95, exclude_cols = None):
     """Remove features with correlation higher than threshold. Exclude columns in exclude_cols."""
     if exclude_cols is None:
         exclude_cols = []
 
     try:
-        numeric_cols = df.select_dtypes(include=[np.number]).columns
+        numeric_cols = df.select_dtypes(include = [np.number]).columns
         cols_to_check = [col for col in numeric_cols if col not in exclude_cols]
 
         if len(cols_to_check) < 2:
             return df, []
 
         corr_matrix = df[cols_to_check].corr().abs()
-        upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+        upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k = 1).astype(bool))
         to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
-        return df.drop(columns=to_drop, errors="ignore"), to_drop
+        return df.drop(columns = to_drop, errors = "ignore"), to_drop
     except Exception as e:
         pro_log(f"Warning: Could not remove correlated features: {e}")
         return df, []

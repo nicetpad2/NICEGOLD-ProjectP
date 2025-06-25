@@ -1,10 +1,9 @@
-from __future__ import annotations
 
-import os
+
+from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
-
-
+import os
 @dataclass
 class ConfigManager:
     """Central configuration handler."""
@@ -25,7 +24,7 @@ class ConfigManager:
         data_file_m15 = Path(os.getenv("DATA_FILE_M15", base_dir / "XAUUSD_M15.parquet"))
 
         for d in (data_dir, model_dir, log_dir):
-            d.mkdir(parents=True, exist_ok=True)
+            d.mkdir(parents = True, exist_ok = True)
         return cls(data_dir, model_dir, log_dir, data_file_m1, data_file_m15)
 
 

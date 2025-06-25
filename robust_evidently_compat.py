@@ -1,18 +1,19 @@
+            from scipy import stats
+from typing import Any, Dict, List, Optional, Union
+        import evidently
+import logging
+import numpy as np
+import sys
+import warnings
 """
 Robust Evidently Compatibility Fix
-=================================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 Fixed implementation that avoids hanging imports for Evidently v0.4.30
 """
 
-import logging
-import sys
-import warnings
-from typing import Any, Dict, List, Optional, Union
-
-import numpy as np
 
 # Setup logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Suppress warnings during import attempts
@@ -28,15 +29,14 @@ def safe_evidently_check():
     global evidently_available, evidently_version
 
     try:
-        import evidently
 
         evidently_version = getattr(evidently, "__version__", "unknown")
         logger.info(f"📊 Evidently {evidently_version} detected")
 
         # For v0.4.30, we know the imports are problematic
-        # So we'll use a statistical fallback with Evidently-style interface
+        # So we'll use a statistical fallback with Evidently - style interface
         evidently_available = True
-        logger.info("✅ Using Evidently-compatible statistical implementation")
+        logger.info("✅ Using Evidently - compatible statistical implementation")
         return True
 
     except ImportError:
@@ -48,7 +48,7 @@ def safe_evidently_check():
 class RobustValueDrift:
     """
     Robust ValueDrift implementation that works with any Evidently version
-    Uses statistical methods with Evidently-compatible interface
+    Uses statistical methods with Evidently - compatible interface
     """
 
     def __init__(self, column_name: str = "target", **kwargs):
@@ -83,37 +83,37 @@ class RobustValueDrift:
                 ]
             )
 
-            # Combined drift score (0-1)
+            # Combined drift score (0 - 1)
             drift_score = min(
-                1.0,
+                1.0, 
                 max(
-                    1 - drift_results["ks_pvalue"],
-                    drift_results["mean_shift_zscore"] / 10.0,
-                    abs(np.log(drift_results["std_ratio"])) / 2.0,
-                ),
+                    1 - drift_results["ks_pvalue"], 
+                    drift_results["mean_shift_zscore"] / 10.0, 
+                    abs(np.log(drift_results["std_ratio"])) / 2.0, 
+                ), 
             )
 
             result = {
-                "drift_score": float(drift_score),
-                "drift_detected": bool(drift_detected),
-                "method": "robust_statistical",
-                "column": self.column_name,
-                "evidently_version": evidently_version,
-                "metrics": drift_results,
+                "drift_score": float(drift_score), 
+                "drift_detected": bool(drift_detected), 
+                "method": "robust_statistical", 
+                "column": self.column_name, 
+                "evidently_version": evidently_version, 
+                "metrics": drift_results, 
                 "reference_stats": {
-                    "mean": float(np.mean(ref_values)),
-                    "std": float(np.std(ref_values)),
-                    "count": len(ref_values),
-                },
+                    "mean": float(np.mean(ref_values)), 
+                    "std": float(np.std(ref_values)), 
+                    "count": len(ref_values), 
+                }, 
                 "current_stats": {
-                    "mean": float(np.mean(cur_values)),
-                    "std": float(np.std(cur_values)),
-                    "count": len(cur_values),
-                },
+                    "mean": float(np.mean(cur_values)), 
+                    "std": float(np.std(cur_values)), 
+                    "count": len(cur_values), 
+                }, 
             }
 
             logger.debug(
-                f"📈 Drift calculation for {self.column_name}: score={drift_score:.3f}, detected={drift_detected}"
+                f"📈 Drift calculation for {self.column_name}: score = {drift_score:.3f}, detected = {drift_detected}"
             )
             return result
 
@@ -151,7 +151,7 @@ class RobustValueDrift:
                 else:
                     return np.array([values] if values is not None else [])
 
-            # Array-like
+            # Array - like
             elif hasattr(data, "__iter__") and not isinstance(data, str):
                 return np.array([v for v in data if v is not None])
 
@@ -167,28 +167,27 @@ class RobustValueDrift:
     ) -> Dict[str, float]:
         """Calculate comprehensive drift metrics"""
         try:
-            from scipy import stats
 
             # Basic statistics
             ref_mean, ref_std = np.mean(ref_values), np.std(ref_values)
             cur_mean, cur_std = np.mean(cur_values), np.std(cur_values)
 
-            # Kolmogorov-Smirnov test
+            # Kolmogorov - Smirnov test
             ks_stat, ks_pvalue = stats.ks_2samp(ref_values, cur_values)
 
             # Mean shift (standardized)
             mean_shift = abs(cur_mean - ref_mean)
-            mean_shift_zscore = mean_shift / (ref_std + 1e-10)
+            mean_shift_zscore = mean_shift / (ref_std + 1e - 10)
 
             # Standard deviation ratio
-            std_ratio = (cur_std + 1e-10) / (ref_std + 1e-10)
+            std_ratio = (cur_std + 1e - 10) / (ref_std + 1e - 10)
 
             return {
-                "ks_statistic": float(ks_stat),
-                "ks_pvalue": float(ks_pvalue),
-                "mean_shift": float(mean_shift),
-                "mean_shift_zscore": float(mean_shift_zscore),
-                "std_ratio": float(std_ratio),
+                "ks_statistic": float(ks_stat), 
+                "ks_pvalue": float(ks_pvalue), 
+                "mean_shift": float(mean_shift), 
+                "mean_shift_zscore": float(mean_shift_zscore), 
+                "std_ratio": float(std_ratio), 
             }
 
         except ImportError:
@@ -197,26 +196,26 @@ class RobustValueDrift:
             cur_mean, cur_std = np.mean(cur_values), np.std(cur_values)
 
             mean_shift = abs(cur_mean - ref_mean)
-            mean_shift_zscore = mean_shift / (ref_std + 1e-10)
-            std_ratio = (cur_std + 1e-10) / (ref_std + 1e-10)
+            mean_shift_zscore = mean_shift / (ref_std + 1e - 10)
+            std_ratio = (cur_std + 1e - 10) / (ref_std + 1e - 10)
 
             return {
-                "ks_statistic": 0.0,
-                "ks_pvalue": 0.5,  # Neutral p-value
-                "mean_shift": float(mean_shift),
-                "mean_shift_zscore": float(mean_shift_zscore),
-                "std_ratio": float(std_ratio),
+                "ks_statistic": 0.0, 
+                "ks_pvalue": 0.5,  # Neutral p - value
+                "mean_shift": float(mean_shift), 
+                "mean_shift_zscore": float(mean_shift_zscore), 
+                "std_ratio": float(std_ratio), 
             }
 
     def _empty_result(self, reason: str) -> Dict[str, Any]:
         """Return empty/fallback result"""
         return {
-            "drift_score": 0.0,
-            "drift_detected": False,
-            "method": "robust_statistical",
-            "column": self.column_name,
-            "evidently_version": evidently_version,
-            "reason": reason,
+            "drift_score": 0.0, 
+            "drift_detected": False, 
+            "method": "robust_statistical", 
+            "column": self.column_name, 
+            "evidently_version": evidently_version, 
+            "reason": reason, 
         }
 
 
@@ -245,13 +244,13 @@ def test_compatibility():
     detector = ValueDrift("target")
     result_no_drift = detector.calculate(ref_data, cur_data_no_drift)
     logger.info(
-        f"📊 No drift test: score={result_no_drift['drift_score']:.3f}, detected={result_no_drift['drift_detected']}"
+        f"📊 No drift test: score = {result_no_drift['drift_score']:.3f}, detected = {result_no_drift['drift_detected']}"
     )
 
     # Test with drift
     result_drift = detector.calculate(ref_data, cur_data_drift)
     logger.info(
-        f"📊 With drift test: score={result_drift['drift_score']:.3f}, detected={result_drift['drift_detected']}"
+        f"📊 With drift test: score = {result_drift['drift_score']:.3f}, detected = {result_drift['drift_detected']}"
     )
 
     logger.info("✅ Robust Evidently compatibility test complete")
@@ -259,11 +258,11 @@ def test_compatibility():
 
 
 __all__ = [
-    "ValueDrift",
-    "DataDrift",
-    "EVIDENTLY_AVAILABLE",
-    "RobustValueDrift",
-    "test_compatibility",
+    "ValueDrift", 
+    "DataDrift", 
+    "EVIDENTLY_AVAILABLE", 
+    "RobustValueDrift", 
+    "test_compatibility", 
 ]
 
 if __name__ == "__main__":

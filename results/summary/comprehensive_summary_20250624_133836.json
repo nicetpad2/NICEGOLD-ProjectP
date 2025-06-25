@@ -1,0 +1,113 @@
+{
+  "timestamp": "2025-06-24T13:38:35.441065",
+  "pipeline_stages": {},
+  "model_performance": {
+    "NICEGOLD ML Model": {
+      "model_name": "NICEGOLD ML Model",
+      "basic_metrics": {
+        "accuracy": 0.532,
+        "precision": 0.5239791332263242,
+        "recall": 0.532,
+        "f1_score": 0.5272576,
+        "auc_score": null
+      },
+      "confusion_matrix": [
+        [
+          141,
+          253
+        ],
+        [
+          215,
+          391
+        ]
+      ],
+      "classification_report": {
+        "0": {
+          "precision": 0.3960674157303371,
+          "recall": 0.35786802030456855,
+          "f1-score": 0.376,
+          "support": 394.0
+        },
+        "1": {
+          "precision": 0.6071428571428571,
+          "recall": 0.6452145214521452,
+          "f1-score": 0.6256,
+          "support": 606.0
+        },
+        "accuracy": 0.532,
+        "macro avg": {
+          "precision": 0.5016051364365971,
+          "recall": 0.5015412708783569,
+          "f1-score": 0.5008,
+          "support": 1000.0
+        },
+        "weighted avg": {
+          "precision": 0.5239791332263242,
+          "recall": 0.532,
+          "f1-score": 0.5272576,
+          "support": 1000.0
+        }
+      },
+      "data_distribution": {
+        "total_samples": 1000,
+        "positive_samples": 606,
+        "negative_samples": 394,
+        "imbalance_ratio": 0.606
+      }
+    }
+  },
+  "feature_importance": {},
+  "optimization_results": {},
+  "trading_simulation": {
+    "initial_capital": 10000.0,
+    "final_capital": 13450.75,
+    "total_return": 0.345075,
+    "total_return_percentage": 34.5075,
+    "net_profit": 3450.75,
+    "start_date": "2023-01-01",
+    "end_date": "2024-12-31",
+    "trading_days": 730,
+    "trading_months": 24.0,
+    "trading_years": 2.0,
+    "total_trades": 347,
+    "winning_trades": 201,
+    "losing_trades": 146,
+    "win_rate": 0.579250720461095,
+    "loss_rate": 0.4207492795389049,
+    "win_rate_percentage": 57.925072046109506,
+    "loss_rate_percentage": 42.07492795389049,
+    "average_win": 4.52,
+    "average_loss": -2.87,
+    "largest_win": 23.45,
+    "largest_loss": -12.67,
+    "risk_reward_ratio": 1.5749128919860624,
+    "expected_value_per_trade": 1.4106628242074923,
+    "max_drawdown": 0.0856,
+    "max_drawdown_percentage": 8.559999999999999,
+    "sharpe_ratio": 1.245,
+    "calmar_ratio": 2.0156250000000004,
+    "profit_factor": 1.73,
+    "daily_volatility": 0.0234,
+    "annual_volatility": 0.3714634840734685,
+    "max_consecutive_wins": 12,
+    "max_consecutive_losses": 8,
+    "recovery_factor": 4.031250000000001,
+    "trades_per_day": 0.47534246575342465,
+    "average_holding_period": 2.1,
+    "simulation_period": "2023-01-01 to 2024-12-31"
+  },
+  "data_analysis": {},
+  "recommendations": [],
+  "next_steps": [
+    "1. 🎯 Priority Focus: Address high-priority recommendations first",
+    "2. 📊 Data Enhancement: Collect more diverse and recent market data",
+    "3. 🔬 Model Experimentation: Test advanced algorithms (XGBoost, Neural Networks)",
+    "4. ⚙️ Hyperparameter Optimization: Fine-tune all model parameters",
+    "5. 📈 Backtesting: Extend historical testing period",
+    "6. 🛡️ Risk Management: Implement advanced risk controls",
+    "7. 🚀 Production Deployment: Prepare for live trading",
+    "8. 📱 Monitoring System: Set up real-time performance tracking",
+    "9. 🔄 Continuous Learning: Implement online learning capabilities",
+    "10. 📈 Portfolio Expansion: Consider multi-asset strategies"
+  ]
+}

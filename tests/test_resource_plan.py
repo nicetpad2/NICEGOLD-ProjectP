@@ -1,15 +1,13 @@
+from src.utils import resource_plan
+import builtins
+import json
+import logging
 import os
+import pytest
 import sys
+import types
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT_DIR)
-import json
-import builtins
-import types
-import logging
-
-import pytest
-
-from src.utils import resource_plan
 
 
 class DummyPSUtil:
@@ -26,7 +24,7 @@ class DummyPSUtil:
 
 @pytest.fixture
 def fake_psutil():
-    return DummyPSUtil(total=int(8e9))
+    return DummyPSUtil(total = int(8e9))
 
 
 def test_get_resource_plan_success(monkeypatch, fake_psutil):
@@ -47,7 +45,7 @@ def test_get_resource_plan_psutil_missing(monkeypatch, caplog):
 
     monkeypatch.setattr(builtins, '__import__', fake_import)
     monkeypatch.setattr(os, 'cpu_count', lambda: 2)
-    with caplog.at_level(logging.DEBUG, logger="src.utils.resource_plan"):
+    with caplog.at_level(logging.DEBUG, logger = "src.utils.resource_plan"):
         plan = resource_plan.get_resource_plan()
     monkeypatch.setattr(builtins, '__import__', real_import)
     assert plan['total_memory_gb'] == 0.0
@@ -57,7 +55,7 @@ def test_get_resource_plan_psutil_missing(monkeypatch, caplog):
 def test_save_resource_plan(tmp_path, monkeypatch, fake_psutil, caplog):
     monkeypatch.setitem(sys.modules, 'psutil', fake_psutil)
     monkeypatch.setattr(os, 'cpu_count', lambda: 1)
-    with caplog.at_level(logging.INFO, logger="src.utils.resource_plan"):
+    with caplog.at_level(logging.INFO, logger = "src.utils.resource_plan"):
         resource_plan.save_resource_plan(str(tmp_path))
     saved = json.loads((tmp_path / 'resource_plan.json').read_text())
     assert saved == {'cpu_count': 1, 'total_memory_gb': 8.0}

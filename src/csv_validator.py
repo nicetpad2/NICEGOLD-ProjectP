@@ -1,33 +1,32 @@
-"""[Patch v6.7.12] CSV validation and cleaning utilities."""
-
+from src import data_cleaner
+from src.data_loader import validate_csv_data
+from typing import Iterable
 import argparse
 import logging
-from typing import Iterable
+import pandas as pd
+"""[Patch v6.7.12] CSV validation and cleaning utilities."""
+
 
 POSSIBLE_DATETIME_COLS = [
-    "Time",
-    "Date/Time",
-    "Timestamp",
-    "DateTime",
-    "Datetime",
-    "datetime",
-    "date/time",
-    "time",
+    "Time", 
+    "Date/Time", 
+    "Timestamp", 
+    "DateTime", 
+    "Datetime", 
+    "datetime", 
+    "date/time", 
+    "time", 
 ]
 
 DEFAULT_REQUIRED_COLS = [
-    "Timestamp",
-    "Open",
-    "High",
-    "Low",
-    "Close",
-    "Volume",
+    "Timestamp", 
+    "Open", 
+    "High", 
+    "Low", 
+    "Close", 
+    "Volume", 
 ]
 
-import pandas as pd
-
-from src import data_cleaner
-from src.data_loader import validate_csv_data
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +41,7 @@ def find_and_rename_datetime_column(df: pd.DataFrame) -> pd.DataFrame:
 
     if datetime_col_found:
         if datetime_col_found != "Time":
-            df.rename(columns={datetime_col_found: "Time"}, inplace=True)
+            df.rename(columns = {datetime_col_found: "Time"}, inplace = True)
             logger.info("[Patch] Renamed column '%s' to 'Time'", datetime_col_found)
     elif {"Date", "Time"}.issubset(df.columns):
         df["Time"] = df["Date"].astype(str) + " " + df["Time"].astype(str)
@@ -54,9 +53,9 @@ def find_and_rename_datetime_column(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def validate_and_convert_csv(
-    path: str,
-    output: str | None = None,
-    required_cols: Iterable[str] | None = None,
+    path: str, 
+    output: str | None = None, 
+    required_cols: Iterable[str] | None = None, 
 ) -> pd.DataFrame:
     """[Patch] Load, clean, validate then optionally save a CSV file."""
     if required_cols is None:
@@ -69,10 +68,10 @@ def validate_and_convert_csv(
         df["Timestamp"] = df["Time"]
 
     if "Date" not in df.columns and "Timestamp" in df.columns:
-        parts = df["Timestamp"].astype(str).str.split(" ", n=1, expand=True)
+        parts = df["Timestamp"].astype(str).str.split(" ", n = 1, expand = True)
         if parts.shape[1] == 2:
-            date_part = parts[0].str.replace("-", "")
-            year = date_part.str[:4].astype(int, errors="ignore")
+            date_part = parts[0].str.replace(" - ", "")
+            year = date_part.str[:4].astype(int, errors = "ignore")
             date_part = year.where(year < 2500, year - 543).astype(str).str.zfill(4) + date_part.str[4:]
             df["Date"] = date_part
             df["Timestamp"] = parts[1]
@@ -81,16 +80,16 @@ def validate_and_convert_csv(
     validate_csv_data(df, required_cols)
     df = data_cleaner.clean_dataframe(df)
     if output:
-        df.to_csv(output, index=False)
+        df.to_csv(output, index = False)
         logger.info("[Patch] Validated CSV written to %s", output)
     return df
 
 
-def main(argv=None) -> None:
-    parser = argparse.ArgumentParser(description="Validate and clean CSV")
-    parser.add_argument("input", help="Input CSV file")
-    parser.add_argument("--output", help="Output CSV file", default=None)
-    parser.add_argument("--require", nargs="*", default=None, help="Required columns")
+def main(argv = None) -> None:
+    parser = argparse.ArgumentParser(description = "Validate and clean CSV")
+    parser.add_argument("input", help = "Input CSV file")
+    parser.add_argument(" -  - output", help = "Output CSV file", default = None)
+    parser.add_argument(" -  - require", nargs = "*", default = None, help = "Required columns")
     args = parser.parse_args(argv)
     validate_and_convert_csv(args.input, args.output, args.require)
 

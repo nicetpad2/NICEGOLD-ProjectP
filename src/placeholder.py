@@ -19,7 +19,7 @@ def required_lines_for_target(
     """Return additional covered lines needed to reach ``target_pct``.
 
     Parameters
-    ----------
+    - -  -  -  -  -  -  -  -  - 
     total_lines : int
         Total number of lines measured.
     current_covered : int
@@ -28,7 +28,7 @@ def required_lines_for_target(
         Desired coverage expressed as a decimal (e.g., ``0.65`` for 65%).
 
     Returns
-    -------
+    - -  -  -  -  -  - 
     int
         Additional lines that must be covered. If the target is already
         reached, ``0`` is returned.
@@ -41,4 +41,3 @@ def required_lines_for_target(
 
     target_lines = int(total_lines * target_pct)
     return max(target_lines - current_covered, 0)
-

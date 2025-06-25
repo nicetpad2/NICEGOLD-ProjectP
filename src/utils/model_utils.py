@@ -1,15 +1,15 @@
-import os
-import logging
-import urllib.request
-import json
-from typing import Iterable, Tuple, Any, Optional
-import numpy as np
 
-logger = logging.getLogger(__name__)
-
-import pandas as pd
 from joblib import dump, load
 from sklearn.metrics import accuracy_score, roc_auc_score
+from typing import Iterable, Tuple, Any, Optional
+import json
+import logging
+import numpy as np
+import os
+import pandas as pd
+import urllib.request
+logger = logging.getLogger(__name__)
+
 
 # [Patch v5.6.1] Utility to download model files if missing
 
@@ -67,14 +67,14 @@ def download_feature_list_if_missing(features_path: str, url_env: str) -> bool:
         return False
 
 
-def safe_dirname(path, default="output_default"):
+def safe_dirname(path, default = "output_default"):
     d = os.path.dirname(path)
     return d if d else default
 
 
 def save_model(model: Any, path: str) -> None:
     """Save model object to disk using joblib."""
-    os.makedirs(safe_dirname(path), exist_ok=True)
+    os.makedirs(safe_dirname(path), exist_ok = True)
     dump(model, path)
 
 
@@ -93,10 +93,10 @@ def load_model(path: str) -> Any:
 
 
 def evaluate_model(
-    model: Any,
-    X: pd.DataFrame,
-    y: Iterable[int],
-    class_idx: int = 1,
+    model: Any, 
+    X: pd.DataFrame, 
+    y: Iterable[int], 
+    class_idx: int = 1, 
 ) -> Optional[Tuple[float, float]]:
     """Return accuracy and AUC for the given model."""
     if not hasattr(model, "predict_proba"):
@@ -137,10 +137,10 @@ def get_last_training_timestamp(model: Any) -> pd.Timestamp | None:
 
 
 def predict_with_time_check(
-    model: Any,
-    X: pd.DataFrame,
-    current_timestamp: pd.Timestamp,
-    class_idx: int = 1,
+    model: Any, 
+    X: pd.DataFrame, 
+    current_timestamp: pd.Timestamp, 
+    class_idx: int = 1, 
 ) -> Optional[float]:
     """Predict while asserting no lookahead bias."""
     last_ts = get_last_training_timestamp(model)
@@ -151,7 +151,7 @@ def predict_with_time_check(
 
 # [Patch v5.7.3] Utility to validate existence and size of a file
 def validate_file(path: str) -> bool:
-    """Return True if file exists and is non-empty."""
+    """Return True if file exists and is non - empty."""
     return os.path.isfile(path) and os.path.getsize(path) > 0
 
 
@@ -169,7 +169,7 @@ def get_latest_model_and_threshold(
         if f.startswith("model_") and f.endswith(".joblib")
     ]
     model_files.sort()
-    model_path = os.path.join(model_dir, model_files[-1]) if model_files else None
+    model_path = os.path.join(model_dir, model_files[ - 1]) if model_files else None
 
     thresh_path = os.path.join(model_dir, threshold_file)
     threshold = None

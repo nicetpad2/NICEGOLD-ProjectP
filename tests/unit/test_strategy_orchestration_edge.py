@@ -1,13 +1,12 @@
-import os
-import sys
-import pandas as pd
-import numpy as np
-import pytest
-
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, ROOT_DIR)
 
 from strategy import strategy as strategy_module
+import numpy as np
+import os
+import pandas as pd
+import pytest
+import sys
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, ROOT_DIR)
 
 
 def test_apply_strategy_length_mismatch(monkeypatch):

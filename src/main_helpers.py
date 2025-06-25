@@ -1,8 +1,8 @@
+
+
 # Helper functions extracted from src.main.py
-import pandas as pd
 from src.data_loader import setup_output_directory as dl_setup_output_directory
-
-
+import pandas as pd
 def parse_arguments():
     """Stubbed argument parser."""
     return {}
@@ -25,7 +25,7 @@ def drop_nan_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 def convert_to_float32(df: pd.DataFrame) -> pd.DataFrame:
     """Stubbed float32 converter."""
-    return df.astype("float32", errors="ignore")
+    return df.astype("float32", errors = "ignore")
 
 
 def run_initial_backtest():

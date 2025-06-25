@@ -1,8 +1,8 @@
-import logging
+
+
 from pathlib import Path
 from src import training
-
-
+import logging
 def test_save_model_creates_file(tmp_path, monkeypatch, caplog):
     called = {}
     def fake_dump(obj, path):

@@ -1,28 +1,28 @@
-import os
-import csv
+
+
 from datetime import datetime, timezone
-from typing import Iterable, List, Dict
-import numpy as np
 from sklearn.metrics import accuracy_score, roc_auc_score
 from src.config import logger, LOG_DIR
-
-
+from typing import Iterable, List, Dict
+import csv
+import numpy as np
+import os
 def safe_path(path: str, default: str = "output_default") -> str:
     return path if path else default
 
 
 def safe_makedirs(path: str):
     path = safe_path(path)
-    os.makedirs(path, exist_ok=True)
+    os.makedirs(path, exist_ok = True)
     return path
 
 
 def _write_row(path: str, row: List[str]):
     header = not os.path.exists(path)
     dir_path = os.path.dirname(path) or "output_default"
-    os.makedirs(dir_path, exist_ok=True)
+    os.makedirs(dir_path, exist_ok = True)
     mode = "a" if os.path.exists(path) else "w"
-    with open(path, mode, newline="", encoding="utf-8") as fh:
+    with open(path, mode, newline = "", encoding = "utf - 8") as fh:
         writer = csv.writer(fh)
         if header:
             writer.writerow(["timestamp", "label", "auc", "accuracy"])
@@ -30,18 +30,18 @@ def _write_row(path: str, row: List[str]):
 
 
 def log_performance_metrics(
-    y_true: Iterable[int],
-    proba: Iterable[float],
-    label: str = "daily",
-    summary_path: str = os.path.join(LOG_DIR, "performance_metrics.csv"),
+    y_true: Iterable[int], 
+    proba: Iterable[float], 
+    label: str = "daily", 
+    summary_path: str = os.path.join(LOG_DIR, "performance_metrics.csv"), 
 ) -> Dict[str, float]:
     y_true = np.array(list(y_true))
     proba = np.array(list(proba))
     acc = accuracy_score(y_true, proba >= 0.5)
     auc = roc_auc_score(y_true, proba)
-    logger.info(f"[Monitor] {label} AUC={auc:.4f}, ACC={acc:.4f}")
+    logger.info(f"[Monitor] {label} AUC = {auc:.4f}, ACC = {acc:.4f}")
     _write_row(
-        summary_path,
+        summary_path, 
         [datetime.now(timezone.utc).isoformat(), label, f"{auc:.4f}", f"{acc:.4f}"]
     )
     return {"auc": auc, "accuracy": acc}
@@ -51,9 +51,8 @@ def monitor_auc_from_csv(path: str, label: str = "daily", summary_path: str = os
     if not os.path.exists(path):
         logger.error("metrics file not found: %s", path)
         return None
-    data = np.genfromtxt(path, delimiter=",", names=True, dtype=None, encoding="utf-8")
+    data = np.genfromtxt(path, delimiter = ", ", names = True, dtype = None, encoding = "utf - 8")
     if "proba" not in data.dtype.names or "target" not in data.dtype.names:
         logger.error("metrics file missing required columns")
         return None
     return log_performance_metrics(data["target"], data["proba"], label, summary_path)
-

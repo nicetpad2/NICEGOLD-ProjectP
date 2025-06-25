@@ -1,23 +1,23 @@
-import os
-import sys
-import pandas as pd
-import numpy as np
-import logging
-from pathlib import Path
-import urllib.request
-import pytest
 
+from pathlib import Path
+from src.utils.model_utils import (
+import logging
+import numpy as np
+import os
+import pandas as pd
+import pytest
+import sys
+import urllib.request
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 
-from src.utils.model_utils import (
-    save_model,
-    load_model,
-    evaluate_model,
-    predict,
-    download_model_if_missing,
-    download_feature_list_if_missing,
-    validate_file,
+    save_model, 
+    load_model, 
+    evaluate_model, 
+    predict, 
+    download_model_if_missing, 
+    download_feature_list_if_missing, 
+    validate_file, 
 )
 
 
@@ -58,9 +58,9 @@ def test_predict_with_class_idx(tmp_path, monkeypatch):
     loaded = load_model(str(path))
     monkeypatch.setattr('src.utils.model_utils.accuracy_score', lambda a, b: 1.0)
     monkeypatch.setattr('src.utils.model_utils.roc_auc_score', lambda a, b: 0.5)
-    p0 = predict(loaded, X.iloc[[0]], class_idx=0)
-    p1 = predict(loaded, X.iloc[[0]], class_idx=1)
-    assert abs(p0 + p1 - 1.0) < 1e-6
+    p0 = predict(loaded, X.iloc[[0]], class_idx = 0)
+    p1 = predict(loaded, X.iloc[[0]], class_idx = 1)
+    assert abs(p0 + p1 - 1.0) < 1e - 6
 
 
 def test_evaluate_model_without_proba(caplog):
@@ -116,7 +116,7 @@ def test_download_model_if_missing_exists(monkeypatch, tmp_path):
 
 def test_download_model_env_missing(monkeypatch, tmp_path, caplog):
     path = tmp_path / 'model.pkl'
-    monkeypatch.delenv('MODEL_URL', raising=False)
+    monkeypatch.delenv('MODEL_URL', raising = False)
     with caplog.at_level(logging.WARNING):
         assert not download_model_if_missing(str(path), 'MODEL_URL')
     assert any('No URL specified' in m for m in caplog.messages)
@@ -137,7 +137,7 @@ def test_download_feature_list_error(monkeypatch, tmp_path, caplog):
 
 def test_download_feature_list_env_missing(monkeypatch, tmp_path, caplog):
     path = tmp_path / 'features.json'
-    monkeypatch.delenv('FEAT_URL', raising=False)
+    monkeypatch.delenv('FEAT_URL', raising = False)
     with caplog.at_level(logging.WARNING):
         assert not download_feature_list_if_missing(str(path), 'FEAT_URL')
     assert any('No URL specified' in m for m in caplog.messages)

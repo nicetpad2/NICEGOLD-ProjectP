@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
+        from src.data_loader.csv_loader import safe_load_csv_auto
+        from src.evidently_compat import EVIDENTLY_AVAILABLE, ValueDrift
+        from src.pydantic_v2_compat import BaseModel, Field, SecretField
+import logging
+        import ProjectP
+        import projectp.utils_feature
+        import src.data_loader.csv_loader
+import sys
+import traceback
 """
 Circular Import Emergency Fix
-============================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 Fixes the circular import issue with safe_load_csv_auto and related functions
 """
 
-import logging
-import sys
-import traceback
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level = logging.INFO, format = "%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -22,12 +28,10 @@ def apply_circular_import_fixes():
 
     # Fix 1: Ensure delayed imports in csv_loader
     try:
-        import src.data_loader.csv_loader
 
         logger.info("✅ CSV loader module accessible")
 
         # Test safe_load_csv_auto import
-        from src.data_loader.csv_loader import safe_load_csv_auto
 
         logger.info("✅ safe_load_csv_auto import successful")
 
@@ -38,7 +42,6 @@ def apply_circular_import_fixes():
     # Fix 2: Check and patch import paths
     try:
         # Ensure utils_feature doesn't create circular imports
-        import projectp.utils_feature
 
         logger.info("✅ utils_feature accessible")
 
@@ -47,13 +50,13 @@ def apply_circular_import_fixes():
 
     # Fix 3: Apply import patches to common problem modules
     problem_modules = [
-        "src.import_manager",
-        "src.import_compatibility",
-        "src.final_import_manager",
-        "fix_all_imports",
-        "ultimate_import_fix",
-        "circular_import_fix",
-        "final_ultimate_fix",
+        "src.import_manager", 
+        "src.import_compatibility", 
+        "src.final_import_manager", 
+        "fix_all_imports", 
+        "ultimate_import_fix", 
+        "circular_import_fix", 
+        "final_ultimate_fix", 
     ]
 
     for module_name in problem_modules:
@@ -75,17 +78,17 @@ def test_key_imports():
     logger.info("🧪 Testing key imports...")
 
     test_imports = [
-        ("CSV Loader", "src.data_loader.csv_loader", "safe_load_csv_auto"),
-        ("Model Helpers", "src.model_helpers", None),
-        ("Model Training", "src.model_training", None),
-        ("Strategy", "src.strategy", None),
-        ("Backtest Engine", "backtest_engine", None),
+        ("CSV Loader", "src.data_loader.csv_loader", "safe_load_csv_auto"), 
+        ("Model Helpers", "src.model_helpers", None), 
+        ("Model Training", "src.model_training", None), 
+        ("Strategy", "src.strategy", None), 
+        ("Backtest Engine", "backtest_engine", None), 
     ]
 
     success_count = 0
     for name, module, function in test_imports:
         try:
-            mod = __import__(module, fromlist=[function] if function else [])
+            mod = __import__(module, fromlist = [function] if function else [])
             if function and hasattr(mod, function):
                 logger.info(f"✅ {name}: {function} available")
             elif function:
@@ -108,7 +111,6 @@ def run_pipeline_readiness_test():
 
     try:
         # Test main pipeline entry point
-        import ProjectP
 
         logger.info("✅ ProjectP imports successfully")
 
@@ -119,11 +121,9 @@ def run_pipeline_readiness_test():
             logger.info("✅ main function available")
 
         # Test compatibility layers
-        from src.pydantic_v2_compat import BaseModel, Field, SecretField
 
         logger.info("✅ Pydantic compatibility layer working")
 
-        from src.evidently_compat import EVIDENTLY_AVAILABLE, ValueDrift
 
         logger.info(
             f"✅ Evidently compatibility layer working (available: {EVIDENTLY_AVAILABLE})"
@@ -154,7 +154,7 @@ def main():
     # Test pipeline readiness
     if run_pipeline_readiness_test():
         logger.info("🎉 SUCCESS: All circular import issues fixed!")
-        logger.info("💻 You can now run: python ProjectP.py --run_full_pipeline")
+        logger.info("💻 You can now run: python ProjectP.py - - run_full_pipeline")
         return True
     else:
         logger.error("❌ Pipeline still has issues")

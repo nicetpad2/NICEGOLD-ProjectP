@@ -1,8 +1,8 @@
-import os
-import gc
+
 
 # [Patch v5.5.6] Controlled manual garbage collection utility
-
+import gc
+import os
 ENABLE_MANUAL_GC = os.getenv("ENABLE_MANUAL_GC", "0") in {"1", "True", "true"}
 
 

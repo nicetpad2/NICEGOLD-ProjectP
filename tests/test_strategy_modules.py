@@ -1,18 +1,18 @@
-import os
-import sys
-import pandas as pd
-from datetime import datetime, timezone
 
+from datetime import datetime, timezone
+from strategy import (
+import os
+import pandas as pd
+import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT_DIR)
 
-from strategy import (
-    run_backtest,
-    OrderManager,
-    calculate_position_size,
-    atr_sl_tp_wrapper,
-    open_trade,
-    plot_equity_curve,
+    run_backtest, 
+    OrderManager, 
+    calculate_position_size, 
+    atr_sl_tp_wrapper, 
+    open_trade, 
+    plot_equity_curve, 
 )
 
 
@@ -42,4 +42,3 @@ def test_run_backtest_simple():
 def test_plot_equity_curve_returns_axis():
     ax = plot_equity_curve([1, 2, 3])
     assert hasattr(ax, "plot")
-

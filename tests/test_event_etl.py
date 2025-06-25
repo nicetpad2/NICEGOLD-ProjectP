@@ -1,15 +1,13 @@
-import os
+
 
 from sqlalchemy import create_engine, text, inspect
-
-
 from src.event_etl import init_db, ingest_log_to_db
-
+import os
 SAMPLE_LOG = """
-INFO:root: Attempting to Open New Order (Standard) for SELL at 2023-01-01 10:00:00+00:00...
-WARNING:root: BLOCKED: Margin check failed at 2023-01-01 10:00:01+00:00
-INFO:root: Order Opened at 2023-01-01 10:00:02+00:00
-ERROR:root: Kill Switch Activated 2023-01-01 10:05:00+00:00
+INFO:root: Attempting to Open New Order (Standard) for SELL at 2023 - 01 - 01 10:00:00 + 00:00...
+WARNING:root: BLOCKED: Margin check failed at 2023 - 01 - 01 10:00:01 + 00:00
+INFO:root: Order Opened at 2023 - 01 - 01 10:00:02 + 00:00
+ERROR:root: Kill Switch Activated 2023 - 01 - 01 10:05:00 + 00:00
 """
 
 
@@ -40,7 +38,6 @@ def test_ingest_log_to_db_empty(tmp_path):
     assert result == 0
 
 
-
 def test_init_db_creates_indexes(tmp_path):
     db_path = tmp_path / "db.sqlite"
     engine = create_engine(f"sqlite:///{db_path}")
@@ -50,5 +47,3 @@ def test_init_db_creates_indexes(tmp_path):
     names = {idx["name"] for idx in indexes}
     assert "ix_trade_events_timestamp" in names
     assert "ix_trade_events_event_type" in names
-
-

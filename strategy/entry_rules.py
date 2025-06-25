@@ -1,23 +1,23 @@
-import pandas as pd
-import numpy as np
-from src.features import macd, rsi, detect_macd_divergence, sma
-from src.constants import ColumnName
-try:
     from src.config import USE_MACD_SIGNALS, USE_RSI_SIGNALS
+from src.constants import ColumnName
+from src.features import macd, rsi, detect_macd_divergence, sma
+import numpy as np
+import pandas as pd
+try:
 except Exception:  # pragma: no cover - fallback for missing config
     USE_MACD_SIGNALS = True
     USE_RSI_SIGNALS = True
 
 
 def generate_open_signals(
-    df: pd.DataFrame,
-    use_macd: bool = USE_MACD_SIGNALS,
-    use_rsi: bool = USE_RSI_SIGNALS,
-    trend: str | None = None,
-    ma_fast: int = 15,
-    ma_slow: int = 50,
-    volume_col: str = ColumnName.VOLUME_CAP,
-    vol_window: int = 10,
+    df: pd.DataFrame, 
+    use_macd: bool = USE_MACD_SIGNALS, 
+    use_rsi: bool = USE_RSI_SIGNALS, 
+    trend: str | None = None, 
+    ma_fast: int = 15, 
+    ma_slow: int = 50, 
+    volume_col: str = ColumnName.VOLUME_CAP, 
+    vol_window: int = 10, 
 ) -> np.ndarray:
     """สร้างสัญญาณเปิด order พร้อมตัวเลือกเปิด/ปิด MACD/RSI และตัวกรอง MTF"""
 
@@ -50,8 +50,8 @@ def generate_open_signals(
     signals.append(ma_cond)
 
     if volume_col in df.columns:
-        vol = pd.to_numeric(df[volume_col], errors="coerce")
-        avg_vol = vol.rolling(vol_window, min_periods=1).mean()
+        vol = pd.to_numeric(df[volume_col], errors = "coerce")
+        avg_vol = vol.rolling(vol_window, min_periods = 1).mean()
         vol_cond = vol > avg_vol * 1.5
         signals.append(vol_cond)
 

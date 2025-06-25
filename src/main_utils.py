@@ -1,10 +1,10 @@
-import os
-import logging
-import pandas as pd
-from src.data_loader import load_data
+
+
 from src.csv_validator import validate_and_convert_csv
-
-
+from src.data_loader import load_data
+import logging
+import os
+import pandas as pd
 def ensure_default_output_dir(path):
     """สร้างโฟลเดอร์ผลลัพธ์เริ่มต้นหากยังไม่มี"""
     if not path:
@@ -13,22 +13,22 @@ def ensure_default_output_dir(path):
         project_root = os.getcwd()
         path = os.path.join(project_root, path)
     try:
-        os.makedirs(path, exist_ok=True)
+        os.makedirs(path, exist_ok = True)
         logging.info(f"   (Setup) ตรวจสอบโฟลเดอร์ผลลัพธ์: {path}")
         return path
     except Exception as e:  # pragma: no cover - unexpected file errors
-        logging.error(f"   (Error) สร้างโฟลเดอร์ผลลัพธ์ไม่สำเร็จ: {e}", exc_info=True)
+        logging.error(f"   (Error) สร้างโฟลเดอร์ผลลัพธ์ไม่สำเร็จ: {e}", exc_info = True)
         return None
 
 
-def load_validated_csv(raw_path, timeframe, dtypes=None):
+def load_validated_csv(raw_path, timeframe, dtypes = None):
     """Validate and load CSV or Parquet, ensuring Buddhist year conversion."""
     if raw_path.endswith(".parquet"):
         try:
             return pd.read_parquet(raw_path)
         except Exception as e_read:
             logging.warning(f"(Warning) Failed to read parquet {raw_path}: {e_read}")
-            return load_data(raw_path.replace(".parquet", ".csv"), timeframe, dtypes=dtypes)
+            return load_data(raw_path.replace(".parquet", ".csv"), timeframe, dtypes = dtypes)
 
     parquet_path = raw_path.replace(".csv", ".parquet")
     if os.path.exists(parquet_path):
@@ -47,7 +47,7 @@ def load_validated_csv(raw_path, timeframe, dtypes=None):
             print(f"เกิดข้อผิดพลาดร้ายแรงระหว่างการตรวจสอบและแปลงไฟล์ CSV: {e}")
             raise
 
-    df_loaded = load_data(clean_path, timeframe, dtypes=dtypes)
+    df_loaded = load_data(clean_path, timeframe, dtypes = dtypes)
     try:
         df_loaded.to_parquet(parquet_path)
     except Exception as e_save:
@@ -62,7 +62,7 @@ def setup_fonts():
     pass
 
 
-def print_gpu_utilization(_=None):
+def print_gpu_utilization(_ = None):
     """ฟังก์ชันสำรองสำหรับแสดงการใช้ GPU (ไม่ทำอะไร)."""
     pass
 

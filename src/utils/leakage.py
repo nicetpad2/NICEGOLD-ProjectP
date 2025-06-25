@@ -1,24 +1,23 @@
-"""Utilities to help prevent data leakage when splitting data."""
-
 from __future__ import annotations
-
 import hashlib
 import pandas as pd
+"""Utilities to help prevent data leakage when splitting data."""
+
 
 __all__ = ["hash_df", "timestamp_split", "assert_no_overlap"]
 
 
 def hash_df(df: pd.DataFrame) -> str:
     """Return a hash representing the DataFrame contents."""
-    return hashlib.md5(pd.util.hash_pandas_object(df, index=True).values).hexdigest()
+    return hashlib.md5(pd.util.hash_pandas_object(df, index = True).values).hexdigest()
 
 
 def timestamp_split(
-    df: pd.DataFrame,
-    train_start: str,
-    train_end: str,
-    test_start: str,
-    test_end: str,
+    df: pd.DataFrame, 
+    train_start: str, 
+    train_end: str, 
+    test_start: str, 
+    test_end: str, 
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split a DataFrame into train and test sets using ``loc`` to avoid leakage."""
     df_sorted = df.sort_index()

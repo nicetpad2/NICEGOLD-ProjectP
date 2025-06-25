@@ -1,6 +1,6 @@
-import os
-import logging
 
+import logging
+import os
 logger = logging.getLogger(__name__)
 
 # [Patch v5.5.4] Utility to read float from environment
@@ -9,14 +9,14 @@ def get_env_float(key: str, default: float) -> float:
     """Return environment variable ``key`` as float if possible.
 
     Parameters
-    ----------
+    - -  -  -  -  -  -  -  -  - 
     key : str
         Environment variable name.
     default : float
         Value to return if variable is not set or invalid.
 
     Returns
-    -------
+    - -  -  -  -  -  - 
     float
         Parsed float or ``default``.
     """

@@ -1,10 +1,10 @@
-import pandas as pd
-import pytest
+
 
 import importlib.util
 import os
+import pandas as pd
+import pytest
 import sys
-
 def load_wfv():
     spec = importlib.util.spec_from_file_location(
         "src.wfv", os.path.join(os.path.dirname(__file__), "..", "src", "wfv.py")
@@ -36,11 +36,11 @@ def test_grid_search_fallback_first_candidate(monkeypatch):
     df = pd.DataFrame({"Close": range(10)})
     grid = {"tp": [1, 2], "sl": [1, 2]}
 
-    def bt(_df, tp=1, sl=1):
+    def bt(_df, tp = 1, sl = 1):
         return {"pnl": 1.0, "winrate": 0.5, "maxdd": 0.1}
 
     monkeypatch.setattr(wfv, "_dominates", lambda *args, **kwargs: True)
-    res = wfv.walk_forward_grid_search(df, grid, bt, train_window=4, test_window=2, step=2)
+    res = wfv.walk_forward_grid_search(df, grid, bt, train_window = 4, test_window = 2, step = 2)
     assert (res[["tp", "sl"]] == 1).all().all()
 
 
@@ -48,6 +48,6 @@ def test_prune_features_missing_columns():
     wfv = load_wfv()
     df = pd.DataFrame({"a": [1], "c": [3]})
     imp = {"a": 0.005, "b": 0.001, "c": 0.5}
-    new_df, dropped = wfv.prune_features_by_importance(df, imp, threshold=0.01)
+    new_df, dropped = wfv.prune_features_by_importance(df, imp, threshold = 0.01)
     assert list(new_df.columns) == ["c"]
     assert dropped == ["a"]

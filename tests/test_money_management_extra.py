@@ -1,16 +1,16 @@
-import os
-import sys
-import math
-import pytest
 
+from src.money_management import (
+import math
+import os
+import pytest
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
-from src.money_management import (
-    atr_sl_tp,
-    update_be_trailing,
-    adaptive_position_size,
-    portfolio_hard_stop,
+    atr_sl_tp, 
+    update_be_trailing, 
+    adaptive_position_size, 
+    portfolio_hard_stop, 
 )
 
 
@@ -45,10 +45,10 @@ def test_update_be_trailing_edge_cases(monkeypatch):
 
 
 def test_adaptive_position_size_and_portfolio_stop(monkeypatch):
-    monkeypatch.setattr('src.money_management.volatility_adjusted_lot_size', lambda e, a, risk_pct=0.01: (0.5, 1.0))
+    monkeypatch.setattr('src.money_management.volatility_adjusted_lot_size', lambda e, a, risk_pct = 0.01: (0.5, 1.0))
     assert adaptive_position_size(1000.0, 0.2) == 0.5
 
     monkeypatch.setattr('src.money_management.check_portfolio_stop', lambda dd, t: dd >= t)
     assert portfolio_hard_stop(1000.0, 800.0)
     assert not portfolio_hard_stop('bad', 800.0)
-    assert not portfolio_hard_stop(-1, 0)
+    assert not portfolio_hard_stop( - 1, 0)

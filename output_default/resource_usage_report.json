@@ -1,0 +1,27 @@
+{
+  "monitoring_period": {
+    "start": "2025-06-24T08:46:32.110863",
+    "end": "2025-06-24T08:46:32.110863",
+    "duration_minutes": 0.0
+  },
+  "resource_summary": {
+    "avg_cpu_percent": 1.0,
+    "max_cpu_percent": 1.0,
+    "avg_ram_percent": 39.3,
+    "max_ram_percent": 39.3,
+    "min_disk_free_gb": 3.8043060302734375
+  },
+  "alerts": [],
+  "recommendations": [
+    "\u2705 System resources are healthy"
+  ],
+  "snapshots": [
+    {
+      "timestamp": "2025-06-24T08:46:32.110863",
+      "cpu_percent": 1.0,
+      "ram_percent": 39.3,
+      "ram_used_gb": 5.824176788330078,
+      "disk_free_gb": 3.8043060302734375
+    }
+  ]
+}

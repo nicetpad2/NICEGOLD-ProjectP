@@ -1,11 +1,11 @@
-import os
-import sys
-import pandas as pd
 
+import os
+import pandas as pd
+import sys
 SELECTED_FEATURES = None
 
 def get_feature_target_columns(df: pd.DataFrame) -> tuple[list[str], str]:
-    feature_cols = [c for c in df.columns if c not in ['target_event','target_direction','Date','Time','Symbol','datetime','target','pred_proba'] and df[c].dtype != 'O']
+    feature_cols = [c for c in df.columns if c not in ['target_event', 'target_direction', 'Date', 'Time', 'Symbol', 'datetime', 'target', 'pred_proba'] and df[c].dtype != 'O']
     global SELECTED_FEATURES
     if SELECTED_FEATURES:
         feature_cols = [c for c in feature_cols if c in SELECTED_FEATURES]
@@ -58,11 +58,11 @@ def map_standard_columns(df: pd.DataFrame) -> pd.DataFrame:
             col_map[c] = "Volume"
         else:
             col_map[c] = c
-    df = df.rename(columns=col_map)
+    df = df.rename(columns = col_map)
     # Remove duplicate lowercase columns if standard exists
     for col in ["close", "volume", "open", "high", "low"]:
         if col in df.columns and col.capitalize() in df.columns:
-            df = df.drop(columns=[col])
+            df = df.drop(columns = [col])
     return df
 
 def assert_no_lowercase_columns(df: pd.DataFrame):

@@ -1,21 +1,28 @@
 #!/usr/bin/env python3
+        from basic_auc_fix import create_optimized_model
+from pathlib import Path
+        from src.data_loader.csv_loader import safe_load_csv_auto
+        from src.evidently_compat import ValueDrift, get_drift_detector
+        from src.pydantic_v2_compat import BaseModel, Field, SecretField
+import logging
+        import numpy as np
+import os
+        import pandas as pd
+        import ProjectP
+import sys
+import traceback
 """
 Final Production Ready Fix
-=========================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 สำหรับแก้ไขปัญหาสุดท้ายให้พร้อมใช้งาน Production
 
 เป็น script สุดท้ายที่แก้ไขทุกอย่างให้พร้อมใช้งานจริง
 """
 
-import logging
-import os
-import sys
-import traceback
-from pathlib import Path
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level = logging.INFO, format = "%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -25,12 +32,11 @@ def test_pydantic_production():
     try:
         logger.info("🔧 Testing Pydantic v2 production compatibility...")
 
-        from src.pydantic_v2_compat import BaseModel, Field, SecretField
 
         # Production test
         class ProductionModel(BaseModel):
-            secret: str = SecretField(default="production")
-            config: str = Field(default="test")
+            secret: str = SecretField(default = "production")
+            config: str = Field(default = "test")
 
         model = ProductionModel()
         logger.info("✅ Pydantic v2 - PRODUCTION READY")
@@ -46,12 +52,10 @@ def test_evidently_production():
     try:
         logger.info("🔧 Testing Evidently production compatibility...")
 
-        from src.evidently_compat import ValueDrift, get_drift_detector
 
         # Production test
         detector = get_drift_detector("production_column")
 
-        import numpy as np
 
         ref_data = {"production_column": np.random.normal(0, 1, 100)}
         cur_data = {"production_column": np.random.normal(0.1, 1, 100)}
@@ -77,7 +81,6 @@ def test_basic_auc_fix_production():
     try:
         logger.info("🔧 Testing basic_auc_fix production readiness...")
 
-        from basic_auc_fix import create_optimized_model
 
         if callable(create_optimized_model):
             logger.info("✅ basic_auc_fix - PRODUCTION READY")
@@ -100,14 +103,12 @@ def test_csv_loader_production():
         logger.info("🔧 Testing CSV loader production compatibility...")
 
         # Create test CSV
-        import pandas as pd
 
-        from src.data_loader.csv_loader import safe_load_csv_auto
 
         test_df = pd.DataFrame({"test": [1, 2, 3], "value": [4, 5, 6]})
 
         temp_file = "temp_production_test.csv"
-        test_df.to_csv(temp_file, index=False)
+        test_df.to_csv(temp_file, index = False)
 
         try:
             loaded_df = safe_load_csv_auto(temp_file)
@@ -137,7 +138,6 @@ def test_projectp_production():
     try:
         logger.info("🔧 Testing ProjectP production integration...")
 
-        import ProjectP
 
         required_functions = ["main", "run_full_pipeline"]
         all_functions_present = all(
@@ -162,14 +162,14 @@ def test_projectp_production():
 def run_production_tests():
     """Run all production tests"""
     logger.info("🚀 FINAL PRODUCTION READINESS TEST")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     test_results = {
-        "pydantic": test_pydantic_production(),
-        "evidently": test_evidently_production(),
-        "basic_auc_fix": test_basic_auc_fix_production(),
-        "csv_loader": test_csv_loader_production(),
-        "projectp": test_projectp_production(),
+        "pydantic": test_pydantic_production(), 
+        "evidently": test_evidently_production(), 
+        "basic_auc_fix": test_basic_auc_fix_production(), 
+        "csv_loader": test_csv_loader_production(), 
+        "projectp": test_projectp_production(), 
     }
 
     # Final pipeline assessment
@@ -181,21 +181,21 @@ def run_production_tests():
 
 def report_production_status(test_results):
     """Report final production status"""
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
     logger.info("📊 PRODUCTION READINESS STATUS")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     for component, status in test_results.items():
         status_icon = "✅ READY" if status else "❌ FAILED"
         logger.info(f"{component:20} : {status_icon}")
 
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     all_ready = all(test_results.values())
     if all_ready:
         logger.info("🎉 PRODUCTION READY!")
         logger.info("✅ All components verified and ready for production use")
-        logger.info("💡 You can now run: python ProjectP.py --run_full_pipeline")
+        logger.info("💡 You can now run: python ProjectP.py - - run_full_pipeline")
     else:
         failed_components = [
             comp for comp, status in test_results.items() if not status

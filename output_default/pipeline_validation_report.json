@@ -1,0 +1,154 @@
+{
+  "timestamp": "2025-06-24T08:46:35.112933",
+  "overall_status": "CRITICAL",
+  "stage_summaries": {
+    "preprocess": {
+      "total_checks": 2,
+      "passed_checks": 0,
+      "failed_checks": 2,
+      "critical_count": 0,
+      "error_count": 2,
+      "warning_count": 0,
+      "details": [
+        {
+          "passed": false,
+          "message": "Cannot load preprocessed_data: [Errno 2] No such file or directory: 'output_default/preprocessed_super.parquet'",
+          "level": "ERROR",
+          "score": null
+        },
+        {
+          "passed": false,
+          "message": "Expected output not found: preprocessed_data at output_default/preprocessed_super.parquet",
+          "level": "ERROR",
+          "score": null
+        }
+      ]
+    },
+    "train": {
+      "total_checks": 3,
+      "passed_checks": 0,
+      "failed_checks": 3,
+      "critical_count": 1,
+      "error_count": 2,
+      "warning_count": 0,
+      "details": [
+        {
+          "passed": false,
+          "message": "Model file not found: output_default/catboost_model_best.pkl",
+          "level": "CRITICAL",
+          "score": null
+        },
+        {
+          "passed": false,
+          "message": "Expected output not found: model at output_default/catboost_model_best.pkl",
+          "level": "ERROR",
+          "score": null
+        },
+        {
+          "passed": false,
+          "message": "Expected output not found: features at output_default/train_features.txt",
+          "level": "ERROR",
+          "score": null
+        }
+      ]
+    },
+    "walkforward": {
+      "total_checks": 4,
+      "passed_checks": 0,
+      "failed_checks": 4,
+      "critical_count": 1,
+      "error_count": 3,
+      "warning_count": 0,
+      "details": [
+        {
+          "passed": false,
+          "message": "Cannot load metrics metrics: [Errno 2] No such file or directory: 'output_default/walkforward_metrics.csv'",
+          "level": "ERROR",
+          "score": null
+        },
+        {
+          "passed": false,
+          "message": "Model file not found: output_default/catboost_model_best_cv.pkl",
+          "level": "CRITICAL",
+          "score": null
+        },
+        {
+          "passed": false,
+          "message": "Expected output not found: metrics at output_default/walkforward_metrics.csv",
+          "level": "ERROR",
+          "score": null
+        },
+        {
+          "passed": false,
+          "message": "Expected output not found: model_cv at output_default/catboost_model_best_cv.pkl",
+          "level": "ERROR",
+          "score": null
+        }
+      ]
+    },
+    "predict": {
+      "total_checks": 2,
+      "passed_checks": 0,
+      "failed_checks": 2,
+      "critical_count": 0,
+      "error_count": 2,
+      "warning_count": 0,
+      "details": [
+        {
+          "passed": false,
+          "message": "Cannot load predictions predictions: [Errno 2] No such file or directory: 'output_default/predictions.csv'",
+          "level": "ERROR",
+          "score": null
+        },
+        {
+          "passed": false,
+          "message": "Expected output not found: predictions at output_default/predictions.csv",
+          "level": "ERROR",
+          "score": null
+        }
+      ]
+    },
+    "backtest": {
+      "total_checks": 1,
+      "passed_checks": 0,
+      "failed_checks": 1,
+      "critical_count": 0,
+      "error_count": 1,
+      "warning_count": 0,
+      "details": [
+        {
+          "passed": false,
+          "message": "Expected output not found: backtest_results at output_default/backtest_results.csv",
+          "level": "ERROR",
+          "score": null
+        }
+      ]
+    }
+  },
+  "critical_issues": [
+    "train: Model file not found: output_default/catboost_model_best.pkl",
+    "walkforward: Model file not found: output_default/catboost_model_best_cv.pkl"
+  ],
+  "warnings": [
+    "preprocess: Cannot load preprocessed_data: [Errno 2] No such file or directory: 'output_default/preprocessed_super.parquet'",
+    "preprocess: Expected output not found: preprocessed_data at output_default/preprocessed_super.parquet",
+    "train: Expected output not found: model at output_default/catboost_model_best.pkl",
+    "train: Expected output not found: features at output_default/train_features.txt",
+    "walkforward: Cannot load metrics metrics: [Errno 2] No such file or directory: 'output_default/walkforward_metrics.csv'",
+    "walkforward: Expected output not found: metrics at output_default/walkforward_metrics.csv",
+    "walkforward: Expected output not found: model_cv at output_default/catboost_model_best_cv.pkl",
+    "predict: Cannot load predictions predictions: [Errno 2] No such file or directory: 'output_default/predictions.csv'",
+    "predict: Expected output not found: predictions at output_default/predictions.csv",
+    "backtest: Expected output not found: backtest_results at output_default/backtest_results.csv"
+  ],
+  "recommendations": [
+    "\ud83d\udd34 Address critical issues before production deployment",
+    "\u26a0\ufe0f Review and address warnings to improve pipeline reliability",
+    "\ud83d\udd27 Consider improving pipeline robustness - validation success rate is below 90%"
+  ],
+  "summary_stats": {
+    "total_checks": 12,
+    "passed_checks": 0,
+    "success_rate": 0.0
+  }
+}

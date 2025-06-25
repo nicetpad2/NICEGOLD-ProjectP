@@ -1,17 +1,32 @@
+    from builtins import BaseModel, Field, SecretField, SecretStr
+        from builtins import SecretStr
+            from pydantic import BaseModel, ConfigDict, Field
+            from pydantic import BaseModel, Field
+        from pydantic import BaseSettings as PydanticBaseSettings
+    from pydantic import SecretField, Field, BaseModel
+                from pydantic import SecretStr
+                    from pydantic.fields import SecretField
+            from pydantic.types import SecretStr
+        from pydantic_settings import BaseSettings as PydanticSettings
+        from src.pydantic_fix import SecretField, Field, BaseModel
+from typing import Any, Dict, Optional, Type, Union
+        import builtins
+                import json
+import logging
+            import pydantic
+import sys
+            import types
+import warnings
 """
 Professional Pydantic v2 Compatibility Layer
-==========================================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 Handles the SecretField import issue in Pydantic v2.x where SecretField was removed
 """
 
-import logging
-import sys
-import warnings
-from typing import Any, Dict, Optional, Type, Union
 
 # Configure logging
 logger = logging.getLogger(__name__)
-warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+warnings.filterwarnings("ignore", category = UserWarning, module = "pydantic")
 
 
 class PydanticV2Compatibility:
@@ -25,7 +40,6 @@ class PydanticV2Compatibility:
     def _initialize(self):
         """Initialize compatibility layer with proper detection"""
         try:
-            import pydantic
 
             self.pydantic_version = pydantic.__version__
 
@@ -51,20 +65,18 @@ class PydanticV2Compatibility:
     def _setup_v2_compatibility(self):
         """Setup Pydantic v2 compatibility"""
         try:
-            from pydantic import BaseModel, ConfigDict, Field
-            from pydantic.types import SecretStr
 
             # Create SecretField replacement for v2
-            def SecretField(default=None, **kwargs):
+            def SecretField(default = None, **kwargs):
                 """
                 Pydantic v2 compatible SecretField replacement
                 Maps to Field with appropriate configuration
                 """
-                # Remove v1-specific arguments that don't exist in v2
+                # Remove v1 - specific arguments that don't exist in v2
                 kwargs.pop("secret", None)
                 kwargs.pop("repr", None)
 
-                return Field(default=default, **kwargs)
+                return Field(default = default, **kwargs)
 
             # Create enhanced SecretStr wrapper
             class EnhancedSecretStr(SecretStr):
@@ -88,11 +100,11 @@ class PydanticV2Compatibility:
             # Register in global namespace
             self._register_compatibility_objects(
                 {
-                    "SecretField": SecretField,
-                    "Field": Field,
-                    "BaseModel": BaseModel,
-                    "SecretStr": EnhancedSecretStr,
-                    "ConfigDict": ConfigDict,
+                    "SecretField": SecretField, 
+                    "Field": Field, 
+                    "BaseModel": BaseModel, 
+                    "SecretStr": EnhancedSecretStr, 
+                    "ConfigDict": ConfigDict, 
                 }
             )
 
@@ -103,38 +115,33 @@ class PydanticV2Compatibility:
     def _setup_v1_compatibility(self):
         """Setup Pydantic v1 compatibility"""
         try:
-            from pydantic import BaseModel, Field
 
             # Try to import SecretField from v1
             try:
                 try:
-    from pydantic import SecretField, Field, BaseModel
 except ImportError:
     try:
-        from src.pydantic_fix import SecretField, Field, BaseModel
     except ImportError:
         # Fallback
-        def SecretField(default=None, **kwargs): return default
-        def Field(default=None, **kwargs): return default
+        def SecretField(default = None, **kwargs): return default
+        def Field(default = None, **kwargs): return default
         class BaseModel: pass
 
                 logger.info("✅ Native SecretField found in v1")
             except ImportError:
                 try:
-                    from pydantic.fields import SecretField
 
                     logger.info("✅ SecretField imported from pydantic.fields")
                 except ImportError:
                     # Create SecretField fallback for v1
-                    def SecretField(default=None, **kwargs):
+                    def SecretField(default = None, **kwargs):
                         """V1 SecretField fallback using Field"""
-                        return Field(default=default, **kwargs)
+                        return Field(default = default, **kwargs)
 
                     logger.info("✅ Created SecretField fallback for v1")
 
             # Import SecretStr
             try:
-                from pydantic import SecretStr
             except ImportError:
                 # Fallback SecretStr
                 class SecretStr:
@@ -153,10 +160,10 @@ except ImportError:
             # Register compatibility objects
             self._register_compatibility_objects(
                 {
-                    "SecretField": SecretField,
-                    "Field": Field,
-                    "BaseModel": BaseModel,
-                    "SecretStr": SecretStr,
+                    "SecretField": SecretField, 
+                    "Field": Field, 
+                    "BaseModel": BaseModel, 
+                    "SecretStr": SecretStr, 
                 }
             )
 
@@ -168,11 +175,11 @@ except ImportError:
         """Setup complete fallback when Pydantic is not available"""
         logger.info("🔄 Setting up Pydantic fallback compatibility")
 
-        def SecretField(default=None, **kwargs):
+        def SecretField(default = None, **kwargs):
             """Complete fallback SecretField"""
             return default
 
-        def Field(default=None, **kwargs):
+        def Field(default = None, **kwargs):
             """Complete fallback Field"""
             return default
 
@@ -204,7 +211,6 @@ except ImportError:
 
             def json(self, **kwargs):
                 """Return JSON representation"""
-                import json
 
                 return json.dumps(self.dict())
 
@@ -217,17 +223,16 @@ except ImportError:
         # Register fallback objects
         self._register_compatibility_objects(
             {
-                "SecretField": SecretField,
-                "Field": Field,
-                "BaseModel": FallbackBaseModel,
-                "SecretStr": FallbackSecretStr,
+                "SecretField": SecretField, 
+                "Field": Field, 
+                "BaseModel": FallbackBaseModel, 
+                "SecretStr": FallbackSecretStr, 
             }
         )
 
     def _register_compatibility_objects(self, objects: Dict[str, Any]):
         """Register compatibility objects in multiple namespaces"""
         # Register in builtins for global access
-        import builtins
 
         for name, obj in objects.items():
             setattr(builtins, f"Pydantic{name}", obj)
@@ -235,16 +240,14 @@ except ImportError:
             if not hasattr(builtins, name):
                 setattr(builtins, name, obj)
 
-        # Monkey-patch pydantic module if it exists
+        # Monkey - patch pydantic module if it exists
         try:
-            import pydantic
 
             for name, obj in objects.items():
                 if not hasattr(pydantic, name):
                     setattr(pydantic, name, obj)
         except ImportError:
             # Create minimal pydantic module
-            import types
 
             pydantic_module = types.ModuleType("pydantic")
             for name, obj in objects.items():
@@ -257,26 +260,24 @@ except ImportError:
         """Test that compatibility objects work correctly"""
         try:
             try:
-    from pydantic import SecretField, Field, BaseModel
 except ImportError:
     try:
-        from src.pydantic_fix import SecretField, Field, BaseModel
     except ImportError:
         # Fallback
-        def SecretField(default=None, **kwargs): return default
-        def Field(default=None, **kwargs): return default
+        def SecretField(default = None, **kwargs): return default
+        def Field(default = None, **kwargs): return default
         class BaseModel: pass
 
             # Test SecretField
-            secret_field = SecretField(default="test")
+            secret_field = SecretField(default = "test")
 
             # Test Field
-            regular_field = Field(default="test")
+            regular_field = Field(default = "test")
 
             # Test BaseModel
             class TestModel(BaseModel):
-                secret: str = SecretField(default="secret")
-                regular: str = Field(default="regular")
+                secret: str = SecretField(default = "secret")
+                regular: str = Field(default = "regular")
 
             model = TestModel()
             logger.info("✅ Compatibility test passed")
@@ -289,9 +290,9 @@ except ImportError:
     def get_info(self):
         """Get compatibility information"""
         return {
-            "pydantic_version": self.pydantic_version,
-            "compatibility_mode": self.compatibility_mode,
-            "available_objects": ["SecretField", "Field", "BaseModel", "SecretStr"],
+            "pydantic_version": self.pydantic_version, 
+            "compatibility_mode": self.compatibility_mode, 
+            "available_objects": ["SecretField", "Field", "BaseModel", "SecretStr"], 
         }
 
 
@@ -300,7 +301,6 @@ _compat = PydanticV2Compatibility()
 
 # Export compatibility objects safely
 try:
-    from pydantic import BaseModel, Field
 
     # Don't try to import SecretField directly - it doesn't exist in v2
     # Instead, use our compatibility layer
@@ -308,16 +308,13 @@ try:
         SecretField = getattr(__import__("builtins"), "PydanticSecretField")
     else:
         # Create fallback SecretField
-        def SecretField(default=None, **kwargs):
-            return Field(default=default, **kwargs)
+        def SecretField(default = None, **kwargs):
+            return Field(default = default, **kwargs)
 
     if hasattr(__import__("pydantic"), "SecretStr"):
-        from pydantic import SecretStr
     else:
-        from builtins import SecretStr
 
 except ImportError:
-    from builtins import BaseModel, Field, SecretField, SecretStr
 
 # Test compatibility on import
 if _compat.test_compatibility():
@@ -326,43 +323,41 @@ else:
     logger.warning("⚠️ Pydantic compatibility established with limitations")
 
 
-# BaseSettings compatibility (moved to pydantic-settings in v2)
+# BaseSettings compatibility (moved to pydantic - settings in v2)
 BaseSettings = None
 
 def _get_base_settings():
     """Get BaseSettings with compatibility handling"""
     global BaseSettings
-    
+
     if BaseSettings is not None:
         return BaseSettings
-    
-    # Strategy 1: pydantic-settings (recommended for v2)
+
+    # Strategy 1: pydantic - settings (recommended for v2)
     try:
-        from pydantic_settings import BaseSettings as PydanticSettings
         BaseSettings = PydanticSettings
-        logger.info("✅ Using BaseSettings from pydantic-settings")
+        logger.info("✅ Using BaseSettings from pydantic - settings")
         return BaseSettings
     except ImportError:
         pass
-    
+
     # Strategy 2: pydantic v1 location
     try:
-        from pydantic import BaseSettings as PydanticBaseSettings
         BaseSettings = PydanticBaseSettings
         logger.info("✅ Using BaseSettings from pydantic (v1)")
         return BaseSettings
     except ImportError:
         pass
-    
+
     # Strategy 3: Create fallback
     class BaseSettingsFallback(BaseModel):
         """Fallback BaseSettings implementation"""
-        
+
         class Config:
             env_file = '.env'
-            env_file_encoding = 'utf-8'
+            env_file_encoding = 'utf - 8'
             case_sensitive = False
-    
+
     BaseSettings = BaseSettingsFallback
     logger.info("✅ Using BaseSettings fallback")
     return BaseSettings

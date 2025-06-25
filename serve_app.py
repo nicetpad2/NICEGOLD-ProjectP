@@ -1,8 +1,8 @@
-# serve_app.py
-# Minimal FastAPI app for serving
-import os
-from fastapi import FastAPI
 
+# Minimal FastAPI app for serving
+# serve_app.py
+from fastapi import FastAPI
+import os
 app = FastAPI()
 
 @app.get("/")

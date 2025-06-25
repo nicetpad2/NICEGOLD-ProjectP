@@ -1,28 +1,28 @@
+    from pydantic import __version__ as pydantic_version
+    from pydantic import BaseModel as PydanticBaseModel
+    from pydantic import Field as PydanticField
+from typing import Any, Optional
+import logging
 """
 Simple Pydantic SecretField Replacement
-======================================
-A drop-in replacement for the missing SecretField in Pydantic v2
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
+A drop - in replacement for the missing SecretField in Pydantic v2
 """
 
-import logging
-from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
 try:
-    from pydantic import BaseModel as PydanticBaseModel
-    from pydantic import Field as PydanticField
-    from pydantic import __version__ as pydantic_version
 
     logger.info(f"Using Pydantic {pydantic_version}")
 
     def SecretField(
-        default: Any = None,
-        *,
-        alias: Optional[str] = None,
-        title: Optional[str] = None,
-        description: Optional[str] = None,
-        **kwargs: Any,
+        default: Any = None, 
+        *, 
+        alias: Optional[str] = None, 
+        title: Optional[str] = None, 
+        description: Optional[str] = None, 
+        **kwargs: Any, 
     ) -> Any:
         """
         Pydantic v2 compatible SecretField replacement.
@@ -45,7 +45,7 @@ try:
         kwargs.pop("repr", None)
 
         return PydanticField(
-            default=default, alias=alias, title=title, description=description, **kwargs
+            default = default, alias = alias, title = title, description = description, **kwargs
         )
 
     # Also provide the standard Field and BaseModel

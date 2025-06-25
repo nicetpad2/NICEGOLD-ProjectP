@@ -1,20 +1,18 @@
-"""Simple authentication manager using PBKDF2 hashing."""
-
 from __future__ import annotations
-
-import os
-import json
-import hashlib
-import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+import hashlib
+import json
+import os
+import secrets
+"""Simple authentication manager using PBKDF2 hashing."""
 
 
 # [Patch v6.9.47] Login system module
 HASH_ITERATIONS = 100_000
 SALT_BYTES = 16
 HASH_NAME = "sha256"
-SESSION_TIMEOUT = timedelta(hours=1)
+SESSION_TIMEOUT = timedelta(hours = 1)
 
 
 @dataclass
@@ -36,18 +34,18 @@ class AuthManager:
 
     def _load_users(self) -> None:
         if os.path.exists(self.user_file):
-            with open(self.user_file, "r", encoding="utf-8") as f:
+            with open(self.user_file, "r", encoding = "utf - 8") as f:
                 self.users = json.load(f)
         else:
             self.users = {}
 
     def _save_users(self) -> None:
-        with open(self.user_file, "w", encoding="utf-8") as f:
+        with open(self.user_file, "w", encoding = "utf - 8") as f:
             json.dump(self.users, f)
 
     def _hash_password(self, password: str, salt: bytes) -> bytes:
         return hashlib.pbkdf2_hmac(
-            HASH_NAME, password.encode("utf-8"), salt, HASH_ITERATIONS
+            HASH_NAME, password.encode("utf - 8"), salt, HASH_ITERATIONS
         )
 
     def register(self, username: str, password: str) -> None:
@@ -69,9 +67,9 @@ class AuthManager:
         if secrets.compare_digest(self._hash_password(password, salt), stored_hash):
             token = secrets.token_urlsafe()
             session = Session(
-                username=username,
-                token=token,
-                expires_at=datetime.utcnow() + SESSION_TIMEOUT,
+                username = username, 
+                token = token, 
+                expires_at = datetime.utcnow() + SESSION_TIMEOUT, 
             )
             self.sessions[token] = session
             return session

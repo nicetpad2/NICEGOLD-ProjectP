@@ -1,12 +1,12 @@
-import pandas as pd
 from src.strategy_components import (
-    EntryStrategy,
-    ExitStrategy,
-    RiskManagementStrategy,
-    TrendFilter,
-    DefaultEntryStrategy,
-    DefaultExitStrategy,
-    MainStrategy,
+import pandas as pd
+    EntryStrategy, 
+    ExitStrategy, 
+    RiskManagementStrategy, 
+    TrendFilter, 
+    DefaultEntryStrategy, 
+    DefaultExitStrategy, 
+    MainStrategy, 
 )
 
 class DummyEntry(DefaultEntryStrategy):

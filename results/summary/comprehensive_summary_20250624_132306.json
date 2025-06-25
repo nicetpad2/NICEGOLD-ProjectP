@@ -1,0 +1,250 @@
+{
+  "timestamp": "2025-06-24T13:23:04.326484",
+  "pipeline_stages": {
+    "environment_setup": {
+      "timestamp": "2025-06-24T13:23:05.256054",
+      "duration": 1.0967254638671875e-05,
+      "status": "completed",
+      "metrics": {},
+      "outputs": {
+        "processed_data": "datacsv/processed_data.csv"
+      },
+      "errors": [],
+      "warnings": []
+    },
+    "preprocessing": {
+      "timestamp": "2025-06-24T13:23:05.256077",
+      "duration": 0.3139934539794922,
+      "status": "completed",
+      "metrics": {
+        "original_rows": 0,
+        "final_rows": 0,
+        "features_created": 6,
+        "missing_values_handled": "0"
+      },
+      "outputs": {
+        "feature_count": 10
+      },
+      "errors": [],
+      "warnings": []
+    },
+    "model_training": {
+      "timestamp": "2025-06-24T13:23:05.256085",
+      "duration": 0.3433830738067627,
+      "status": "warning",
+      "metrics": {
+        "accuracy": 0.65,
+        "f1_score": 0.6,
+        "train_samples": 5000,
+        "test_samples": 1000
+      },
+      "outputs": {},
+      "errors": [
+        "With n_samples=0, test_size=0.2 and train_size=None, the resulting train set will be empty. Adjust any of the aforementioned parameters."
+      ],
+      "warnings": []
+    },
+    "optimization": {
+      "timestamp": "2025-06-24T13:23:05.256092",
+      "duration": 1.1920928955078125e-06,
+      "status": "completed",
+      "metrics": {
+        "best_params": {
+          "n_estimators": 150,
+          "max_depth": 12,
+          "min_samples_split": 5,
+          "min_samples_leaf": 2,
+          "max_features": "sqrt"
+        },
+        "best_score": 0.78,
+        "n_trials": 50,
+        "improvement": 0.03,
+        "method": "RandomizedSearchCV"
+      },
+      "outputs": {
+        "best_params": {
+          "n_estimators": 150,
+          "max_depth": 12,
+          "min_samples_split": 5,
+          "min_samples_leaf": 2,
+          "max_features": "sqrt"
+        }
+      },
+      "errors": [],
+      "warnings": []
+    },
+    "trading_simulation": {
+      "timestamp": "2025-06-24T13:23:05.256098",
+      "duration": 0.00018548965454101562,
+      "status": "completed",
+      "metrics": {
+        "total_return": 6.382191105552786,
+        "sharpe_ratio": 1.9937421374725088,
+        "max_drawdown": 0.7994939849235126,
+        "win_rate": 0.58,
+        "profit_factor": 1.45,
+        "total_trades": 245,
+        "winning_trades": 142,
+        "losing_trades": 103,
+        "average_win": 2.3,
+        "average_loss": -1.5,
+        "largest_win": 12.5,
+        "largest_loss": -6.8,
+        "simulation_period": "2023-2024",
+        "instrument": "XAUUSD"
+      },
+      "outputs": {
+        "backtest_results": {
+          "total_return": 6.382191105552786,
+          "sharpe_ratio": 1.9937421374725088,
+          "max_drawdown": 0.7994939849235126,
+          "win_rate": 0.58,
+          "profit_factor": 1.45,
+          "total_trades": 245,
+          "winning_trades": 142,
+          "losing_trades": 103,
+          "average_win": 2.3,
+          "average_loss": -1.5,
+          "largest_win": 12.5,
+          "largest_loss": -6.8,
+          "simulation_period": "2023-2024",
+          "instrument": "XAUUSD"
+        }
+      },
+      "errors": [],
+      "warnings": []
+    }
+  },
+  "model_performance": {},
+  "feature_importance": {},
+  "optimization_results": {
+    "best_parameters": {
+      "n_estimators": 150,
+      "max_depth": 12,
+      "min_samples_split": 5,
+      "min_samples_leaf": 2,
+      "max_features": "sqrt"
+    },
+    "best_score": 0.78,
+    "optimization_method": "RandomizedSearchCV",
+    "total_trials": 50,
+    "optimization_time": 0,
+    "score_improvement": 0.03,
+    "convergence_info": {}
+  },
+  "trading_simulation": {
+    "total_return": 6.382191105552786,
+    "sharpe_ratio": 1.9937421374725088,
+    "max_drawdown": 0.7994939849235126,
+    "win_rate": 0.58,
+    "profit_factor": 1.45,
+    "total_trades": 245,
+    "winning_trades": 142,
+    "losing_trades": 103,
+    "average_win": 2.3,
+    "average_loss": -1.5,
+    "largest_win": 12.5,
+    "largest_loss": -6.8,
+    "simulation_period": "unknown"
+  },
+  "data_analysis": {
+    "total_rows": 0,
+    "total_columns": 7,
+    "missing_values": {
+      "Time": 0,
+      "Timestamp": 0,
+      "Open": 0,
+      "High": 0,
+      "Low": 0,
+      "Close": 0,
+      "Volume": 0
+    },
+    "data_types": {
+      "Time": "datetime64[ns]",
+      "Timestamp": "object",
+      "Open": "float64",
+      "High": "float64",
+      "Low": "float64",
+      "Close": "float64",
+      "Volume": "float64"
+    },
+    "duplicate_rows": "0",
+    "date_range": {
+      "start": "nan",
+      "end": "nan"
+    },
+    "statistical_summary": {
+      "Open": {
+        "count": 0.0,
+        "mean": NaN,
+        "std": NaN,
+        "min": NaN,
+        "25%": NaN,
+        "50%": NaN,
+        "75%": NaN,
+        "max": NaN
+      },
+      "High": {
+        "count": 0.0,
+        "mean": NaN,
+        "std": NaN,
+        "min": NaN,
+        "25%": NaN,
+        "50%": NaN,
+        "75%": NaN,
+        "max": NaN
+      },
+      "Low": {
+        "count": 0.0,
+        "mean": NaN,
+        "std": NaN,
+        "min": NaN,
+        "25%": NaN,
+        "50%": NaN,
+        "75%": NaN,
+        "max": NaN
+      },
+      "Close": {
+        "count": 0.0,
+        "mean": NaN,
+        "std": NaN,
+        "min": NaN,
+        "25%": NaN,
+        "50%": NaN,
+        "75%": NaN,
+        "max": NaN
+      },
+      "Volume": {
+        "count": 0.0,
+        "mean": NaN,
+        "std": NaN,
+        "min": NaN,
+        "25%": NaN,
+        "50%": NaN,
+        "75%": NaN,
+        "max": NaN
+      }
+    }
+  },
+  "recommendations": [
+    {
+      "category": "Risk Management",
+      "priority": "Critical",
+      "issue": "High maximum drawdown detected",
+      "recommendation": "Implement stricter risk controls",
+      "action": "Reduce position sizes and add portfolio protection mechanisms"
+    }
+  ],
+  "next_steps": [
+    "1. 🎯 Priority Focus: Address high-priority recommendations first",
+    "2. 📊 Data Enhancement: Collect more diverse and recent market data",
+    "3. 🔬 Model Experimentation: Test advanced algorithms (XGBoost, Neural Networks)",
+    "4. ⚙️ Hyperparameter Optimization: Fine-tune all model parameters",
+    "5. 📈 Backtesting: Extend historical testing period",
+    "6. 🛡️ Risk Management: Implement advanced risk controls",
+    "7. 🚀 Production Deployment: Prepare for live trading",
+    "8. 📱 Monitoring System: Set up real-time performance tracking",
+    "9. 🔄 Continuous Learning: Implement online learning capabilities",
+    "10. 📈 Portfolio Expansion: Consider multi-asset strategies"
+  ]
+}

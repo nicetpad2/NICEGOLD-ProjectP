@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
+        from pydantic import Field
+import logging
+        import pydantic
+import sys
 """
 Prefect Compatibility Patch for Pydantic v2
-==========================================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 
 This module patches Pydantic to provide SecretField compatibility
 for Prefect when using Pydantic v2.
 """
 
-import logging
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +21,6 @@ def patch_pydantic_for_prefect():
     This must be called before importing Prefect.
     """
     try:
-        import pydantic
 
         # Check if SecretField already exists
         if hasattr(pydantic, "SecretField"):
@@ -27,14 +28,13 @@ def patch_pydantic_for_prefect():
             return True
 
         # Create SecretField as an alias to Field for compatibility
-        from pydantic import Field
 
-        def SecretField(default=None, **kwargs):
+        def SecretField(default = None, **kwargs):
             """Compatibility SecretField for Prefect with Pydantic v2"""
             # Remove any old v1 specific parameters
             kwargs.pop("secret", None)
             kwargs.pop("repr", None)
-            return Field(default=default, **kwargs)
+            return Field(default = default, **kwargs)
 
         # Inject SecretField into pydantic module
         pydantic.SecretField = SecretField

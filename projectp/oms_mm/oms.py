@@ -1,9 +1,9 @@
+
 # OMS (Order Management System) - เทพ
-import uuid
+from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Dict, Optional, Any, Callable, Tuple
-from datetime import datetime, timezone
-
+import uuid
 class OrderStatus(Enum):
     """สถานะออเดอร์"""
     NEW = 'NEW'
@@ -23,7 +23,7 @@ class OrderType(Enum):
     # ...ขยายเพิ่มได้...
 
 class Order:
-    """ออเดอร์เดียว (multi-asset, multi-type, metadata, event/callback ready)"""
+    """ออเดอร์เดียว (multi - asset, multi - type, metadata, event/callback ready)"""
     def __init__(self, symbol: str, qty: float, order_type: OrderType, price: float, user_id: Optional[str] = None, tag: Optional[str] = None, meta: Optional[Dict[str, Any]] = None):
         self.id: str = str(uuid.uuid4())
         self.symbol: str = symbol
@@ -41,19 +41,19 @@ class Order:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            'id': self.id,
-            'symbol': self.symbol,
-            'qty': self.qty,
-            'order_type': self.order_type.value,
-            'price': self.price,
-            'status': self.status.value,
-            'filled_qty': self.filled_qty,
-            'timestamp': self.timestamp.isoformat(),
-            'history': self.history,
+            'id': self.id, 
+            'symbol': self.symbol, 
+            'qty': self.qty, 
+            'order_type': self.order_type.value, 
+            'price': self.price, 
+            'status': self.status.value, 
+            'filled_qty': self.filled_qty, 
+            'timestamp': self.timestamp.isoformat(), 
+            'history': self.history, 
         }
 
 class OMS:
-    """Order Management System (เทพ: multi-asset, multi-type, event/callback, validation, plug-in)"""
+    """Order Management System (เทพ: multi - asset, multi - type, event/callback, validation, plug - in)"""
     def __init__(self):
         self.orders: Dict[str, Order] = {}
         self.order_history: List[Order] = []
@@ -61,7 +61,7 @@ class OMS:
         self.on_cancel: Optional[Callable[[Dict[str, Any]], None]] = None
         self.on_reject: Optional[Callable[[Dict[str, Any]], None]] = None
         self.custom_validator: Optional[Callable[[Order], Tuple[bool, str]]] = None
-        # ...future: multi-user/account, plug-in, logging...
+        # ...future: multi - user/account, plug - in, logging...
 
     def send_order(self, symbol: str, qty: float, order_type: OrderType, price: float, user_id: Optional[str] = None, tag: Optional[str] = None, meta: Optional[Dict[str, Any]] = None) -> str:
         if qty <= 0 or price <= 0:
@@ -119,4 +119,4 @@ class OMS:
 
     def to_dict(self) -> List[Dict[str, Any]]:
         return [o.to_dict() for o in self.order_history]
-    # จุดขยาย: add batch_order, plug-in, logging, multi-account, ...
+    # จุดขยาย: add batch_order, plug - in, logging, multi - account, ...

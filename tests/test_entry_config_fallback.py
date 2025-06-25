@@ -1,11 +1,12 @@
+
+
+# pytest.skip("Disabled: expects non - existent functionality", allow_module_level = True)
+    import builtins
 import importlib
-import types
-import sys
 import os
 import pytest
-
-# pytest.skip("Disabled: expects non-existent functionality", allow_module_level=True)
-
+import sys
+import types
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 sys.path.insert(1, os.path.join(ROOT_DIR, 'src'))
@@ -18,10 +19,9 @@ def test_entry_config_import_error(monkeypatch):
     # Import src.main normally; config import should fail due to missing deps
     if 'src.main' in sys.modules:
         del sys.modules['src.main']
-    import builtins
     real_import = builtins.__import__
 
-    def fake_import(name, globals=None, locals=None, fromlist=(), level=0):
+    def fake_import(name, globals = None, locals = None, fromlist = (), level = 0):
         if name == 'src.config':  # pragma: no cover - error branch
             raise ImportError('mock fail')
         return real_import(name, globals, locals, fromlist, level)

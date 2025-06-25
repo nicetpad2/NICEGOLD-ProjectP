@@ -1,7 +1,7 @@
+
+
 from src.utils import pipeline_config
 import pytest
-
-
 def test_load_config_defaults(tmp_path):
     cfg = pipeline_config.load_config(str(tmp_path / 'missing.yaml'))
     assert isinstance(cfg, pipeline_config.PipelineConfig)

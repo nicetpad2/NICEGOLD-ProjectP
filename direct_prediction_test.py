@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
+import joblib
+import os
+import pandas as pd
+    import traceback
 """
 Direct test of prediction logic to verify fix
 """
 
-import os
-import pandas as pd
-import joblib
 
 print("🔧 Direct Prediction Test...")
 
@@ -26,16 +27,16 @@ try:
 
     # Load features from train_features.txt
     features_path = os.path.join("output_default", "train_features.txt")
-    with open(features_path, "r", encoding="utf-8") as f:
+    with open(features_path, "r", encoding = "utf - 8") as f:
         original_features = [line.strip() for line in f if line.strip()]
-    
+
     print(f"✅ Model expects features: {original_features}")
 
     # Map data columns to model features
     for orig_feat in original_features:
         lower_feat = orig_feat.lower()
         if lower_feat in df.columns and orig_feat not in df.columns:
-            df.rename(columns={lower_feat: orig_feat}, inplace=True)
+            df.rename(columns = {lower_feat: orig_feat}, inplace = True)
             print(f"✅ Renamed '{lower_feat}' -> '{orig_feat}'")
 
     # Verify all features are available
@@ -49,7 +50,7 @@ try:
     # Test prediction on small sample
     test_data = df[original_features].head(10)
     test_data = test_data.fillna(0)
-    
+
     print(f"✅ Test data shape: {test_data.shape}")
     print(f"✅ Test data columns: {list(test_data.columns)}")
 
@@ -63,5 +64,4 @@ try:
 
 except Exception as e:
     print(f"❌ Error: {e}")
-    import traceback
     traceback.print_exc()

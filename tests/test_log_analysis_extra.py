@@ -1,21 +1,21 @@
-import pandas as pd
-import os
-import sys
-import pytest
 
+from src.log_analysis import (
+import os
+import pandas as pd
+import pytest
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
-from src.log_analysis import (
-    calculate_hourly_summary,
-    calculate_reason_summary,
-    calculate_duration_stats,
-    calculate_drawdown_stats,
-    calculate_expectancy,
-    calculate_alert_summary,
-    compile_log_summary,
-    summarize_block_reasons,
-    plot_expectancy_by_period,
+    calculate_hourly_summary, 
+    calculate_reason_summary, 
+    calculate_duration_stats, 
+    calculate_drawdown_stats, 
+    calculate_expectancy, 
+    calculate_alert_summary, 
+    compile_log_summary, 
+    summarize_block_reasons, 
+    plot_expectancy_by_period, 
 )
 
 
@@ -59,10 +59,10 @@ def test_alert_summary_and_compile(tmp_path):
 def test_summarize_block_reasons():
     assert summarize_block_reasons([]).empty
     logs = [
-        {"reason": "A"},
-        {"reason": "B"},
-        {"reason": "A"},
-        "bad",
+        {"reason": "A"}, 
+        {"reason": "B"}, 
+        {"reason": "A"}, 
+        "bad", 
     ]
     counts = summarize_block_reasons(logs)
     assert counts.loc["A"] == 2
@@ -75,6 +75,6 @@ def test_calculate_expectancy_all_nan():
 
 
 def test_plot_expectancy_by_period():
-    exp = pd.Series([0.1, -0.2], index=['a', 'b'])
+    exp = pd.Series([0.1, -0.2], index = ['a', 'b'])
     fig = plot_expectancy_by_period(exp)
     assert hasattr(fig, 'savefig')

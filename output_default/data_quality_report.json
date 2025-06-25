@@ -1,0 +1,21 @@
+{
+  "report_type": "data_quality_analysis",
+  "timestamp": "2025-06-24T09:16:04.299392",
+  "data_overview": {
+    "total_records": 0,
+    "total_features": 0,
+    "data_size_mb": 0,
+    "date_range": {
+      "start_date": null,
+      "end_date": null
+    }
+  },
+  "quality_metrics": {
+    "missing_values_percentage": 0,
+    "duplicate_records": 0,
+    "outliers_detected": 0,
+    "data_consistency_score": 0
+  },
+  "feature_analysis": {},
+  "data_health_score": 100
+}

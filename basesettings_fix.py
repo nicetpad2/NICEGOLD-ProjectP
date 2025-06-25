@@ -1,18 +1,25 @@
 #!/usr/bin/env python3
+        from pydantic import BaseModel
+        from pydantic import BaseSettings
+        from pydantic import BaseSettings as PydanticBaseSettings
+        from pydantic_settings import BaseSettings
+        from pydantic_settings import BaseSettings as PydanticSettings
+from typing import Any, Dict, Optional
+import logging
+                import os
+        import subprocess
+import sys
+import warnings
 """
 Pydantic BaseSettings Compatibility Fix
-======================================
-แก้ไขปัญหา BaseSettings ที่ถูกย้ายไปยัง pydantic-settings ใน Pydantic v2
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
+แก้ไขปัญหา BaseSettings ที่ถูกย้ายไปยัง pydantic - settings ใน Pydantic v2
 พร้อมสำหรับ Production
 """
 
-import logging
-import sys
-import warnings
-from typing import Any, Dict, Optional
 
 # Setup logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Suppress warnings
@@ -22,18 +29,16 @@ warnings.filterwarnings("ignore")
 def create_basesettings_compatibility():
     """Create BaseSettings compatibility for Pydantic v2"""
 
-    # Strategy 1: Try pydantic-settings package (recommended for v2)
+    # Strategy 1: Try pydantic - settings package (recommended for v2)
     try:
-        from pydantic_settings import BaseSettings
 
-        logger.info("✅ Using BaseSettings from pydantic-settings (recommended)")
+        logger.info("✅ Using BaseSettings from pydantic - settings (recommended)")
         return BaseSettings
     except ImportError:
-        logger.info("⚠️ pydantic-settings not available, trying alternatives...")
+        logger.info("⚠️ pydantic - settings not available, trying alternatives...")
 
     # Strategy 2: Try old Pydantic v1 location
     try:
-        from pydantic import BaseSettings
 
         logger.info("✅ Using BaseSettings from pydantic (v1 compatibility)")
         return BaseSettings
@@ -42,20 +47,18 @@ def create_basesettings_compatibility():
 
     # Strategy 3: Create fallback BaseSettings
     try:
-        from pydantic import BaseModel
 
         class BaseSettingsFallback(BaseModel):
             """Fallback BaseSettings implementation"""
 
             class Config:
                 env_file = ".env"
-                env_file_encoding = "utf-8"
+                env_file_encoding = "utf - 8"
                 case_sensitive = False
 
             @classmethod
             def from_env(cls, **kwargs):
                 """Load settings from environment variables"""
-                import os
 
                 env_values = {}
 
@@ -97,19 +100,18 @@ def create_basesettings_compatibility():
 
             @classmethod
             def from_env(cls, **kwargs):
-                import os
 
                 env_values = {}
 
                 # Load common environment variables
                 common_env_vars = [
-                    "DATABASE_URL",
-                    "API_KEY",
-                    "SECRET_KEY",
-                    "DEBUG",
-                    "HOST",
-                    "PORT",
-                    "LOG_LEVEL",
+                    "DATABASE_URL", 
+                    "API_KEY", 
+                    "SECRET_KEY", 
+                    "DEBUG", 
+                    "HOST", 
+                    "PORT", 
+                    "LOG_LEVEL", 
                 ]
 
                 for var in common_env_vars:
@@ -124,28 +126,26 @@ def create_basesettings_compatibility():
 
 
 def install_pydantic_settings():
-    """Try to install pydantic-settings package"""
+    """Try to install pydantic - settings package"""
     try:
-        import subprocess
-        import sys
 
-        logger.info("🔧 Attempting to install pydantic-settings...")
+        logger.info("🔧 Attempting to install pydantic - settings...")
         result = subprocess.run(
-            [sys.executable, "-m", "pip", "install", "pydantic-settings"],
-            capture_output=True,
-            text=True,
-            timeout=60,
+            [sys.executable, " - m", "pip", "install", "pydantic - settings"], 
+            capture_output = True, 
+            text = True, 
+            timeout = 60, 
         )
 
         if result.returncode == 0:
-            logger.info("✅ pydantic-settings installed successfully")
+            logger.info("✅ pydantic - settings installed successfully")
             return True
         else:
-            logger.warning(f"⚠️ Failed to install pydantic-settings: {result.stderr}")
+            logger.warning(f"⚠️ Failed to install pydantic - settings: {result.stderr}")
             return False
 
     except Exception as e:
-        logger.warning(f"⚠️ Could not install pydantic-settings: {e}")
+        logger.warning(f"⚠️ Could not install pydantic - settings: {e}")
         return False
 
 
@@ -156,7 +156,7 @@ def update_compatibility_layer():
         # Read the current compatibility file
         compat_file = "src/pydantic_v2_compat.py"
 
-        with open(compat_file, "r", encoding="utf-8") as f:
+        with open(compat_file, "r", encoding = "utf - 8") as f:
             content = f.read()
 
         # Check if BaseSettings is already handled
@@ -166,43 +166,41 @@ def update_compatibility_layer():
 
         # Add BaseSettings to the compatibility layer
         basesettings_code = '''
-# BaseSettings compatibility (moved to pydantic-settings in v2)
+# BaseSettings compatibility (moved to pydantic - settings in v2)
 BaseSettings = None
 
 def _get_base_settings():
     """Get BaseSettings with compatibility handling"""
     global BaseSettings
-    
+
     if BaseSettings is not None:
         return BaseSettings
-    
-    # Strategy 1: pydantic-settings (recommended for v2)
+
+    # Strategy 1: pydantic - settings (recommended for v2)
     try:
-        from pydantic_settings import BaseSettings as PydanticSettings
         BaseSettings = PydanticSettings
-        logger.info("✅ Using BaseSettings from pydantic-settings")
+        logger.info("✅ Using BaseSettings from pydantic - settings")
         return BaseSettings
     except ImportError:
         pass
-    
+
     # Strategy 2: pydantic v1 location
     try:
-        from pydantic import BaseSettings as PydanticBaseSettings
         BaseSettings = PydanticBaseSettings
         logger.info("✅ Using BaseSettings from pydantic (v1)")
         return BaseSettings
     except ImportError:
         pass
-    
+
     # Strategy 3: Create fallback
     class BaseSettingsFallback(BaseModel):
         """Fallback BaseSettings implementation"""
-        
+
         class Config:
             env_file = '.env'
-            env_file_encoding = 'utf-8'
+            env_file_encoding = 'utf - 8'
             case_sensitive = False
-    
+
     BaseSettings = BaseSettingsFallback
     logger.info("✅ Using BaseSettings fallback")
     return BaseSettings
@@ -228,8 +226,8 @@ except Exception as e:
 
             # Update __all__ to include BaseSettings
             new_content = new_content.replace(
-                '__all__ = ["SecretField", "Field", "BaseModel"]',
-                '__all__ = ["SecretField", "Field", "BaseModel", "BaseSettings"]',
+                '__all__ = ["SecretField", "Field", "BaseModel"]', 
+                '__all__ = ["SecretField", "Field", "BaseModel", "BaseSettings"]', 
             )
         else:
             # Append at the end
@@ -241,7 +239,7 @@ except Exception as e:
             )
 
         # Write back
-        with open(compat_file, "w", encoding="utf-8") as f:
+        with open(compat_file, "w", encoding = "utf - 8") as f:
             f.write(new_content)
 
         logger.info("✅ Updated compatibility layer with BaseSettings")
@@ -263,7 +261,7 @@ def test_basesettings_compatibility():
         class TestSettings(BaseSettings):
             app_name: str = "TestApp"
             debug: bool = False
-            api_key: str = "default-key"
+            api_key: str = "default - key"
 
         # Test instantiation
         settings = TestSettings()
@@ -271,7 +269,7 @@ def test_basesettings_compatibility():
 
         # Test from_env if available
         if hasattr(TestSettings, "from_env"):
-            env_settings = TestSettings.from_env(app_name="EnvApp")
+            env_settings = TestSettings.from_env(app_name = "EnvApp")
             logger.info(
                 f"✅ BaseSettings from_env test passed: {env_settings.app_name}"
             )
@@ -287,9 +285,9 @@ def main():
     """Main BaseSettings compatibility fix"""
 
     logger.info("🚀 Pydantic BaseSettings Compatibility Fix")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
-    # Step 1: Try to install pydantic-settings
+    # Step 1: Try to install pydantic - settings
     installed = install_pydantic_settings()
 
     # Step 2: Create compatibility layer
@@ -302,15 +300,15 @@ def main():
     test_passed = test_basesettings_compatibility()
 
     # Report results
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
     logger.info("📊 BASESETTINGS COMPATIBILITY RESULTS")
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     results = {
-        "pydantic-settings_install": installed,
-        "compatibility_layer": BaseSettings is not None,
-        "main_file_update": updated,
-        "compatibility_test": test_passed,
+        "pydantic - settings_install": installed, 
+        "compatibility_layer": BaseSettings is not None, 
+        "main_file_update": updated, 
+        "compatibility_test": test_passed, 
     }
 
     all_ok = True
@@ -320,7 +318,7 @@ def main():
         if not status:
             all_ok = False
 
-    logger.info("=" * 60)
+    logger.info(" = " * 60)
 
     if all_ok:
         logger.info("🎉 BASESETTINGS COMPATIBILITY READY!")

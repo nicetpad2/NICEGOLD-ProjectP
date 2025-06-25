@@ -1,9 +1,9 @@
 # [Patch v6.9.39] Extracted strategy components from strategy.py
 """Basic strategy classes separated from :mod:`src.strategy`."""
 
-# ---------------------------------------------------------------------------
+# - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - 
 # Strategy Pattern Utilities
-# ---------------------------------------------------------------------------
+# - -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - 
 
 
 class EntryStrategy:
@@ -41,7 +41,7 @@ class DefaultEntryStrategy(EntryStrategy):
         from strategy.entry_rules import generate_open_signals
 
         signals = generate_open_signals(data)
-        return int(signals[-1]) if len(signals) else 0
+        return int(signals[ - 1]) if len(signals) else 0
 
 
 class DefaultExitStrategy(ExitStrategy):
@@ -51,13 +51,13 @@ class DefaultExitStrategy(ExitStrategy):
         from strategy.exit_rules import generate_close_signals
 
         signals = generate_close_signals(data)
-        return int(signals[-1]) if len(signals) else 0
+        return int(signals[ - 1]) if len(signals) else 0
 
 
 class MainStrategy:
     """Compose entry/exit/risk/trend components via dependency injection."""
 
-    def __init__(self, entry_handler, exit_handler, risk_manager=None, trend_filter=None):
+    def __init__(self, entry_handler, exit_handler, risk_manager = None, trend_filter = None):
         self.entry_handler = entry_handler
         self.exit_handler = exit_handler
         self.risk_manager = risk_manager or RiskManagementStrategy()
@@ -71,11 +71,11 @@ class MainStrategy:
 
 
 __all__ = [
-    "EntryStrategy",
-    "ExitStrategy",
-    "RiskManagementStrategy",
-    "TrendFilter",
-    "DefaultEntryStrategy",
-    "DefaultExitStrategy",
-    "MainStrategy",
+    "EntryStrategy", 
+    "ExitStrategy", 
+    "RiskManagementStrategy", 
+    "TrendFilter", 
+    "DefaultEntryStrategy", 
+    "DefaultExitStrategy", 
+    "MainStrategy", 
 ]

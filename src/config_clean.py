@@ -1,32 +1,56 @@
+# -*- coding: utf - 8 -* - 
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-NICEGOLD-ProjectP Configuration Module
-Production-ready configuration with ASCII-only logging for cross-platform compatibility.
-"""
-
+    from catboost import CatBoostClassifier, Pool
+        from catboost.utils import get_gpu_device_count
+from collections import Counter, defaultdict
+from datetime import datetime
+        from google.colab import drive
+            from importlib.metadata import version as _v
+        from IPython import get_ipython
+from joblib import dump as joblib_dump
+from joblib import load
+from pathlib import Path
+from sklearn.metrics import (
+from sklearn.model_selection import TimeSeriesSplit, train_test_split
+from sklearn.preprocessing import OrdinalEncoder, StandardScaler
+    from src.utils import get_env_float, load_settings, log_settings
 import atexit
+    import catboost
+            import google.colab  # noqa: F401
+    import GPUtil
 import importlib
 import logging
+import numpy as np
 import os
+import pandas as pd
 import pathlib
+                    import pynvml
+    import shap
+import sklearn
 import subprocess
 import sys
+    import ta
 import time
+        import torch
 import traceback
 import warnings as _warnings
+"""
+NICEGOLD - ProjectP Configuration Module
+Production - ready configuration with ASCII - only logging for cross - platform compatibility.
+"""
+
 
 # Suppress joblib/loky physical core warnings
 os.environ["JOBLIB_MULTIPROCESSING"] = "0"
 os.environ["LOKY_MAX_CPU_COUNT"] = "1"
 
 _warnings.filterwarnings(
-    "ignore",
-    message="Could not find the number of physical cores*",
-    category=UserWarning,
+    "ignore", 
+    message = "Could not find the number of physical cores*", 
+    category = UserWarning, 
 )
 _warnings.filterwarnings(
-    "ignore", message="joblib.externals.loky.backend.context.*", category=UserWarning
+    "ignore", message = "joblib.externals.loky.backend.context.*", category = UserWarning
 )
 
 # Default constants tested by tests/test_config_defaults.py
@@ -35,13 +59,13 @@ M15_TREND_RSI_UP = 60
 M15_TREND_RSI_DOWN = 40
 FORCED_ENTRY_MIN_GAIN_Z_ABS = 0.5
 FORCED_ENTRY_ALLOWED_REGIMES = [
-    "Normal",
-    "Breakout",
-    "StrongTrend",
-    "Reversal",
-    "Pullback",
-    "InsideBar",
-    "Choppy",
+    "Normal", 
+    "Breakout", 
+    "StrongTrend", 
+    "Reversal", 
+    "Pullback", 
+    "InsideBar", 
+    "Choppy", 
 ]
 ENABLE_SOFT_COOLDOWN = True
 ADAPTIVE_SIGNAL_SCORE_QUANTILE = 0.4
@@ -61,30 +85,25 @@ DEPTH = 6
 L2_LEAF_REG = None
 
 # Core imports
-from collections import Counter, defaultdict
-from datetime import datetime
-from pathlib import Path
 
-from joblib import dump as joblib_dump
-from joblib import load
 
 # Read version from VERSION file
 VERSION_FILE = os.path.join(os.path.dirname(__file__), "..", "VERSION")
-with open(VERSION_FILE, "r", encoding="utf-8") as vf:
+with open(VERSION_FILE, "r", encoding = "utf - 8") as vf:
     __version__ = vf.read().strip()
 
 # Register module as 'config' for reload compatibility
 if "src.config" not in sys.modules:
     sys.modules["src.config"] = sys.modules[__name__]
 
-# Auto-installation configuration
-AUTO_INSTALL_LIBS = False  # If True, attempt to auto-install missing libraries
+# Auto - installation configuration
+AUTO_INSTALL_LIBS = False  # If True, attempt to auto - install missing libraries
 
 # Output and models directories
 OUTPUT_DIR = Path(__file__).parent.parent / "output_default"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_DIR.mkdir(parents = True, exist_ok = True)
 MODELS_DIR = OUTPUT_DIR / "models"
-MODELS_DIR.mkdir(parents=True, exist_ok=True)
+MODELS_DIR.mkdir(parents = True, exist_ok = True)
 
 # Production configuration
 DATABASE_URL = os.getenv(
@@ -92,7 +111,7 @@ DATABASE_URL = os.getenv(
 )
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your - secret - key - change - in - production")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
@@ -112,33 +131,27 @@ EMERGENCY_STOP_DRAWDOWN = float(os.getenv("EMERGENCY_STOP_DRAWDOWN", "0.15"))
 # Data configuration
 BASE_DIR = pathlib.Path(__file__).parent
 DATA_DIR = BASE_DIR.parent / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR.mkdir(parents = True, exist_ok = True)
 SYMBOL = os.getenv("SYMBOL", "XAUUSD")
 TIMEFRAME = os.getenv("TIMEFRAME", "M1")
 
 # Initialize hyperparameters to prevent missing attribute warnings
 for _attr in [
-    "subsample",
-    "colsample_bylevel",
-    "bagging_temperature",
-    "random_strength",
-    "seed",
+    "subsample", 
+    "colsample_bylevel", 
+    "bagging_temperature", 
+    "random_strength", 
+    "seed", 
 ]:
     if _attr not in globals():
         globals()[_attr] = None
 
 # Core ML imports
-import numpy as np
-import pandas as pd
-import sklearn
-from sklearn.metrics import (
-    accuracy_score,
-    classification_report,
-    log_loss,
-    roc_auc_score,
+    accuracy_score, 
+    classification_report, 
+    log_loss, 
+    roc_auc_score, 
 )
-from sklearn.model_selection import TimeSeriesSplit, train_test_split
-from sklearn.preprocessing import OrdinalEncoder, StandardScaler
 
 
 # Enhanced logging setup
@@ -148,18 +161,18 @@ def setup_enhanced_logging():
         logging.root.removeHandler(handler)
 
     logs_dir = Path("logs")
-    logs_dir.mkdir(exist_ok=True)
+    logs_dir.mkdir(exist_ok = True)
 
     class ColoredFormatter(logging.Formatter):
         """Custom formatter with colors for different log levels"""
 
         COLORS = {
-            "DEBUG": "\\033[36m",
-            "INFO": "\\033[32m",
-            "WARNING": "\\033[33m",
-            "ERROR": "\\033[31m",
-            "CRITICAL": "\\033[35m",
-            "RESET": "\\033[0m",
+            "DEBUG": "\\033[36m", 
+            "INFO": "\\033[32m", 
+            "WARNING": "\\033[33m", 
+            "ERROR": "\\033[31m", 
+            "CRITICAL": "\\033[35m", 
+            "RESET": "\\033[0m", 
         }
 
         def format(self, record):
@@ -169,15 +182,15 @@ def setup_enhanced_logging():
 
     console_handler = logging.StreamHandler()
     console_formatter = ColoredFormatter(
-        "%(asctime)s | %(levelname)s | %(name)-15s | %(message)s", datefmt="%H:%M:%S"
+        "%(asctime)s | %(levelname)s | %(name) - 15s | %(message)s", datefmt = "%H:%M:%S"
     )
     console_handler.setFormatter(console_formatter)
     console_handler.setLevel(logging.INFO)
 
     file_handler = logging.FileHandler(logs_dir / "nicegold.log")
     file_formatter = logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | %(name)-15s | %(funcName)-20s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+        "%(asctime)s | %(levelname) - 8s | %(name) - 15s | %(funcName) - 20s | %(message)s", 
+        datefmt = "%Y - %m - %d %H:%M:%S", 
     )
     file_handler.setFormatter(file_formatter)
     file_handler.setLevel(logging.DEBUG)
@@ -200,7 +213,6 @@ logger.setLevel(logging.INFO)
 
 # Load runtime settings
 try:
-    from src.utils import get_env_float, load_settings, log_settings
 
     SETTINGS = load_settings()
     log_settings(SETTINGS, logger)
@@ -210,10 +222,10 @@ except ImportError:
 
 # Logging configuration
 BASE_LOG_DIR = os.path.join(os.path.dirname(__file__), "..", "logs")
-LOG_DATE = datetime.now().strftime("%Y-%m-%d")
+LOG_DATE = datetime.now().strftime("%Y - %m - %d")
 FOLD_ID = os.getenv("FOLD_ID", "fold0")
 LOG_DIR = os.path.join(BASE_LOG_DIR, LOG_DATE, FOLD_ID)
-os.makedirs(LOG_DIR, exist_ok=True)
+os.makedirs(LOG_DIR, exist_ok = True)
 LOG_FILENAME = os.path.join(LOG_DIR, f"gold_ai_v{__version__}_qa.log")
 DEFAULT_TRADE_LOG_MIN_ROWS = int(os.getenv("TRADE_LOG_MIN_ROWS", 10))
 
@@ -232,7 +244,7 @@ formatter = logging.Formatter(
     "[%(asctime)s][%(levelname)s][%(process)d][%(filename)s:%(lineno)d] - %(message)s"
 )
 
-fh = logging.FileHandler(LOG_FILENAME, mode="w", encoding="utf-8")
+fh = logging.FileHandler(LOG_FILENAME, mode = "w", encoding = "utf - 8")
 fh.setFormatter(formatter)
 sh = logging.StreamHandler(sys.stdout)
 sh.setFormatter(formatter)
@@ -252,12 +264,12 @@ atexit.register(logging.shutdown)
 root_logger = logging.getLogger()
 root_logger.setLevel(_log_level)
 
-logger.info(f"--- (Start) Gold AI v{__version__} ---")
-logger.info("--- Loading libraries and checking dependencies ---")
+logger.info(f" -  - - (Start) Gold AI v{__version__} - -  - ")
+logger.info(" -  - - Loading libraries and checking dependencies - -  - ")
 
 
 # Library version logging helper
-def log_library_version(library_name, library_object=None, version=None):
+def log_library_version(library_name, library_object = None, version = None):
     """Logs the version of the imported library."""
     try:
         version = version or getattr(library_object, "__version__", "N/A")
@@ -269,11 +281,11 @@ def log_library_version(library_name, library_object=None, version=None):
 # Log versions of core libraries
 log_library_version("Pandas", pd)
 log_library_version("NumPy", np)
-log_library_version("Scikit-learn", sklearn)
+log_library_version("Scikit - learn", sklearn)
 
 
 # Library installation and checks
-def install_library_if_needed(library_name, import_name=None, install_name=None):
+def install_library_if_needed(library_name, import_name = None, install_name = None):
     """Install a library if it's not available and AUTO_INSTALL_LIBS is True"""
     import_name = import_name or library_name.lower()
     install_name = install_name or library_name.lower()
@@ -287,10 +299,10 @@ def install_library_if_needed(library_name, import_name=None, install_name=None)
             logger.info(f"   Installing {library_name} library...")
             try:
                 subprocess.run(
-                    [sys.executable, "-m", "pip", "install", install_name, "-q"],
-                    check=True,
-                    capture_output=True,
-                    text=True,
+                    [sys.executable, " - m", "pip", "install", install_name, " - q"], 
+                    check = True, 
+                    capture_output = True, 
+                    text = True, 
                 )
                 lib = __import__(import_name)
                 logger.info(f"   (Success) {library_name} installed successfully.")
@@ -301,7 +313,7 @@ def install_library_if_needed(library_name, import_name=None, install_name=None)
                 return None
         else:
             logger.warning(
-                f"Library '{library_name}' not installed and AUTO_INSTALL_LIBS=False"
+                f"Library '{library_name}' not installed and AUTO_INSTALL_LIBS = False"
             )
             return None
 
@@ -313,17 +325,15 @@ optuna = install_library_if_needed("Optuna", "optuna")
 # TA library
 TA_VERSION = "N/A"
 try:
-    import ta
 
     TA_VERSION = getattr(ta, "__version__", "N/A")
     if TA_VERSION == "N/A":
         try:
-            from importlib.metadata import version as _v
 
             TA_VERSION = _v("ta")
         except Exception:
             TA_VERSION = "N/A"
-    log_library_version("TA", ta, version=TA_VERSION)
+    log_library_version("TA", ta, version = TA_VERSION)
 except ImportError:
     ta = install_library_if_needed("TA", "ta")
     if ta:
@@ -331,12 +341,9 @@ except ImportError:
 
 # CatBoost library
 try:
-    import catboost
-    from catboost import CatBoostClassifier, Pool
 
     logger.info(f"   (Info) CatBoost version: {catboost.__version__}")
     try:
-        from catboost.utils import get_gpu_device_count
 
         gpu_count = get_gpu_device_count()
         logger.info(f"   (Info) GPU count for CatBoost: {gpu_count}")
@@ -346,8 +353,6 @@ except ImportError:
     catboost = install_library_if_needed("CatBoost", "catboost")
     if catboost:
         try:
-            from catboost import CatBoostClassifier, Pool
-            from catboost.utils import get_gpu_device_count
         except ImportError:
             CatBoostClassifier = None
             Pool = None
@@ -366,7 +371,6 @@ psutil = install_library_if_needed("psutil")
 SHAP_INSTALLED = False
 SHAP_AVAILABLE = False
 try:
-    import shap
 
     SHAP_INSTALLED = True
     SHAP_AVAILABLE = True
@@ -391,7 +395,6 @@ def install_shap():
 
 # GPUtil library (optional)
 try:
-    import GPUtil
 
     logger.debug("GPUtil library already installed.")
 except Exception as e:
@@ -405,13 +408,11 @@ def is_colab():
     """Return True if running within Google Colab."""
     if os.environ.get("COLAB_RELEASE_TAG") or os.environ.get("COLAB_GPU"):
         try:
-            import google.colab  # noqa: F401
 
             return True
         except Exception:
             return False
     try:
-        from IPython import get_ipython
 
         ip = get_ipython()
         return (
@@ -434,10 +435,9 @@ elif os.path.isdir(DRIVE_BASE_PATH):
     FILE_BASE = DRIVE_BASE_PATH
 elif is_colab():
     try:
-        from google.colab import drive
 
         logger.info("(Info) Running on Google Colab - mounting Google Drive...")
-        drive.mount("/content/drive", force_remount=True)
+        drive.mount("/content/drive", force_remount = True)
         logger.info("(Success) Mount Google Drive successful")
         FILE_BASE = os.getcwd()
     except Exception as e:
@@ -452,9 +452,9 @@ DEFAULT_LOG_DIR = BASE_LOG_DIR
 
 # GPU acceleration setup
 USE_GPU_ACCELERATION = os.getenv("USE_GPU_ACCELERATION", "True").lower() in (
-    "true",
-    "1",
-    "yes",
+    "true", 
+    "1", 
+    "yes", 
 )
 cudf = None
 cuml = None
@@ -470,7 +470,6 @@ def setup_gpu_acceleration():
     logger.info("Checking GPU availability...")
 
     try:
-        import torch
 
         if torch.cuda.is_available():
             device_count = torch.cuda.device_count()
@@ -493,7 +492,6 @@ def setup_gpu_acceleration():
 
                 # Setup pynvml for monitoring
                 try:
-                    import pynvml
 
                     pynvml.nvmlInit()
                     nvml_handle = pynvml.nvmlDeviceGetHandleByIndex(0)

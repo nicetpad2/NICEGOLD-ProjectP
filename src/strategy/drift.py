@@ -1,4 +1,4 @@
-"""DriftObserver class and drift-related functions."""
+"""DriftObserver class and drift - related functions."""
 
 import logging
 import numpy as np
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class DriftObserver:
     """
     Observes and analyzes feature drift between training and testing folds
-    using Wasserstein distance and T-tests.
+    using Wasserstein distance and T - tests.
     """
     def __init__(self, features_to_observe):
         """
@@ -34,16 +34,16 @@ class DriftObserver:
             fold_num (int): The index of the current fold (starting from 0).
         """
         logger.info(f"    (DriftObserver) Analyzing Drift for Fold {fold_num + 1} (M1 Features)...")
-        
+
         # Placeholder implementation
         fold_results = {}
         for feature in self.features:
             fold_results[feature] = {
                 "wasserstein": 0.1,  # dummy value
-                "ttest_stat": 0.0,
+                "ttest_stat": 0.0, 
                 "ttest_p": 0.5
             }
-        
+
         self.results[fold_num] = fold_results
         logger.info(f"    (DriftObserver) Completed drift analysis for Fold {fold_num + 1}")
 
@@ -59,23 +59,23 @@ class DriftObserver:
         """
         if fold_num not in self.results:
             return np.nan
-        
+
         fold_data = self.results[fold_num]
         if not fold_data or not isinstance(fold_data, dict):
             return np.nan
 
-        w_dists = [res["wasserstein"] for res in fold_data.values() 
+        w_dists = [res["wasserstein"] for res in fold_data.values()
                   if isinstance(res, dict) and pd.notna(res.get("wasserstein"))]
         mean_w_dist = np.mean(w_dists) if w_dists else np.nan
-        
+
         return mean_w_dist
 
-    def needs_retrain(self, fold_num, threshold=0.1):
-        """Determine if the given fold requires re-training based on drift."""
+    def needs_retrain(self, fold_num, threshold = 0.1):
+        """Determine if the given fold requires re - training based on drift."""
         fold_data = self.results.get(fold_num)
         if not fold_data or not isinstance(fold_data, dict):
             return False
-        
+
         for metrics in fold_data.values():
             if isinstance(metrics, dict):
                 w_dist = metrics.get("wasserstein")
@@ -90,9 +90,9 @@ class DriftObserver:
         """
         Exports the detailed drift metrics for a specific fold to a CSV file.
         """
-        logger.debug(f"          (Success) Exported Drift Summary for Fold {fold_num+1} (stub)")
+        logger.debug(f"          (Success) Exported Drift Summary for Fold {fold_num + 1} (stub)")
 
-    def summarize_and_save(self, output_dir, wasserstein_threshold=None, ttest_alpha=None):
+    def summarize_and_save(self, output_dir, wasserstein_threshold = None, ttest_alpha = None):
         """
         Summarizes drift results across all analyzed folds and saves a summary CSV report.
         """

@@ -1,18 +1,18 @@
-"""High-level strategy helpers and minimal backtest routine."""
-from __future__ import annotations
-
-import pandas as pd
-
 from .entry_rules import generate_open_signals
 from .exit_rules import generate_close_signals
 from .order_management import OrderManager, OrderStatus as OrderStatusOM
 from .risk_management import (
-    calculate_position_size,
-    RiskManager,
-    OrderStatus as OrderStatusRM,
-)
 from .stoploss_utils import atr_sl_tp_wrapper
 from .trade_executor import execute_order, open_trade
+from __future__ import annotations
+import pandas as pd
+"""High - level strategy helpers and minimal backtest routine."""
+
+
+    calculate_position_size, 
+    RiskManager, 
+    OrderStatus as OrderStatusRM, 
+)
 
 
 def apply_strategy(df: pd.DataFrame) -> pd.DataFrame:
@@ -32,7 +32,7 @@ def run_backtest(df: pd.DataFrame, initial_balance: float, risk_pct: float = 0.0
     """Run a minimal backtest using generated signals.
 
     Parameters
-    ----------
+    - -  -  -  -  -  -  -  -  - 
     df : pd.DataFrame
         Input OHLC data with ``Close`` prices.
     initial_balance : float
@@ -41,7 +41,7 @@ def run_backtest(df: pd.DataFrame, initial_balance: float, risk_pct: float = 0.0
         Percentage risked per trade, by default ``0.01``.
 
     Returns
-    -------
+    - -  -  -  -  -  - 
     list
         A list of executed trade dictionaries.
     """
@@ -70,9 +70,9 @@ def run_backtest(df: pd.DataFrame, initial_balance: float, risk_pct: float = 0.0
                 balance += profit * current_trade["size"]
                 trades.append(
                     {
-                        "entry_idx": current_trade["entry_idx"],
-                        "exit_idx": idx,
-                        "profit": profit,
+                        "entry_idx": current_trade["entry_idx"], 
+                        "exit_idx": idx, 
+                        "profit": profit, 
                     }
                 )
                 drawdown = max(0.0, (initial_balance - balance) / initial_balance)

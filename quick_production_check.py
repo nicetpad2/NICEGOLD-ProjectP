@@ -1,28 +1,32 @@
 #!/usr/bin/env python3
+        from basic_auc_fix import create_optimized_model
+        from src.data_loader.csv_loader import safe_load_csv_auto
+        from src.evidently_compat import get_drift_detector
+        from src.pydantic_v2_compat import BaseModel, Field, SecretField
+import logging
+        import ProjectP
+import sys
 """
 Quick Production Status Check
-============================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 ตรวจสอบสถานะ Production แบบรวดเร็ว
 """
 
-import logging
-import sys
 
 # Setup minimal logging
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logging.basicConfig(level = logging.INFO, format = "%(message)s")
 logger = logging.getLogger(__name__)
 
 
 def quick_test():
     """Quick production test"""
     print("🚀 QUICK PRODUCTION STATUS CHECK")
-    print("=" * 50)
+    print(" = " * 50)
 
     results = {}
 
     # Test 1: Pydantic
     try:
-        from src.pydantic_v2_compat import BaseModel, Field, SecretField
 
         results["pydantic"] = True
         print("✅ Pydantic v2 compatibility - READY")
@@ -32,7 +36,6 @@ def quick_test():
 
     # Test 2: Evidently
     try:
-        from src.evidently_compat import get_drift_detector
 
         detector = get_drift_detector()
         results["evidently"] = True
@@ -43,7 +46,6 @@ def quick_test():
 
     # Test 3: Basic AUC Fix
     try:
-        from basic_auc_fix import create_optimized_model
 
         if callable(create_optimized_model):
             results["basic_auc_fix"] = True
@@ -57,7 +59,6 @@ def quick_test():
 
     # Test 4: CSV Loader (minimal test)
     try:
-        from src.data_loader.csv_loader import safe_load_csv_auto
 
         results["csv_loader"] = True
         print("✅ CSV loader - READY")
@@ -67,7 +68,6 @@ def quick_test():
 
     # Test 5: ProjectP
     try:
-        import ProjectP
 
         if hasattr(ProjectP, "main") and hasattr(ProjectP, "run_full_pipeline"):
             results["projectp"] = True
@@ -79,7 +79,7 @@ def quick_test():
         results["projectp"] = False
         print(f"❌ ProjectP - FAILED: {e}")
 
-    print("=" * 50)
+    print(" = " * 50)
 
     # Final status
     ready_count = sum(results.values())
@@ -88,7 +88,7 @@ def quick_test():
     if ready_count == total_count:
         print("🎉 PRODUCTION READY!")
         print("✅ ALL COMPONENTS OPERATIONAL")
-        print("💡 Ready to run: python ProjectP.py --run_full_pipeline")
+        print("💡 Ready to run: python ProjectP.py - - run_full_pipeline")
         return True
     else:
         print(f"⚠️  PARTIALLY READY ({ready_count}/{total_count})")

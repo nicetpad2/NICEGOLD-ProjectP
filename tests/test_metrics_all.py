@@ -1,7 +1,7 @@
-import pandas as pd
-import numpy as np
-from src.metrics import performance
 
+from src.metrics import performance
+import numpy as np
+import pandas as pd
 def test_sharpe_ratio_zero():
     returns = pd.Series([0, 0, 0, 0])
     result = performance.sharpe_ratio(returns)
@@ -18,6 +18,6 @@ def test_win_rate_all_win():
     assert result == 1
 
 def test_profit_factor_all_loss():
-    trades = pd.DataFrame({'pnl': [-1, -2, -3]})
+    trades = pd.DataFrame({'pnl': [ - 1, -2, -3]})
     result = performance.profit_factor(trades)
     assert result == 0

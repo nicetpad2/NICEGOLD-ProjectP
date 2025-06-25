@@ -1,13 +1,12 @@
+
+
+# pytest.skip("Disabled: expects non - existent functionality", allow_module_level = True)
 import importlib
+import logging
+import os
+import pytest
 import sys
 import types
-import os
-
-import logging
-import pytest
-
-# pytest.skip("Disabled: expects non-existent functionality", allow_module_level=True)
-
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 
@@ -22,7 +21,7 @@ def test_fund_profiles_loaded_from_config(monkeypatch):
     dummy.print_gpu_utilization = lambda *_: None
     monkeypatch.setitem(sys.modules, 'src.config', dummy)
     if 'src' in sys.modules:
-        monkeypatch.setattr(sys.modules['src'], 'config', dummy, raising=False)
+        monkeypatch.setattr(sys.modules['src'], 'config', dummy, raising = False)
     if 'src.main' in sys.modules:
         del sys.modules['src.main']
     main = importlib.import_module('src.main')

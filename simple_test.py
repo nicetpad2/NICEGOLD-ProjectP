@@ -1,26 +1,28 @@
+# -*- coding: utf - 8 -* - 
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from pathlib import Path
+    from projectp.pipeline import TradingPipeline
+    from src.config import USE_GPU_ACCELERATION, setup_enhanced_logging
+    import numpy as np
+import os
+    import pandas as pd
+import sys
+    import traceback
 """Simple pipeline test runner"""
 
-import os
-import sys
-from pathlib import Path
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 try:
-    print("=== NICEGOLD-ProjectP Pipeline Test ===")
+    print(" =  = = NICEGOLD - ProjectP Pipeline Test = =  = ")
     print("1. Testing imports...")
 
     # Test basic imports
-    import numpy as np
-    import pandas as pd
 
     print("   ✓ Basic data libraries imported")
 
     # Test project imports
-    from src.config import USE_GPU_ACCELERATION, setup_enhanced_logging
 
     logger = setup_enhanced_logging()
     print("   ✓ Enhanced logging setup")
@@ -28,7 +30,6 @@ try:
     print(f"   ✓ GPU acceleration enabled: {USE_GPU_ACCELERATION}")
 
     # Test pipeline import
-    from projectp.pipeline import TradingPipeline
 
     print("   ✓ Trading pipeline imported")
 
@@ -59,7 +60,6 @@ try:
 
 except Exception as e:
     print(f"❌ Error during pipeline test: {e}")
-    import traceback
 
     traceback.print_exc()
     sys.exit(1)

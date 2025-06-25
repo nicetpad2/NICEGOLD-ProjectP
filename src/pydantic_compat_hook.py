@@ -1,13 +1,16 @@
+            from pydantic import Field
+from typing import Any, Dict
+import builtins
+import importlib
+import logging
+            import pydantic
+import sys
 """
 Ultimate Pydantic v2 Compatibility Fix
-=====================================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 Professional solution for Pydantic v2 SecretField compatibility
 """
 
-import importlib
-import logging
-import sys
-from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -26,16 +29,14 @@ class PydanticCompatibilityHook:
 
         try:
             # Import pydantic
-            import pydantic
-            from pydantic import Field
 
             # Create SecretField
-            def SecretField(default=None, **kwargs):
+            def SecretField(default = None, **kwargs):
                 """Pydantic v2 compatible SecretField"""
-                # Remove v1-specific parameters
+                # Remove v1 - specific parameters
                 for old_param in ["secret", "repr", "min_length", "max_length"]:
                     kwargs.pop(old_param, None)
-                return Field(default=default, **kwargs)
+                return Field(default = default, **kwargs)
 
             # Patch the module
             pydantic.SecretField = SecretField
@@ -60,7 +61,7 @@ class PydanticCompatibilityHook:
             return self.pydantic_module.SecretField
         else:
             # Fallback
-            def FallbackSecretField(default=None, **kwargs):
+            def FallbackSecretField(default = None, **kwargs):
                 return default
 
             return FallbackSecretField
@@ -80,14 +81,13 @@ def ensure_pydantic_compatibility():
     return _compat_hook.apply_patches()
 
 
-# Auto-apply on import
+# Auto - apply on import
 ensure_pydantic_compatibility()
 
 # Export for use
 SecretField = get_compatible_secretfield()
 
 # Make available in builtins
-import builtins
 
 builtins.CompatibleSecretField = SecretField
 

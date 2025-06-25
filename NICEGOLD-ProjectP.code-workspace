@@ -1,0 +1,194 @@
+{
+    "folders": [
+        {
+            "name": "NICEGOLD-ProjectP",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "./.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "python.analysis.autoImportCompletions": true,
+        "python.analysis.typeCheckingMode": "basic",
+        "editor.formatOnSave": true,
+        "files.associations": {
+            "*.py": "python",
+            "*.yaml": "yaml",
+            "*.yml": "yaml",
+            "*.md": "markdown"
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.cwd": "${workspaceFolder}",
+        "jupyter.notebookFileRoot": "${workspaceFolder}",
+        "workbench.colorTheme": "Default Dark+",
+        "editor.minimap.enabled": true,
+        "files.autoSave": "onFocusChange",
+        "editor.rulers": [88, 120],
+        "python.formatting.provider": "black",
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": true
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.flake8",
+            "ms-python.black-formatter",
+            "ms-python.debugpy",
+            "ms-toolsai.jupyter",
+            "redhat.vscode-yaml",
+            "ms-vscode.vscode-json",
+            "streetsidesoftware.code-spell-checker",
+            "ms-python.mypy-type-checker",
+            "charliermarsh.ruff",
+            "ms-vscode.cmake-tools"
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "🚀 Run NICEGOLD System",
+                "type": "shell",
+                "command": "python",
+                "args": ["ProjectP.py"],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "new"
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "🧪 Run Tests",
+                "type": "shell",
+                "command": "python",
+                "args": ["-m", "pytest", "tests/", "-v"],
+                "group": "test",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "new"
+                }
+            },
+            {
+                "label": "📊 Run Data Analysis",
+                "type": "shell",
+                "command": "python",
+                "args": ["test_data_analysis.py"],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "new"
+                }
+            },
+            {
+                "label": "🌐 Start Web Dashboard",
+                "type": "shell",
+                "command": "streamlit",
+                "args": ["run", "ai_agents_web_ultimate.py"],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "new"
+                },
+                "isBackground": true
+            },
+            {
+                "label": "🔧 Setup Environment",
+                "type": "shell",
+                "command": "python",
+                "args": ["setup_new.py"],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "new"
+                }
+            },
+            {
+                "label": "🧹 Clean System",
+                "type": "shell",
+                "command": "find",
+                "args": [
+                    ".",
+                    "-type", "f",
+                    "(",
+                    "-name", "*.pyc",
+                    "-o", "-name", "*.pyo",
+                    "-o", "-name", "__pycache__",
+                    ")",
+                    "-delete"
+                ],
+                "group": "build"
+            },
+            {
+                "label": "📦 Install Requirements",
+                "type": "shell",
+                "command": "pip",
+                "args": ["install", "-r", "requirements.txt"],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "new"
+                }
+            }
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "🚀 Debug NICEGOLD System",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/ProjectP.py",
+                "console": "integratedTerminal",
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}"
+                }
+            },
+            {
+                "name": "🧪 Debug Tests",
+                "type": "debugpy",
+                "request": "launch",
+                "module": "pytest",
+                "args": ["tests/", "-v", "-s"],
+                "console": "integratedTerminal",
+                "cwd": "${workspaceFolder}"
+            },
+            {
+                "name": "📊 Debug Data Analysis",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/test_data_analysis.py",
+                "console": "integratedTerminal",
+                "cwd": "${workspaceFolder}"
+            },
+            {
+                "name": "🌐 Debug Web Dashboard",
+                "type": "debugpy",
+                "request": "launch",
+                "module": "streamlit",
+                "args": ["run", "ai_agents_web_ultimate.py"],
+                "console": "integratedTerminal",
+                "cwd": "${workspaceFolder}"
+            }
+        ]
+    }
+}

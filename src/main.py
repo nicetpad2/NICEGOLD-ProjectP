@@ -1,47 +1,46 @@
+
 # main.py (entry point) สำหรับเรียกใช้งาน pipeline/main logic
-import logging
+    from pathlib import Path
 from src.pipeline import main
 from src.strategy import run_all_folds_with_threshold
-
-if __name__ == "__main__":
     import argparse
+import logging
+    import os
+    import pandas as pd
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--stage", choices=["preprocess", "backtest", "report"], default="full"
+        " -  - stage", choices = ["preprocess", "backtest", "report"], default = "full"
     )
     args = parser.parse_args()
     stage_map = {
-        "preprocess": "PREPARE_TRAIN_DATA",
-        "backtest": "FULL_RUN",
-        "report": "REPORT",
+        "preprocess": "PREPARE_TRAIN_DATA", 
+        "backtest": "FULL_RUN", 
+        "report": "REPORT", 
     }
     selected_run_mode = stage_map.get(args.stage, "FULL_PIPELINE")
     logging.info(f"(Starting) กำลังเริ่มการทำงานหลัก (main) ในโหมด: {selected_run_mode}...")
-    main(run_mode=selected_run_mode)
+    main(run_mode = selected_run_mode)
 
-# --- Stub/placeholder for test compatibility ---
+# - - - Stub/placeholder for test compatibility - -  - 
 def safe_load_csv_auto(*args, **kwargs):
-    import pandas as pd
-    return pd.DataFrame({'Open':[1],'High':[1],'Low':[1],'Close':[1],'datetime':['2024-01-01']})
+    return pd.DataFrame({'Open':[1], 'High':[1], 'Low':[1], 'Close':[1], 'datetime':['2024 - 01 - 01']})
 
 def ensure_default_output_dir(path):
-    import os
-    os.makedirs(path, exist_ok=True)
+    os.makedirs(path, exist_ok = True)
     return path
 
 def ensure_model_files_exist(out_dir, *args, **kwargs):
-    import os
-    from pathlib import Path
     out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents = True, exist_ok = True)
     # สร้างไฟล์ placeholder ตามที่ test ตรวจสอบ
     for name in [
-        'meta_classifier.pkl',
-        'features_main.json',
-        'meta_classifier_spike.pkl',
-        'features_spike.json',
-        'meta_classifier_cluster.pkl',
-        'features_cluster.json',
+        'meta_classifier.pkl', 
+        'features_main.json', 
+        'meta_classifier_spike.pkl', 
+        'features_spike.json', 
+        'meta_classifier_cluster.pkl', 
+        'features_cluster.json', 
     ]:
         (out_dir / name).write_text('')
     return None
@@ -64,11 +63,9 @@ def load_features_from_file():
     pass
 
 def load_data(*args, **kwargs):
-    import pandas as pd
-    return pd.DataFrame({'Open':[1],'High':[1],'Low':[1],'Close':[1],'datetime':['2024-01-01']})
+    return pd.DataFrame({'Open':[1], 'High':[1], 'Low':[1], 'Close':[1], 'datetime':['2024 - 01 - 01']})
 
 def load_validated_csv(*args, **kwargs):
-    import pandas as pd
     return pd.DataFrame({'Date': ['20240101'], 'Timestamp': ['00:00:00'], 'Open': [1.0], 'High': [1.0], 'Low': [1.0], 'Close': [1.0]})
 
 def drop_nan_rows(df):
@@ -96,7 +93,7 @@ DEFAULT_FUND_PROFILES = {}
 DEFAULT_KILL_SWITCH_MAX_DD_THRESHOLD = 0.15
 DEFAULT_KILL_SWITCH_WARNING_MAX_DD_THRESHOLD = 0.25
 
-# --- Additional stubs for test compatibility ---
+# - - - Additional stubs for test compatibility - -  - 
 def ensure_main_features_file(*args, **kwargs):
     return None
 

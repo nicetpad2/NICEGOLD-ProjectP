@@ -1,15 +1,17 @@
+
+# [Patch v6.2.5] CPU - only fallback for missing CUDA libraries and missing torch
+from pathlib import Path
+from src import features
+from typing import Optional, Tuple
 import json
 import logging
-from pathlib import Path
-from typing import Optional, Tuple
-
-import warnings
-# [Patch v6.2.5] CPU-only fallback for missing CUDA libraries and missing torch
-try:
+import pandas as pd
     import torch
+import warnings
+try:
 except Exception as e:  # ModuleNotFoundError or OSError
     logging.warning(
-        "torch unavailable (%s), defaulting to CPU-only mode", e
+        "torch unavailable (%s), defaulting to CPU - only mode", e
     )  # [Patch] use logging to avoid runtime warning
 
     class _DummyCuda:
@@ -21,21 +23,19 @@ except Exception as e:  # ModuleNotFoundError or OSError
 
     torch = _DummyTorch()
 
-import pandas as pd
-from src import features
 
 logger = logging.getLogger(__name__)
 
 
 def adaptive_sl_tp(
-    current_atr: float,
-    avg_atr: float,
-    base_sl: float = 2.0,
-    base_tp: float = 1.8,
+    current_atr: float, 
+    avg_atr: float, 
+    base_sl: float = 2.0, 
+    base_tp: float = 1.8, 
 ) -> Tuple[float, float]:
     """Return adaptive SL/TP multipliers based on ATR ratio."""
     logger.debug(
-        "Calculating adaptive_sl_tp with current_atr=%s avg_atr=%s", current_atr, avg_atr
+        "Calculating adaptive_sl_tp with current_atr = %s avg_atr = %s", current_atr, avg_atr
     )
     try:
         current = float(current_atr)
@@ -43,8 +43,8 @@ def adaptive_sl_tp(
     except (TypeError, ValueError):
         logger.warning("Received invalid ATR inputs: %s, %s", current_atr, avg_atr)
         return base_sl, base_tp
-    if avg <= 1e-9:
-        logger.warning("Average ATR is non-positive: %s", avg)
+    if avg <= 1e - 9:
+        logger.warning("Average ATR is non - positive: %s", avg)
         return base_sl, base_tp
     ratio = current / avg
     if ratio > 1.5:
@@ -55,15 +55,15 @@ def adaptive_sl_tp(
 
 
 def adaptive_risk(
-    equity: float,
-    peak_equity: float,
-    base_risk: float = 0.01,
-    dd_threshold: float = 0.1,
-    min_risk: float = 0.002,
+    equity: float, 
+    peak_equity: float, 
+    base_risk: float = 0.01, 
+    dd_threshold: float = 0.1, 
+    min_risk: float = 0.002, 
 ) -> float:
     """Adjust risk per trade according to drawdown."""
     logger.debug(
-        "Calculating adaptive_risk with equity=%s peak_equity=%s", equity, peak_equity
+        "Calculating adaptive_risk with equity = %s peak_equity = %s", equity, peak_equity
     )
     try:
         eq = float(equity)
@@ -72,7 +72,7 @@ def adaptive_risk(
         logger.warning("Invalid equity inputs: %s, %s", equity, peak_equity)
         return base_risk
     if peak <= 0:
-        logger.warning("Peak equity is non-positive: %s", peak_equity)
+        logger.warning("Peak equity is non - positive: %s", peak_equity)
         return base_risk
     dd = 1.0 - eq / peak
     if dd > dd_threshold:
@@ -86,8 +86,8 @@ def log_best_params(params: dict, fold_index: int, output_dir: str) -> Optional[
     path = Path(output_dir) / f"best_params_fold_{fold_index}.json"
     logger.debug("Saving best params for fold %s to %s", fold_index, path)
     try:
-        with open(path, "w", encoding="utf-8") as fh:
-            json.dump(params, fh, ensure_ascii=False, indent=2)
+        with open(path, "w", encoding = "utf - 8") as fh:
+            json.dump(params, fh, ensure_ascii = False, indent = 2)
         logger.info("Saved best params to %s", path)
         return path
     except Exception as e:  # pragma: no cover - logging only
@@ -97,15 +97,15 @@ def log_best_params(params: dict, fold_index: int, output_dir: str) -> Optional[
 
 def calculate_atr(df: pd.DataFrame, period: int = 14) -> float:
     """Return the latest ATR value using :func:`features.atr`."""
-    logger.debug("Calculating ATR for period=%s", period)
+    logger.debug("Calculating ATR for period = %s", period)
     if not isinstance(df, pd.DataFrame):
         logger.warning("calculate_atr received invalid dataframe: %s", type(df))
         return float("nan")
     try:
-        atr_df = features.atr(df[["High", "Low", "Close"]].copy(), period=period)
+        atr_df = features.atr(df[["High", "Low", "Close"]].copy(), period = period)
         col = f"ATR_{period}"
         if col in atr_df.columns:
-            val = pd.to_numeric(atr_df[col].iloc[-1], errors="coerce")
+            val = pd.to_numeric(atr_df[col].iloc[ - 1], errors = "coerce")
             return float(val)
     except Exception as e:  # pragma: no cover - logging only
         logger.error("calculate_atr failed: %s", e)
@@ -113,17 +113,17 @@ def calculate_atr(df: pd.DataFrame, period: int = 14) -> float:
 
 
 def atr_position_size(
-    equity: float,
-    atr: float,
-    risk_pct: float = 0.01,
-    atr_mult: float = 1.5,
-    pip_value: float = 0.1,
-    min_lot: float = 0.01,
-    max_lot: float = 5.0,
+    equity: float, 
+    atr: float, 
+    risk_pct: float = 0.01, 
+    atr_mult: float = 1.5, 
+    pip_value: float = 0.1, 
+    min_lot: float = 0.01, 
+    max_lot: float = 5.0, 
 ) -> Tuple[float, float]:
     """Calculate lot size and SL distance based on ATR."""
     logger.debug(
-        "Calculating atr_position_size for equity=%s atr=%s", equity, atr
+        "Calculating atr_position_size for equity = %s atr = %s", equity, atr
     )
     try:
         eq = float(equity)
@@ -133,7 +133,7 @@ def atr_position_size(
         return min_lot, float("nan")
     if eq <= 0 or atr_val <= 0 or pip_value <= 0:
         logger.warning(
-            "Non-positive values detected eq=%s atr=%s pip_value=%s", eq, atr_val, pip_value
+            "Non - positive values detected eq = %s atr = %s pip_value = %s", eq, atr_val, pip_value
         )
         return min_lot, float("nan")
 
@@ -141,7 +141,7 @@ def atr_position_size(
     risk_amount_usd = eq * risk_pct
     sl_pips = sl_delta_price * 10.0
     risk_per_001 = sl_pips * pip_value
-    if risk_per_001 <= 1e-9:
+    if risk_per_001 <= 1e - 9:
         return min_lot, sl_delta_price
 
     lot_units = risk_amount_usd / risk_per_001
@@ -153,14 +153,14 @@ def atr_position_size(
 def compute_kelly_position(current_winrate: float, win_loss_ratio: float) -> float:
     """Return Kelly position size percentage."""
     logger.debug(
-        "Computing Kelly position for winrate=%s ratio=%s", current_winrate, win_loss_ratio
+        "Computing Kelly position for winrate = %s ratio = %s", current_winrate, win_loss_ratio
     )
     try:
         p = float(current_winrate)
         b = float(win_loss_ratio)
     except (TypeError, ValueError):
         logger.warning(
-            "Invalid Kelly inputs winrate=%s ratio=%s", current_winrate, win_loss_ratio
+            "Invalid Kelly inputs winrate = %s ratio = %s", current_winrate, win_loss_ratio
         )
         return 0.0
     if b <= 0:
@@ -173,7 +173,7 @@ def compute_kelly_position(current_winrate: float, win_loss_ratio: float) -> flo
 
 def compute_dynamic_lot(base_lot: float, drawdown_pct: float) -> float:
     """Reduce lot size based on drawdown percentage."""
-    logger.debug("compute_dynamic_lot base_lot=%s drawdown_pct=%s", base_lot, drawdown_pct)
+    logger.debug("compute_dynamic_lot base_lot = %s drawdown_pct = %s", base_lot, drawdown_pct)
     try:
         dd = float(drawdown_pct)
     except (TypeError, ValueError):
@@ -188,21 +188,21 @@ def compute_dynamic_lot(base_lot: float, drawdown_pct: float) -> float:
 
 
 def compute_trailing_atr_stop(
-    entry_price: float,
-    current_price: float,
-    atr_current: float,
-    side: str,
-    old_sl: float,
-    atr_multiplier: float = 1.5,
+    entry_price: float, 
+    current_price: float, 
+    atr_current: float, 
+    side: str, 
+    old_sl: float, 
+    atr_multiplier: float = 1.5, 
 ) -> float:
-    """Return updated stop-loss price based on current ATR movement."""
+    """Return updated stop - loss price based on current ATR movement."""
     logger.debug(
-        "compute_trailing_atr_stop entry=%s price=%s atr=%s side=%s old_sl=%s",
-        entry_price,
-        current_price,
-        atr_current,
-        side,
-        old_sl,
+        "compute_trailing_atr_stop entry = %s price = %s atr = %s side = %s old_sl = %s", 
+        entry_price, 
+        current_price, 
+        atr_current, 
+        side, 
+        old_sl, 
     )
     try:
         entry = float(entry_price)
@@ -234,13 +234,13 @@ def compute_trailing_atr_stop(
     return old_sl
 
 def volatility_adjusted_lot_size(
-    equity: float,
-    atr_value: float,
-    sl_multiplier: float = 1.5,
-    pip_value: float = 0.1,
-    risk_pct: float = 0.01,
-    min_lot: float = 0.01,
-    max_lot: float = 5.0,
+    equity: float, 
+    atr_value: float, 
+    sl_multiplier: float = 1.5, 
+    pip_value: float = 0.1, 
+    risk_pct: float = 0.01, 
+    min_lot: float = 0.01, 
+    max_lot: float = 5.0, 
 ) -> Tuple[float, float]:
     """[Patch] Calculate lot size based on ATR volatility."""
     try:
@@ -250,12 +250,12 @@ def volatility_adjusted_lot_size(
         logger.warning("Invalid inputs for volatility_adjusted_lot_size")
         return min_lot, float("nan")
     if equity <= 0 or atr_value <= 0 or pip_value <= 0:
-        logger.warning("Non-positive inputs for volatility_adjusted_lot_size")
+        logger.warning("Non - positive inputs for volatility_adjusted_lot_size")
         return min_lot, float("nan")
     sl_pips = atr_value * sl_multiplier * 10.0
     risk_amount = equity * risk_pct
     risk_per_lot = sl_pips * pip_value
-    if risk_per_lot <= 1e-9:
+    if risk_per_lot <= 1e - 9:
         return min_lot, atr_value * sl_multiplier
     lot = round(risk_amount / risk_per_lot, 2)
     lot = max(min_lot, min(lot, max_lot))
@@ -263,17 +263,17 @@ def volatility_adjusted_lot_size(
 
 
 def dynamic_risk_adjustment(
-    fold_returns: list[float],
-    base_risk: float = 0.01,
-    loss_cutoff: float = -0.05,
-    win_cutoff: float = 0.05,
+    fold_returns: list[float], 
+    base_risk: float = 0.01, 
+    loss_cutoff: float = -0.05, 
+    win_cutoff: float = 0.05, 
 ) -> float:
     """[Patch] Adjust risk based on consecutive fold performance."""
     if not fold_returns:
         return base_risk
-    last_three = fold_returns[-3:]
-    last_two = fold_returns[-2:]
-    if len(last_three) >= 2 and all(r <= loss_cutoff for r in last_three[-2:]):
+    last_three = fold_returns[ - 3:]
+    last_two = fold_returns[ - 2:]
+    if len(last_three) >= 2 and all(r <= loss_cutoff for r in last_three[ - 2:]):
         return base_risk * 0.5
     if len(last_three) == 3 and all(r <= loss_cutoff for r in last_three):
         return base_risk * 0.5  # pragma: no cover
@@ -293,11 +293,11 @@ def check_portfolio_stop(drawdown_pct: float, threshold: float = 0.10) -> bool:
 
 
 def calculate_dynamic_sl_tp(
-    atr: float,
-    win_rate: float,
-    sl_min_pips: float = 20.0,
-    sl_max_pips: float = 30.0,
-    atr_multiplier: float = 1.5,
+    atr: float, 
+    win_rate: float, 
+    sl_min_pips: float = 20.0, 
+    sl_max_pips: float = 30.0, 
+    atr_multiplier: float = 1.5, 
 ) -> Tuple[float, float]:
     """Return SL/TP distances based on ATR and win rate.
 
@@ -336,7 +336,7 @@ def update_signal_threshold(current_score: float, params) -> float:
     """[Patch] Adjust ``signal_score_threshold`` based on ``current_score``.
 
     หากมีการปรับค่าจะบันทึก Log รูปแบบ
-    ``[Adaptive] Threshold changed | Fold=<…> | Profile=<…> | Old=<…> -> New=<…> | Current Score=<…>``
+    ``[Adaptive] Threshold changed | Fold = <…> | Profile = <…> | Old = <…> -> New = <…> | Current Score = <…>``
     """
 
     try:
@@ -353,24 +353,24 @@ def update_signal_threshold(current_score: float, params) -> float:
         new_th = 0.50
         params.signal_score_threshold = new_th
         logger.info(
-            "[Adaptive] Threshold changed | Fold=%s | Profile=%s | Old=%s -> New=%s | Current Score=%.2f",
-            getattr(params, "current_fold", "N/A"),
-            getattr(params, "profile_name", "N/A"),
-            old_th,
-            new_th,
-            score,
+            "[Adaptive] Threshold changed | Fold = %s | Profile = %s | Old = %s -> New = %s | Current Score = %.2f", 
+            getattr(params, "current_fold", "N/A"), 
+            getattr(params, "profile_name", "N/A"), 
+            old_th, 
+            new_th, 
+            score, 
         )
     elif other_condition:
         old_th = params.signal_score_threshold
         new_th = 0.25
         params.signal_score_threshold = new_th
         logger.info(
-            "[Adaptive] Threshold changed | Fold=%s | Profile=%s | Old=%s -> New=%s | Current Score=%.2f",
-            getattr(params, "current_fold", "N/A"),
-            getattr(params, "profile_name", "N/A"),
-            old_th,
-            new_th,
-            score,
+            "[Adaptive] Threshold changed | Fold = %s | Profile = %s | Old = %s -> New = %s | Current Score = %.2f", 
+            getattr(params, "current_fold", "N/A"), 
+            getattr(params, "profile_name", "N/A"), 
+            old_th, 
+            new_th, 
+            score, 
         )
 
     return params.signal_score_threshold

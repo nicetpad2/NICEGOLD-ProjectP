@@ -1,0 +1,154 @@
+# AI Agents Configuration
+# =========================
+
+# Agent Controller Settings
+agent_controller:
+  project_root: "."
+  reports_directory: "agent_reports"
+  session_timeout: 3600  # 1 hour
+  max_concurrent_tasks: 3
+  enable_auto_save: true
+  verbose_logging: false
+
+# Analysis Settings
+analysis:
+  comprehensive_analysis:
+    enabled: true
+    include_deep_analysis: true
+    timeout: 1800  # 30 minutes
+    
+  code_analysis:
+    enabled: true
+    quality_threshold: 70
+    check_syntax: true
+    check_style: true
+    check_complexity: true
+    
+  project_understanding:
+    enabled: true
+    analyze_structure: true
+    analyze_dependencies: true
+    analyze_file_types: true
+
+# Auto-Fix Settings
+auto_fix:
+  enabled: true
+  backup_before_fix: true
+  max_fixes_per_session: 50
+  fix_types:
+    - syntax_errors
+    - import_issues
+    - style_violations
+    - security_issues
+    - performance_issues
+  
+  safety_level: "conservative"  # conservative, moderate, aggressive
+
+# Optimization Settings
+optimization:
+  enabled: true
+  performance_optimization: true
+  memory_optimization: true
+  code_optimization: true
+  
+  thresholds:
+    cpu_usage_max: 80
+    memory_usage_max: 85
+    execution_time_max: 300  # 5 minutes
+
+# Monitoring Settings
+monitoring:
+  real_time_enabled: false
+  monitoring_interval: 30  # seconds
+  alert_thresholds:
+    cpu_usage: 85
+    memory_usage: 90
+    disk_usage: 95
+    
+  metrics_retention: 168  # hours (1 week)
+
+# Web Interface Settings
+web_interface:
+  default_port: 8501
+  enable_real_time_updates: true
+  auto_refresh_interval: 10  # seconds
+  max_results_display: 100
+  
+  theme:
+    primary_color: "#FF6B6B"
+    background_color: "#FFFFFF"
+    secondary_background_color: "#F0F2F6"
+    text_color: "#262730"
+
+# Export Settings
+export:
+  default_format: "json"
+  include_metadata: true
+  compress_results: false
+  
+  formats:
+    json:
+      enabled: true
+      pretty_print: true
+    csv:
+      enabled: true
+      include_headers: true
+    txt:
+      enabled: true
+      include_summary: true
+
+# Notification Settings
+notifications:
+  enabled: false
+  email:
+    enabled: false
+    smtp_server: ""
+    smtp_port: 587
+    username: ""
+    password: ""
+    recipients: []
+  
+  slack:
+    enabled: false
+    webhook_url: ""
+    channel: "#ai-agents"
+
+# Security Settings
+security:
+  enable_authentication: false
+  allowed_ips: []
+  rate_limiting:
+    enabled: false
+    max_requests_per_hour: 100
+  
+  file_access:
+    restricted_paths: []
+    allowed_extensions: [".py", ".txt", ".json", ".yaml", ".yml", ".md"]
+
+# Advanced Settings
+advanced:
+  experimental_features: false
+  debug_mode: false
+  performance_profiling: false
+  memory_profiling: false
+  
+  ml_pipeline:
+    enable_analysis: true
+    model_optimization: true
+    data_quality_checks: true
+  
+  business_logic:
+    enable_analysis: true
+    complexity_analysis: true
+    pattern_detection: true
+
+# Logging Settings
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file_logging: true
+  console_logging: true
+  log_rotation: true
+  max_log_size: "10MB"
+  backup_count: 5
+  
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

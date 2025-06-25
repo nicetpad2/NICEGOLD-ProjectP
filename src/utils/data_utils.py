@@ -1,7 +1,10 @@
 import logging
 import os
 from pathlib import Path
+
 import pandas as pd
+
+from src.data_cleaner import convert_buddhist_year, read_csv_auto
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +30,6 @@ def prepare_csv_auto(path: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     # ใช้ตัวอ่าน CSV ที่ตรวจสอบตัวคั่นอัตโนมัติจาก data_cleaner
-    from src.data_cleaner import read_csv_auto, convert_buddhist_year
 
     df = read_csv_auto(path)
 
@@ -51,8 +53,10 @@ def prepare_csv_auto(path: str) -> pd.DataFrame:
             df = df.drop_duplicates(subset="timestamp", keep="last")
         df.set_index("timestamp", inplace=True)
     else:
-        logger.warning("[QA-WARNING] timestamp column missing in %s", path)
-        logging.getLogger().warning("[QA-WARNING] timestamp column missing in %s", path)
+        logger.warning("[QA - WARNING] timestamp column missing in %s", path)
+        logging.getLogger().warning(
+            "[QA - WARNING] timestamp column missing in %s", path
+        )
 
     return df
 
@@ -63,7 +67,6 @@ def safe_read_csv(path: str) -> pd.DataFrame:
     Supports CSV and Parquet files automatically.
     """
     try:
-        from src.data_cleaner import read_csv_auto, convert_buddhist_year
 
         if str(path).endswith(".parquet"):
             df = pd.read_parquet(path)

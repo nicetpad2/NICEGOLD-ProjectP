@@ -1,11 +1,11 @@
 
+from src.evaluation import (
 import pandas as pd
 import pytest
-from src.evaluation import (
-    calculate_sortino_ratio,
-    calculate_calmar_ratio,
-    calculate_max_drawdown,
-    compute_underwater_curve,
+    calculate_sortino_ratio, 
+    calculate_calmar_ratio, 
+    calculate_max_drawdown, 
+    compute_underwater_curve, 
 )
 
 
@@ -24,8 +24,7 @@ def test_calculate_calmar_ratio_basic():
 def test_calculate_max_drawdown_and_underwater():
     equity = pd.Series([1.0, 1.1, 0.9, 1.2])
     md = calculate_max_drawdown(equity)
-    assert md == pytest.approx(-0.2)
+    assert md == pytest.approx( - 0.2)
     uw = compute_underwater_curve(equity)
     assert len(uw) == 4
     assert uw.min() < 0
-

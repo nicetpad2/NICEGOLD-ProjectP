@@ -1,14 +1,14 @@
+from typing import Optional
+import numpy as np
+import pandas as pd
 """
 Performance metrics for trading/backtest (เทพ)
 """
-import numpy as np
-import pandas as pd
-from typing import Optional
 
 def sharpe_ratio(returns: pd.Series, risk_free_rate: float = 0.0) -> float:
     """Calculate annualized Sharpe ratio."""
     excess = returns - risk_free_rate
-    return np.nan_to_num(excess.mean() / excess.std(ddof=1) * np.sqrt(252))
+    return np.nan_to_num(excess.mean() / excess.std(ddof = 1) * np.sqrt(252))
 
 def max_drawdown(equity_curve: pd.Series) -> float:
     """Calculate maximum drawdown (as a positive number)."""

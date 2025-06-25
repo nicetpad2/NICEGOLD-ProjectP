@@ -1,7 +1,7 @@
+
+from projectp.utils_feature import map_standard_columns, assert_no_lowercase_columns
 import pandas as pd
 import sys
-from projectp.utils_feature import map_standard_columns, assert_no_lowercase_columns
-
 def validate_column_names(file_path):
     df = pd.read_parquet(file_path)
     df = map_standard_columns(df)

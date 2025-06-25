@@ -1,11 +1,10 @@
+
+from src.utils import settings
 import os
 import sys
-
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ROOT_DIR)
 sys.path.insert(0, os.path.join(ROOT_DIR, 'src'))
-
-from src.utils import settings
 
 
 def test_load_settings_missing_file(tmp_path):
@@ -43,4 +42,3 @@ def test_load_settings_feature_format(tmp_path):
     path.write_text('feature_format: hdf5')
     cfg = settings.load_settings(str(path))
     assert cfg.feature_format == 'hdf5'
-

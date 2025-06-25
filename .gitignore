@@ -1,2 +1,208 @@
-datacsv/XAUUSD_M1.csv
-datacsv/XAUUSD_M15.csv
+# ========================
+# LARGE DATA FILES (EXCLUDED DUE TO SIZE)
+# ========================
+datacsv/
+*.csv
+*.parquet
+*.h5
+*.hdf5
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+logs/
+output/
+output_default/results/
+output_default/analysis/
+output_default/live_trading/
+output_default/models/
+output_default/backtest/
+pipeline_output/
+production_output/
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.bin
+
+# Backup files
+*.backup
+*.bak
+.backups/
+*_backup.py
+ProjectP.py.backup
+ProjectP_backup_*.py
+
+# Agent reports and temporary analysis
+agent_reports/
+temp/
+tmp/
+
+# Large data files (keep small samples)
+data/large/
+
+# Configuration with sensitive data
+.env.local
+.env.production.local
+config/secrets/
+*.key
+*.secret
+
+# Cache directories
+.cache/
+.streamlit/
+
+# Model artifacts
+mlruns/
+wandb/
+
+# Notebooks checkpoints
+notebooks/.ipynb_checkpoints/
+
+# Test artifacts
+.coverage
+htmlcov/
+test_results/
+
+# Documentation build
+_build/
+_static/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Version files
+=0.1.0
+=1.10,
+=14.0.1
+
+# Keep essential data files for demo
+# datacsv/XAUUSD_M1.csv  # Keep for demo
+# datacsv/XAUUSD_M15.csv # Keep for demo

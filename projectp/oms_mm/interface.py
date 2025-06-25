@@ -1,19 +1,19 @@
-# OMS/MM Interface สำหรับเชื่อมกับ pipeline ทุกโหมด (เทพ, risk-aware, multi-asset)
-from typing import Optional, Dict, Any, Callable, List
-from .oms import OMS, OrderType
-from .mm import Portfolio
 
+# OMS/MM Interface สำหรับเชื่อมกับ pipeline ทุกโหมด (เทพ, risk - aware, multi - asset)
+from .mm import Portfolio
+from .oms import OMS, OrderType
+from typing import Optional, Dict, Any, Callable, List
 class OMSMMEngine:
-    """Unified OMS/MM interface (เทพ: event/callback, plug-in, batch, logging, serialization, multi-asset, risk-aware)"""
+    """Unified OMS/MM interface (เทพ: event/callback, plug - in, batch, logging, serialization, multi - asset, risk - aware)"""
     def __init__(self, initial_capital: float = 100.0, risk_config: Optional[Dict[str, Any]] = None, fee_model: Optional[Any] = None):
         self.oms = OMS()
-        self.mm = Portfolio(initial_capital=initial_capital, risk_config=risk_config, fee_model=fee_model)
+        self.mm = Portfolio(initial_capital = initial_capital, risk_config = risk_config, fee_model = fee_model)
         # Event/callback hook
         self.on_event: Optional[Callable[[str, Dict[str, Any]], None]] = None
         self.oms.on_fill = self._on_fill
         self.oms.on_cancel = self._on_cancel
         self.oms.on_reject = self._on_reject
-        # ...future: plug-in, logging, monitoring, ...
+        # ...future: plug - in, logging, monitoring, ...
 
     def _on_fill(self, event: Dict[str, Any]):
         if self.on_event:
@@ -57,7 +57,7 @@ class OMSMMEngine:
         return self.oms.get_order_history()
 
     def get_portfolio_stats(self) -> Dict[str, Any]:
-        """สถิติพอร์ต (multi-asset, risk-aware)"""
+        """สถิติพอร์ต (multi - asset, risk - aware)"""
         return self.mm.get_stats()
 
     def get_equity_curve(self) -> List[float]:
@@ -79,13 +79,13 @@ class OMSMMEngine:
     def serialize_state(self) -> Dict[str, Any]:
         """Export OMS/MM state (snapshot)"""
         return {
-            'oms': self.oms.to_dict(),
-            'portfolio': self.mm.get_stats(),
+            'oms': self.oms.to_dict(), 
+            'portfolio': self.mm.get_stats(), 
         }
-    # ... จุดขยาย: plug-in, logging, monitoring, atomic transaction, ...
+    # ... จุดขยาย: plug - in, logging, monitoring, atomic transaction, ...
 
 # ตัวอย่างการใช้งาน (import OMSMMEngine แล้วใช้ใน pipeline หรือ simulation loop)
-# engine = OMSMMEngine(initial_capital=100)
+# engine = OMSMMEngine(initial_capital = 100)
 # order_id = engine.send_order('XAUUSD', 1, 'BUY', 2400)
 # engine.fill_order(order_id)
 # print(engine.get_portfolio_stats())

@@ -1,21 +1,28 @@
+from pathlib import Path
+            from sklearn.feature_selection import mutual_info_regression
+            from sklearn.metrics import mutual_info_regression
+        from src.evidently_compat import DataDrift, ValueDrift
+        from src.evidently_compat import ValueDrift
+        from src.pydantic_secretfield import BaseModel, Field, SecretField
+        from src.pydantic_secretfield import SecretField
+        import builtins
+import logging
+import sys
+import warnings
 """
 Pipeline Import Initializer
-===========================
+ =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 Professional fix for all pipeline import issues including Pydantic v2
 Import this module at the start of any script that needs compatibility
 """
 
-import logging
-import sys
-import warnings
-from pathlib import Path
 
 # Suppress warnings
-warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category = UserWarning)
+warnings.filterwarnings("ignore", category = DeprecationWarning)
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
+logging.basicConfig(level = logging.INFO, format = "%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -38,16 +45,14 @@ def initialize_pipeline_compatibility():
     # Fix 1: Pydantic SecretField
     try:
         # Make them available globally
-        import builtins
 
-        from src.pydantic_secretfield import BaseModel, Field, SecretField
 
         builtins.SecretField = SecretField
         builtins.PydanticField = Field
         builtins.PydanticBaseModel = BaseModel
 
         # Test that they work
-        test_field = SecretField(default="test")
+        test_field = SecretField(default = "test")
 
         logger.info("✅ Pydantic SecretField compatibility established")
         success_count += 1
@@ -57,9 +62,7 @@ def initialize_pipeline_compatibility():
 
     # Fix 2: Evidently compatibility
     try:
-        import builtins
 
-        from src.evidently_compat import DataDrift, ValueDrift
 
         builtins.ValueDrift = ValueDrift
         builtins.DataDrift = DataDrift
@@ -74,11 +77,8 @@ def initialize_pipeline_compatibility():
     try:
         # sklearn mutual_info_regression
         try:
-            from sklearn.feature_selection import mutual_info_regression
         except ImportError:
-            from sklearn.metrics import mutual_info_regression
 
-        import builtins
 
         builtins.mutual_info_regression = mutual_info_regression
 
@@ -111,9 +111,8 @@ def test_pipeline_imports():
 
     # Test 1: Pydantic SecretField
     try:
-        from src.pydantic_secretfield import SecretField
 
-        field = SecretField(default="test")
+        field = SecretField(default = "test")
         test_results.append(("Pydantic SecretField", True, None))
     except Exception as e:
         test_results.append(("Pydantic SecretField", False, str(e)))
@@ -122,7 +121,7 @@ def test_pipeline_imports():
     try:
         SecretField = getattr(__builtins__, "SecretField", None)
         if SecretField:
-            field = SecretField(default="test")
+            field = SecretField(default = "test")
             test_results.append(("Global SecretField", True, None))
         else:
             test_results.append(("Global SecretField", False, "Not available"))
@@ -131,9 +130,8 @@ def test_pipeline_imports():
 
     # Test 3: Evidently
     try:
-        from src.evidently_compat import ValueDrift
 
-        drift = ValueDrift(column_name="test")
+        drift = ValueDrift(column_name = "test")
         test_results.append(("Evidently ValueDrift", True, None))
     except Exception as e:
         test_results.append(("Evidently ValueDrift", False, str(e)))
@@ -152,7 +150,7 @@ def test_pipeline_imports():
     return success_count, total_tests
 
 
-# Auto-initialize on import
+# Auto - initialize on import
 try:
     initialization_success = initialize_pipeline_compatibility()
     test_success_count, test_total = test_pipeline_imports()
