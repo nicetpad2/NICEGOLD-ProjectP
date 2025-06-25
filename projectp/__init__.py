@@ -1,36 +1,46 @@
-
-# Core pipeline imports with fallbacks
 # ProjectP package init
-    from .dashboard import main as dashboard_main
-    from .pipeline import run_full_pipeline, run_debug_full_pipeline, run_ultimate_pipeline
-        import subprocess
-        import sys
+# Core pipeline imports with fallbacks
+
+import subprocess
+import sys
+
 try:
+    from .dashboard import main as dashboard_main
+    DASHBOARD_AVAILABLE = True
+except ImportError:
+    DASHBOARD_AVAILABLE = False
+    dashboard_main = None
+
+try:
+    from .pipeline import (
+        run_debug_full_pipeline,
+        run_full_pipeline,
+        run_ultimate_pipeline,
+    )
     PIPELINE_AVAILABLE = True
     print("✅ Pipeline functions imported successfully")
 except ImportError as e:
-    print(f"⚠️ Pipeline imports failed: {e}")
     PIPELINE_AVAILABLE = False
+    print(f"⚠️ Pipeline functions not available: {e}")
+    
+    # Create placeholder functions
+    def run_full_pipeline(*args, **kwargs):
+        print("⚠️ Pipeline not available - using fallback")
+        return {}
+    
+    def run_debug_full_pipeline(*args, **kwargs):
+        print("⚠️ Debug pipeline not available - using fallback")
+        return {}
+    
+    def run_ultimate_pipeline(*args, **kwargs):
+        print("⚠️ Ultimate pipeline not available - using fallback")
+        return {}
 
-    # Fallback functions
-    def run_full_pipeline():
-        print("✅ Running fallback full pipeline")
-        return {"status": "completed", "mode": "fallback"}
+def run_dashboard():
+    """Run dashboard if available"""
+    try:
+        subprocess.run([sys.executable, '-m', 'streamlit', 'run', 'projectp/dashboard.py'])
+    except Exception as e:
+        print(f"⚠️ Dashboard not available: {e}")
 
-    def run_debug_full_pipeline():
-        print("🐛 Running fallback debug pipeline")
-        return {"status": "completed", "mode": "debug_fallback"}
-
-    def run_ultimate_pipeline():
-        print("🔥 Running fallback ultimate pipeline")
-        return {"status": "completed", "mode": "ultimate_fallback"}
-
-# Dashboard/Trading integration imports
-try:
-
-    def run_dashboard():
-        """Run the Streamlit dashboard (for CLI integration)"""
-        subprocess.run([sys.executable, ' - m', 'streamlit', 'run', 'projectp/dashboard.py'])
-except ImportError:
-    def run_dashboard():
-        print("⚠️ Dashboard not available")
+__all__ = ['run_full_pipeline', 'run_debug_full_pipeline', 'run_ultimate_pipeline', 'run_dashboard']

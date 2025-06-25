@@ -1,21 +1,19 @@
-
 from projectp.plot import plot_metrics_summary, plot_predictions
-            import ast
-        import json
+import ast
+import json
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import requests
 import seaborn as sns
 import streamlit as st
-        import time
+import time
 import yaml
 def load_trading_config():
     config_path = os.path.join(os.path.dirname(__file__), '../config/settings.yaml')
     with open(config_path, 'r', encoding = 'utf - 8') as f:
         cfg = yaml.safe_load(f)
     return cfg.get('trading', {})
-
 def send_trade_order(symbol: str, side: str, qty: float, price: str | None = None, comment: str | None = None) -> dict[str, str]:
     cfg = load_trading_config()
     if not cfg.get('enabled', False):
@@ -34,7 +32,6 @@ def send_trade_order(symbol: str, side: str, qty: float, price: str | None = Non
         return {'status': 'sent', 'resp': resp.text}
     except Exception as e:
         return {'status': 'error', 'msg': str(e)}
-
 def main():
     st.set_page_config(page_title = "ProjectP Dashboard", layout = "wide")
     st.title("📊 ProjectP เทรด AI Dashboard")
@@ -140,14 +137,12 @@ def main():
     if os.path.exists(test_hist_png):
         st.subheader("Test Prediction Probability Histogram")
         st.image(test_hist_png)
-
     # - - - Real - time Monitor - -  - 
     st.sidebar.header('⏱️ Real - time Monitor')
     auto_refresh = st.sidebar.checkbox('Auto - refresh (5s)', value = False)
     if auto_refresh:
         st.experimental_rerun()
         time.sleep(5)
-
     # - - - Test Set Drilldown - -  - 
     st.header('🔬 Test Set Drilldown')
     if os.path.exists(test_pred_csv):
@@ -188,6 +183,5 @@ def main():
         ax2.set_title('Filtered Prediction Probability Histogram')
         st.pyplot(fig2)
         st.info('💡 สามารถ filter/sort/plot ข้อมูล test set ได้ละเอียดแบบเทพ!')
-
 if __name__ == "__main__":
     main()

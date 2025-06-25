@@ -6,8 +6,6 @@ Beautiful UI with animations, progress bars, and modern design
 Handles menu display and user interaction with enhanced logging
 """
 
-import os
-import sys
 import time
 from datetime import datetime
 from typing import Optional
@@ -15,10 +13,8 @@ from typing import Optional
 # Import new beautiful UI components
 try:
     from utils.welcome_ui_final import (
-        menu_ui,
         show_enhanced_menu,
         show_welcome_screen,
-        welcome_ui,
     )
 
     WELCOME_UI_AVAILABLE = True
@@ -31,7 +27,6 @@ except ImportError:
 try:
     from utils.enhanced_progress import (
         enhanced_processor,
-        process_with_beautiful_progress,
         show_pipeline_progress,
     )
 
@@ -87,17 +82,14 @@ except ImportError:
     # Fallback safe_input if utils not available
     def safe_input(prompt="", default="", timeout=None):
         """Fallback safe input function"""
-        import sys
-
         try:
-            if not sys.stdin.isatty():
-                print(f"{prompt}[Non-interactive mode - using default: {default}]")
-                return default
             return input(prompt)
         except EOFError:
             print(f"\n[EOFError - using default: {default}]")
             return default
         except KeyboardInterrupt:
+            print("\n[KeyboardInterrupt - exiting]")
+            raise
             print("\n[Interrupted by user]")
             raise
         except Exception as e:

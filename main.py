@@ -9,8 +9,54 @@ import sys
 import yaml
 #!/usr/bin/env python3
 """
-NICEGOLD ProjectP - Main Pipeline Entry Point
+🚨 IMPORTANT NOTICE: ProjectP.py is the MAIN ENTRY POINT
+
+For Users and AI Agents:
+DO NOT RUN THIS FILE DIRECTLY
+
+This file is part of the NICEGOLD ProjectP system but should NOT be executed independently.
+
+✅ Correct Way to Run:
+python ProjectP.py
+
+❌ Incorrect (Do NOT do this):
+python main.py  # THIS FILE
+
+Why ProjectP.py?
+ProjectP.py is the official main entry point that includes:
+- ✅ Complete integration of all features
+- ✅ Enhanced error handling
+- ✅ Optimized performance
+- ✅ Advanced UI/UX with Rich interface
+- ✅ Comprehensive progress tracking
+- ✅ Risk management integration
+- ✅ Interactive dashboard capabilities
+
+This file contains LEGACY CODE that has been FULLY INTEGRATED into ProjectP.py.
+
+🎯 Quick Action: Close this file and run: python ProjectP.py
 """
+
+print("🚨 WARNING: You are trying to run a DEPRECATED file!")
+print("📢 NICEGOLD ProjectP v2.1 Main Entry Point is: ProjectP.py")
+print()
+print("✅ Please run: python ProjectP.py")
+print("❌ Do NOT run: python main.py")
+print()
+print("ProjectP.py includes all features from this file with:")
+print("  • Enhanced error handling")
+print("  • Better user interface")
+print("  • Improved performance")
+print("  • Complete integration")
+print()
+print("🎯 For best experience, use ProjectP.py")
+print("=" * 60)
+
+import sys
+sys.exit(1)  # Exit to prevent execution
+
+# LEGACY CODE BELOW - DO NOT EXECUTE
+# ALL FEATURES MOVED TO ProjectP.py
 
 import argparse
 import logging

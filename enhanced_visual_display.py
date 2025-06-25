@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
+import json
+import os
+import time
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
 from rich.align import Align
 from rich.box import ROUNDED
 from rich.columns import Columns
@@ -7,28 +12,14 @@ from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.panel import Panel
-from rich.progress import (
+from rich.progress import BarColumn, Progress, TextColumn, TimeElapsedColumn
 from rich.table import Table
 from rich.text import Text
-from typing import Any, Dict, List, Optional
-import json
-import os
-import time
+
 """
 🎨 ENHANCED VISUAL DISPLAY SYSTEM
 สวยงามและทันสมัยสำหรับ NICEGOLD Pipeline
 """
-
-
-    BarColumn, 
-    MofNCompleteColumn, 
-    Progress, 
-    SpinnerColumn, 
-    TaskProgressColumn, 
-    TextColumn, 
-    TimeElapsedColumn, 
-    TimeRemainingColumn, 
-)
 
 console = Console()
 

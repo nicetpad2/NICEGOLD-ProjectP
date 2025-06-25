@@ -87,48 +87,16 @@ class PerformanceMonitor:
 
 
 # Initialize enhanced logger system
-def init_enhanced_logger_system():
-    """Initialize premium enhanced logger with beautiful display"""
+def init_logger_system():
+    """Initialize enhanced logger with fallback support"""
     logger_config = {
-        "enhanced_available": False,
         "modern_available": False,
         "advanced_available": False,
         "logger": None,
-        "functions": {},
-        "enhanced_logger": None
+        "functions": {}
     }
 
-    # Try enhanced logger first (new premium system)
-    try:
-        from enhanced_logger import create_enhanced_logger
-        
-        enhanced_logger = create_enhanced_logger()
-        logger_config.update({
-            "enhanced_available": True,
-            "enhanced_logger": enhanced_logger,
-            "functions": {
-                "info": enhanced_logger.info,
-                "success": enhanced_logger.success,
-                "warning": enhanced_logger.warning,
-                "error": enhanced_logger.error,
-                "critical": enhanced_logger.critical,
-                "debug": enhanced_logger.debug,
-                "progress": enhanced_logger.progress,
-                "show_progress": enhanced_logger.show_progress_bar,
-                "loading": enhanced_logger.loading_animation,
-                "summary": enhanced_logger.show_summary,
-                "create_menu": enhanced_logger.create_menu,
-            }
-        })
-        
-        enhanced_logger.success("🎨 Premium Enhanced Logger v2.1 Initialized!")
-        enhanced_logger.info("📊 Beautiful scrolling display with error management ready")
-        return logger_config
-
-    except ImportError:
-        pass
-
-    # Try modern logger fallback
+    # Try modern logger first
     try:
         from utils.simple_logger import critical as log_critical
         from utils.simple_logger import error as log_error
@@ -152,12 +120,6 @@ def init_enhanced_logger_system():
                 "warning": log_warning,
                 "error": log_error,
                 "critical": log_critical,
-                "debug": lambda msg, **kw: print(f"🐛 [DEBUG] {msg}"),
-                "progress": lambda msg, **kw: print(f"🔄 [PROGRESS] {msg}"),
-                "show_progress": lambda c, t, title="": print(f"📊 {title}: {c}/{t}"),
-                "loading": lambda msg, dur=1: print(f"⏳ {msg}..."),
-                "summary": lambda: print("📋 Session Summary (Basic Mode)"),
-                "create_menu": lambda title, opts, descs=None: print(f"🎯 {title}"),
             }
         })
 
@@ -178,12 +140,6 @@ def init_enhanced_logger_system():
                     "warning": lambda msg, **kw: print(f"⚠️ [WARNING] {msg}"),
                     "error": lambda msg, **kw: print(f"❌ [ERROR] {msg}"),
                     "critical": lambda msg, **kw: print(f"🚨 [CRITICAL] {msg}"),
-                    "debug": lambda msg, **kw: print(f"🐛 [DEBUG] {msg}"),
-                    "progress": lambda msg, **kw: print(f"🔄 [PROGRESS] {msg}"),
-                    "show_progress": lambda c, t, title="": print(f"📊 {title}: {c}/{t}"),
-                    "loading": lambda msg, dur=1: print(f"⏳ {msg}..."),
-                    "summary": lambda: print("📋 Session Summary (Advanced Mode)"),
-                    "create_menu": lambda title, opts, descs=None: print(f"🎯 {title}"),
                 }
             })
 
@@ -197,12 +153,6 @@ def init_enhanced_logger_system():
                 "warning": lambda msg, **kw: print(f"⚠️ [WARNING] {msg}"),
                 "error": lambda msg, **kw: print(f"❌ [ERROR] {msg}"),
                 "critical": lambda msg, **kw: print(f"🚨 [CRITICAL] {msg}"),
-                "debug": lambda msg, **kw: print(f"🐛 [DEBUG] {msg}"),
-                "progress": lambda msg, **kw: print(f"🔄 [PROGRESS] {msg}"),
-                "show_progress": lambda c, t, title="": print(f"📊 {title}: {c}/{t}"),
-                "loading": lambda msg, dur=1: print(f"⏳ {msg}..."),
-                "summary": lambda: print("📋 Session Summary (Basic Mode)"),
-                "create_menu": lambda title, opts, descs=None: print(f"🎯 {title}"),
             }
             print("⚠️ Using basic logger fallback")
 
@@ -210,7 +160,7 @@ def init_enhanced_logger_system():
 
 
 # Initialize logger
-LOGGER_CONFIG = init_enhanced_logger_system()
+LOGGER_CONFIG = init_logger_system()
 info = LOGGER_CONFIG["functions"]["info"]
 success = LOGGER_CONFIG["functions"]["success"]
 warning = LOGGER_CONFIG["functions"]["warning"]
@@ -527,17 +477,7 @@ class OptimizedProjectPApplication:
             print("\n" * 50)  # Fallback
 
     def print_optimized_logo(self):
-        """Print optimized application logo with enhanced welcome"""
-        # Try enhanced welcome menu first
-        try:
-            from enhanced_welcome_menu import EnhancedWelcomeMenu
-            welcome_menu = EnhancedWelcomeMenu()
-            welcome_menu.show_welcome_screen()
-            return
-        except ImportError:
-            pass
-        
-        # Try enhanced logo
+        """Print optimized application logo"""
         try:
             from utils.enhanced_logo import ProjectPLogo
             print(ProjectPLogo.get_modern_logo())
@@ -545,7 +485,6 @@ class OptimizedProjectPApplication:
         except ImportError:
             pass
 
-        # Try core menu interface
         if self.core_available and self.menu_interface:
             try:
                 self.menu_interface.print_logo()
@@ -627,58 +566,12 @@ class OptimizedProjectPApplication:
                 print(f"💾 Memory: {stats['memory_mb']:.1f}MB")
 
     def show_optimized_main_menu(self):
-        """Display optimized main menu with enhanced logger"""
+        """Display optimized main menu"""
         if self.core_available and self.menu_interface:
             try:
                 return self.menu_interface.print_main_menu()
             except Exception:
                 pass
-
-        # Use enhanced logger if available
-        if LOGGER_CONFIG.get("enhanced_available") and LOGGER_CONFIG.get("functions", {}).get("create_menu"):
-            try:
-                # Create beautiful menu with enhanced logger
-                menu_options = [
-                    "🚀 Full Pipeline",
-                    "📊 Data Analysis", 
-                    "🔧 Quick Test",
-                    "🩺 System Health Check",
-                    "📦 Install Dependencies",
-                    "🧹 Clean System",
-                    "⚡ Performance Monitor",
-                    "🎨 Enhanced Features",
-                    "👋 Exit"
-                ]
-                
-                menu_descriptions = [
-                    "Run complete analysis pipeline",
-                    "Advanced data analysis tools",
-                    "Quick system functionality test",
-                    "Check system status and health",
-                    "Install required packages automatically",
-                    "Clean cache and temporary files",
-                    "Show performance statistics",
-                    "Access premium advanced features",
-                    "Exit the application"
-                ]
-                
-                LOGGER_CONFIG["functions"]["create_menu"](
-                    "NICEGOLD ProjectP v2.1 - Main Menu", 
-                    menu_options, 
-                    menu_descriptions
-                )
-                
-                choice = safe_input_enhanced(
-                    "\n👉 เลือกตัวเลือก (1-9): ",
-                    default="9",
-                    timeout_seconds=CONFIG["DEFAULT_TIMEOUT"],
-                    valid_choices=['1', '2', '3', '4', '5', '6', '7', '8', '9']
-                )
-                return choice
-                
-            except Exception as enhanced_error:
-                warning(f"Enhanced menu error: {enhanced_error}")
-                # Fall through to basic menu
 
         # Optimized fallback menu
         cyan = self.Colors.BRIGHT_CYAN
@@ -696,16 +589,15 @@ class OptimizedProjectPApplication:
         print("5. 📦 Install Dependencies")
         print("6. 🧹 Clean System")
         print("7. ⚡ Performance Monitor")
-        print("8. 🎨 Enhanced Features")
-        print("9. 👋 Exit")
+        print("0. 👋 Exit")
         print(separator)
 
-        prompt_text = self.colorize("👉 เลือกตัวเลือก (1-9):", yellow)
+        prompt_text = self.colorize("👉 เลือกตัวเลือก (0-7):", yellow)
         choice = safe_input_enhanced(
             f"\n{prompt_text} ",
-            default="9",
+            default="0",
             timeout_seconds=CONFIG["DEFAULT_TIMEOUT"],
-            valid_choices=['1', '2', '3', '4', '5', '6', '7', '8', '9']
+            valid_choices=['0', '1', '2', '3', '4', '5', '6', '7']
         )
         return choice
 
@@ -728,42 +620,13 @@ class OptimizedProjectPApplication:
             return True
 
     def _handle_choice_optimized(self, choice: str) -> bool:
-        """Optimized choice handling with enhanced logger"""
+        """Optimized choice handling"""
 
         if choice == "1":
             info("🚀 Running Full Pipeline...")
             if self.core_available:
-                info("Core modules available - starting comprehensive full pipeline")
-                # Call the comprehensive progress system first
-                try:
-                    from comprehensive_full_pipeline_progress import (
-                        ComprehensiveProgressSystem,
-                    )
-                    progress_system = ComprehensiveProgressSystem()
-                    results = progress_system.run_full_pipeline_with_complete_progress()
-                    
-                    # Display summary
-                    if results["pipeline_status"] == "SUCCESS":
-                        success("✅ Comprehensive Full Pipeline completed successfully!")
-                        info(f"⏱️ Execution time: {results['total_execution_time']:.1f}s")
-                        info(f"📊 Method used: {results['method_used']}")
-                    else:
-                        warning("⚠️ Pipeline completed with issues")
-                    
-                    return True
-                    
-                except ImportError as comp_error:
-                    warning(f"Comprehensive system not available: {comp_error}")
-                    # Fallback to menu operations
-                    try:
-                        from core.menu_operations import MenuOperations
-                        menu_ops = MenuOperations()
-                        return menu_ops.full_pipeline()
-                    except ImportError as e:
-                        warning(f"Enhanced pipeline not available: {e}")
-                        # Final fallback to basic execution
-                        info("Running basic pipeline execution...")
-                        return self._run_basic_pipeline()
+                info("Core modules available - starting full pipeline")
+                # Here you would call the actual pipeline
             else:
                 warning("Core modules not available. Install dependencies.")
             return True
@@ -802,16 +665,8 @@ class OptimizedProjectPApplication:
             self._show_performance_stats()
             return True
 
-        elif choice == "8":
-            info("🎨 Enhanced Features...")
-            self._show_enhanced_features_menu()
-            return True
-
-        elif choice == "9" or choice == "0":
+        elif choice == "0":
             success("👋 Thank you for using NICEGOLD ProjectP v2.1!")
-            # Show session summary if enhanced logger available
-            if LOGGER_CONFIG.get("enhanced_available") and LOGGER_CONFIG.get("functions", {}).get("summary"):
-                LOGGER_CONFIG["functions"]["summary"]()
             return False
 
         else:
@@ -839,40 +694,6 @@ class OptimizedProjectPApplication:
                 print(f"   Available directories: {dirs}")
         except Exception as dir_error:
             warning(f"Could not list directories: {dir_error}")
-
-    def _run_basic_pipeline(self):
-        """Basic pipeline execution with simple progress indicators"""
-        try:
-            info("🔄 Executing basic pipeline with simple progress...")
-            
-            # Basic pipeline steps with simple progress
-            steps = [
-                ("📊 Loading Configuration", 0.5),
-                ("🔧 Initializing Data Pipeline", 1.0),
-                ("💾 Loading Market Data", 1.5),
-                ("⚙️ Feature Engineering", 2.0),
-                ("🔄 Data Preprocessing", 1.5),
-                ("📈 Training Models", 3.0),
-                ("📊 Model Evaluation", 1.0),
-                ("🎯 Generating Predictions", 1.0),
-                ("📋 Performance Analysis", 1.0),
-                ("💾 Saving Results", 0.5)
-            ]
-            
-            for step_name, duration in steps:
-                info(f"{step_name}...")
-                # Simple progress simulation
-                for i in range(int(duration * 4)):
-                    print(".", end="", flush=True)
-                    time.sleep(0.25)
-                print(" ✓")
-                
-            success("✅ Basic pipeline completed successfully!")
-            return True
-            
-        except Exception as e:
-            error(f"❌ Basic pipeline failed: {str(e)}")
-            return False
 
     def _install_dependencies_optimized(self):
         """Optimized dependency installation"""
@@ -949,99 +770,34 @@ class OptimizedProjectPApplication:
 
         success(f"✅ Cleanup completed! {total_cleaned} items removed.")
 
-    def _show_enhanced_features_menu(self):
-        """Show enhanced features menu with beautiful display"""
-        if LOGGER_CONFIG.get("enhanced_available"):
-            try:
-                enhanced_logger = LOGGER_CONFIG["enhanced_logger"]
-                
-                # Create beautiful enhanced features menu
-                enhanced_logger.display.clear_screen()
-                enhanced_logger.display.print_header(
-                    "🎨 ENHANCED FEATURES MENU",
-                    "Premium Advanced Tools for Professional Trading"
-                )
-                
-                menu_options = [
-                    "🔍 Advanced Data Pipeline",
-                    "🤖 Model Ensemble System", 
-                    "📊 Interactive Dashboard",
-                    "⚠️ Risk Management System",
-                    "🎯 Complete Enhanced Pipeline",
-                    "🔙 Back to Main Menu"
-                ]
-                
-                menu_descriptions = [
-                    "Advanced data quality analysis and validation",
-                    "Multi-model ensemble training and prediction",
-                    "Interactive charts and real-time dashboard",
-                    "Portfolio risk analysis and management",
-                    "Run all enhanced features in sequence",
-                    "Return to main menu"
-                ]
-                
-                enhanced_logger.create_menu(
-                    "Enhanced Features",
-                    menu_options,
-                    menu_descriptions
-                )
-                
-                choice = safe_input_enhanced(
-                    "\n👉 เลือกฟีเจอร์ขั้นสูง (1-6): ",
-                    default="6",
-                    valid_choices=['1', '2', '3', '4', '5', '6']
-                )
-                
-                # Handle enhanced features choice
-                self._handle_enhanced_features_choice(choice)
-                
-            except Exception as e:
-                error(f"Enhanced features menu error: {e}")
-                self._show_basic_enhanced_features_menu()
-        else:
-            self._show_basic_enhanced_features_menu()
-    
-    def _show_basic_enhanced_features_menu(self):
-        """Basic enhanced features menu fallback"""
-        info("🎨 Enhanced Features Menu")
-        print("=" * 50)
-        print("1. 🔍 Advanced Data Pipeline")
-        print("2. 🤖 Model Ensemble System")
-        print("3. 📊 Interactive Dashboard")
-        print("4. ⚠️ Risk Management System")
-        print("5. 🎯 Complete Enhanced Pipeline")
-        print("6. 🔙 Back to Main Menu")
-        print("=" * 50)
-        
-        choice = safe_input_enhanced(
-            "\n👉 เลือกฟีเจอร์ขั้นสูง (1-6): ",
-            default="6",
-            valid_choices=['1', '2', '3', '4', '5', '6']
-        )
-        
-        self._handle_enhanced_features_choice(choice)
-    
-    def _handle_enhanced_features_choice(self, choice: str):
-        """Handle enhanced features menu choice"""
-        if choice == "1":
-            success("🔍 Starting Advanced Data Pipeline...")
-            run_advanced_data_pipeline()
-        elif choice == "2":
-            success("🤖 Starting Model Ensemble System...")
-            run_model_ensemble_system()
-        elif choice == "3":
-            success("📊 Starting Interactive Dashboard...")
-            run_interactive_dashboard()
-        elif choice == "4":
-            success("⚠️ Starting Risk Management System...")
-            run_risk_management_system()
-        elif choice == "5":
-            success("🎯 Starting Complete Enhanced Pipeline...")
-            run_complete_enhanced_pipeline()
-        elif choice == "6":
-            info("🔙 Returning to main menu...")
-        else:
-            warning("❌ Invalid choice. Returning to main menu.")
+    def _show_performance_stats(self):
+        """Show detailed performance statistics"""
+        stats = self.performance_monitor.get_stats()
+
+        cyan = self.Colors.BRIGHT_CYAN
+        print(f"\n{self.colorize('⚡ PERFORMANCE STATISTICS', cyan)}")
+        print(f"{self.colorize('═' * 50, cyan)}")
+
+        print(f"🕐 Runtime: {stats['runtime']:.2f} seconds")
+
+        if 'memory_mb' in stats:
+            print(f"💾 Memory Usage: {stats['memory_mb']:.1f} MB")
+            if stats['memory_delta'] != 0:
+                delta_sign = "+" if stats['memory_delta'] > 0 else ""
+                print(f"📈 Memory Delta: {delta_sign}{stats['memory_delta']:.1f} MB")
+
+        if 'cpu_percent' in stats:
+            print(f"🖥️ CPU Usage: {stats['cpu_percent']:.1f}%")
+
+        # Additional system info
+        try:
+            import psutil
+            memory_info = psutil.virtual_memory()
+            disk_info = psutil.disk_usage('.')
+            print(f"💻 System Memory: {memory_info.percent:.1f}% used")
+            print(f"💿 Disk Usage: {disk_info.percent:.1f}% used")
+        except ImportError:
+            warning("Install psutil for detailed system stats")
 
     def print_optimized_status_bar(self):
         """Print optimized status bar"""
@@ -1091,11 +847,6 @@ class OptimizedProjectPApplication:
         cyan = self.Colors.BRIGHT_CYAN
 
         print(f"\n{self.colorize('📊 SESSION SUMMARY', cyan)}")
-        print(f"{self.colorize('═' * 50, cyan)}")
-        print(f"🚀 Application: NICEGOLD ProjectP v2.1")
-        print(f"📅 Start Time: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"🐍 Python Version: {sys.version.split()[0]}")
-        print(f"💻 Platform: {os.name}")
         print(f"{self.colorize('═' * 50, cyan)}")
         print(f"⏱️ Session Duration: {str(uptime).split('.')[0]}")
         print(f"🚀 Total Runtime: {stats['runtime']:.2f} seconds")
@@ -1206,258 +957,6 @@ def main_optimized():
     except Exception as startup_error:
         critical(f"Failed to start application: {startup_error}")
         sys.exit(1)
-
-
-
-
-# Enhanced Feature Functions
-def run_advanced_data_pipeline():
-    """🔍 Run Advanced Data Quality Analysis"""
-    try:
-        from advanced_data_pipeline import AdvancedDataPipeline
-        
-        print("\n🔍 Starting Advanced Data Quality Analysis...")
-        pipeline = AdvancedDataPipeline()
-        
-        # Check if we have existing data
-        data_files = list(Path(".").glob("*.csv"))
-        if data_files:
-            data_path = data_files[0]
-            print(f"📁 Loading data from: {data_path}")
-            import pandas as pd
-            data = pd.read_csv(data_path)
-        else:
-            print("📊 Generating sample data for analysis...")
-            # Generate sample data
-            import numpy as np
-            import pandas as pd
-            dates = pd.date_range(start='2024-01-01', end='2024-12-31', freq='1H')
-            data = pd.DataFrame({
-                'timestamp': dates,
-                'open': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5),
-                'high': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5) + np.random.rand(len(dates)) * 5,
-                'low': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5) - np.random.rand(len(dates)) * 5,
-                'close': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5),
-                'volume': np.random.randint(1000, 10000, len(dates))
-            })
-        
-        # Run data quality analysis
-        quality_report = pipeline.validate_data_quality(data, "XAUUSD")
-        
-        # Multi-timeframe analysis
-        if 'timestamp' in data.columns:
-            data_indexed = data.set_index('timestamp')
-        else:
-            dates = pd.date_range(start='2024-01-01', periods=len(data), freq='1H')
-            data_indexed = data.copy()
-            data_indexed.index = dates
-        
-        multi_tf_data = pipeline.multi_timeframe_analysis(data_indexed)
-        
-        print(f"\n✅ Data Quality Analysis Complete!")
-        print(f"📊 Overall Quality Score: {quality_report['overall_quality']:.1f}%")
-        print(f"📈 Timeframes Analyzed: {len(multi_tf_data)}")
-        
-        input("\nPress Enter to continue...")
-        
-    except ImportError:
-        print("❌ Advanced Data Pipeline not available. Please check installation.")
-        input("Press Enter to continue...")
-    except Exception as e:
-        print(f"❌ Error running advanced data pipeline: {str(e)}")
-        input("Press Enter to continue...")
-
-
-def run_model_ensemble_system():
-    """🤖 Run Model Ensemble System"""
-    try:
-        import numpy as np
-
-        from model_ensemble_system import ModelEnsemble
-        
-        print("\n🤖 Starting Model Ensemble System...")
-        ensemble = ModelEnsemble()
-        
-        # Generate sample ML data
-        np.random.seed(42)
-        n_samples = 1000
-        n_features = 20
-        
-        X = np.random.randn(n_samples, n_features)
-        y = (X[:, 0] + X[:, 1] * 0.5 + X[:, 2] * 0.3 + 
-             np.random.randn(n_samples) * 0.1 > 0).astype(int)
-        
-        # Split data
-        split_idx = int(0.8 * n_samples)
-        X_train, X_test = X[:split_idx], X[split_idx:]
-        y_train, y_test = y[:split_idx], y[split_idx:]
-        
-        print("📊 Training ensemble models...")
-        
-        # Train stacking ensemble
-        stacking_results = ensemble.stack_models(X_train, y_train, X_test, y_test)
-        
-        # Train adaptive ensemble  
-        adaptive_results = ensemble.adaptive_ensemble(X_train, y_train, X_test, y_test)
-        
-        print(f"\n✅ Model Ensemble Training Complete!")
-        print(f"🎯 Stacking AUC: {stacking_results.get('ensemble_score', 'N/A')}")
-        print(f"🧠 Adaptive AUC: {adaptive_results.get('ensemble_score', 'N/A')}")
-        
-        input("\nPress Enter to continue...")
-        
-    except ImportError:
-        print("❌ Model Ensemble System not available. Please check installation.")
-        input("Press Enter to continue...")
-    except Exception as e:
-        print(f"❌ Error running model ensemble: {str(e)}")
-        input("Press Enter to continue...")
-
-
-def run_interactive_dashboard():
-    """📊 Run Interactive Dashboard"""
-    try:
-        import numpy as np
-        import pandas as pd
-
-        from interactive_dashboard import InteractiveDashboard
-        
-        print("\n📊 Creating Interactive Dashboard...")
-        dashboard = InteractiveDashboard()
-        
-        # Generate sample data
-        dates = pd.date_range(start='2024-01-01', end='2024-12-31', freq='1H')
-        np.random.seed(42)
-        
-        data = pd.DataFrame({
-            'open': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5),
-            'high': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5) + np.random.rand(len(dates)) * 5,
-            'low': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5) - np.random.rand(len(dates)) * 5,
-            'close': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5),
-            'volume': np.random.randint(1000, 10000, len(dates))
-        }, index=dates)
-        
-        # Generate sample predictions
-        predictions = np.random.random(len(data))
-        
-        print("🎨 Creating interactive charts...")
-        charts = dashboard.create_plotly_charts(data, predictions)
-        
-        print("📱 Generating dashboard...")
-        dashboard_path = dashboard.create_live_dashboard(data)
-        
-        print(f"\n✅ Interactive Dashboard Created!")
-        print(f"📊 Charts Created: {len(charts)}")
-        if isinstance(dashboard_path, str):
-            print(f"📱 Dashboard saved to: {dashboard_path}")
-            print("🌐 Open the HTML file in your browser to view the dashboard")
-        
-        input("\nPress Enter to continue...")
-        
-    except ImportError:
-        print("❌ Interactive Dashboard not available. Please install plotly: pip install plotly")
-        input("Press Enter to continue...")
-    except Exception as e:
-        print(f"❌ Error creating dashboard: {str(e)}")
-        input("Press Enter to continue...")
-
-
-def run_risk_management_system():
-    """⚠️ Run Risk Management System"""
-    try:
-        import numpy as np
-        import pandas as pd
-
-        from risk_management_system import RiskManagementSystem
-        
-        print("\n⚠️ Starting Risk Management Analysis...")
-        risk_mgr = RiskManagementSystem()
-        
-        # Generate sample market data
-        dates = pd.date_range(start='2024-01-01', end='2024-12-31', freq='1H')
-        np.random.seed(42)
-        
-        market_data = pd.DataFrame({
-            'close': 2000 + np.cumsum(np.random.randn(len(dates)) * 0.5),
-            'volume': np.random.randint(1000, 10000, len(dates))
-        }, index=dates)
-        
-        # Sample portfolio data
-        portfolio_data = {
-            'total_value': 100000,
-            'positions': {
-                'GOLD_1': {'weight': 0.08, 'shares': 40, 'entry_price': 2000},
-                'GOLD_2': {'weight': 0.05, 'shares': 25, 'entry_price': 1995}
-            }
-        }
-        
-        print("💰 Calculating optimal position size...")
-        position_size = risk_mgr.calculate_position_size(
-            signal_strength=0.75,
-            account_balance=100000,
-            current_price=2000,
-            volatility=0.2
-        )
-        
-        print("📊 Analyzing portfolio risk...")
-        risk_report = risk_mgr.monitor_portfolio_risk(portfolio_data, market_data)
-        
-        print(f"\n✅ Risk Management Analysis Complete!")
-        print(f"💰 Recommended Position Size: ${position_size['dollar_amount']:,.2f}")
-        print(f"📊 Portfolio Risk Score: {risk_report['overall_risk_score']:.2f}")
-        print(f"⚠️ Risk Alerts: {len(risk_report['alerts'])}")
-        
-        input("\nPress Enter to continue...")
-        
-    except ImportError:
-        print("❌ Risk Management System not available. Please check installation.")
-        input("Press Enter to continue...")
-    except Exception as e:
-        print(f"❌ Error running risk management: {str(e)}")
-        input("Press Enter to continue...")
-
-
-def run_complete_enhanced_pipeline():
-    """🎯 Run Complete Enhanced Pipeline"""
-    try:
-        from enhanced_system_integration import EnhancedFullPipelineV2
-        
-        print("\n🎯 Starting Complete Enhanced Pipeline...")
-        print("This may take a few minutes to complete all phases...")
-        
-        enhanced_system = EnhancedFullPipelineV2()
-        
-        # Run the complete pipeline
-        results = enhanced_system.run_enhanced_pipeline()
-        
-        print(f"\n✅ Enhanced Pipeline Completed!")
-        print(f"📊 Success: {results['success']}")
-        print(f"🔍 Data Quality: {results.get('data_quality', {}).get('overall_quality', 0):.1f}%")
-        
-        model_perf = results.get('model_performance', {})
-        if model_perf:
-            print(f"🤖 Model Accuracy: {model_perf.get('test_accuracy', 0):.1%}")
-        
-        risk_analysis = results.get('risk_analysis', {})
-        if risk_analysis:
-            risk_score = risk_analysis.get('risk_report', {}).get('overall_risk_score', 0)
-            print(f"⚠️ Risk Score: {risk_score:.2f}")
-        
-        if results.get('dashboard_path'):
-            print(f"📱 Dashboard: {results['dashboard_path']}")
-        
-        print(f"💡 Recommendations: {len(results.get('recommendations', []))}")
-        for rec in results.get('recommendations', [])[:3]:  # Show first 3
-            print(f"   • {rec}")
-        
-        input("\nPress Enter to continue...")
-        
-    except ImportError:
-        print("❌ Enhanced System Integration not available. Please check installation.")
-        input("Press Enter to continue...")
-    except Exception as e:
-        print(f"❌ Error running enhanced pipeline: {str(e)}")
-        input("Press Enter to continue...")
 
 
 if __name__ == "__main__":

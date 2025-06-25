@@ -60,10 +60,7 @@ from utils.colors import Colors, colorize
 
 # Enhanced progress and UI imports
 try:
-    from utils.enhanced_progress import (
-        enhanced_processor,
-        simulate_model_training,
-    )
+    from utils.enhanced_progress import enhanced_processor, simulate_model_training
 
     ENHANCED_PROGRESS_AVAILABLE = True
 except ImportError:
@@ -84,87 +81,121 @@ class MenuOperations:
         try:
             info("🚀 Starting Enterprise-Grade ML Trading Pipeline...")
 
-            if ENHANCED_PROGRESS_AVAILABLE and enhanced_processor:
-                # Use beautiful progress system
-                steps = [
-                    {
-                        'name': 'Loading Configuration',
-                        'duration': 0.5,
-                        'spinner': 'dots'
-                    },
-                    {
-                        'name': 'Initializing Data Pipeline',
-                        'duration': 1.0,
-                        'spinner': 'bars'
-                    },
-                    {
-                        'name': 'Loading Market Data',
-                        'duration': 1.5,
-                        'spinner': 'circles'
-                    },
-                    {
-                        'name': 'Feature Engineering',
-                        'duration': 2.0,
-                        'spinner': 'arrows'
-                    },
-                    {
-                        'name': 'Data Preprocessing',
-                        'duration': 1.5,
-                        'spinner': 'squares'
-                    },
-                    {
-                        'name': 'Splitting Train/Test Data',
-                        'duration': 0.5,
-                        'spinner': 'dots'
-                    },
-                    {
-                        'name': 'Training Models (Optimized)',
-                        'function': simulate_model_training,
-                        'duration': 3.0,  # Much faster
-                        'spinner': 'bars'
-                    },
-                    {
-                        'name': 'Model Evaluation',
-                        'duration': 1.0,
-                        'spinner': 'circles'
-                    },
-                    {
-                        'name': 'Generating Predictions',
-                        'duration': 1.0,
-                        'spinner': 'arrows'
-                    },
-                    {
-                        'name': 'Performance Analysis',
-                        'duration': 1.0,
-                        'spinner': 'squares'
-                    },
-                    {
-                        'name': 'Saving Results',
-                        'duration': 0.5,
-                        'spinner': 'dots'
-                    }
-                ]
-
-                # Process with enhanced progress
-                pipeline_success = enhanced_processor.process_with_progress(
-                    steps, "🚀 NICEGOLD Full ML Pipeline")
-
-                if pipeline_success:
-                    # Quick actual execution of core logic
-                    self._execute_actual_pipeline()
-                    success("✅ Full pipeline completed successfully!")
+            # Try to use the enhanced full pipeline first
+            try:
+                from enhanced_full_pipeline import EnhancedFullPipeline
+                enhanced_pipeline = EnhancedFullPipeline()
+                results = enhanced_pipeline.run_enhanced_full_pipeline()
+                
+                # Display results summary
+                if results["pipeline_status"] == "SUCCESS":
+                    success("✅ Enhanced Full Pipeline completed successfully!")
+                    info(f"⏱️ Total execution time: {results['total_execution_time']:.1f}s")
+                    info(f"📊 Successful stages: {results['successful_stages']}/{results['total_stages']}")
+                    if results.get('dashboard_path'):
+                        info(f"📈 Dashboard generated: {results['dashboard_path']}")
+                elif results["pipeline_status"] == "PARTIAL":
+                    warning("⚠️ Enhanced Full Pipeline completed with some issues")
+                    warning(f"Errors: {len(results.get('errors', []))}")
                 else:
-                    warning("⚠️ Pipeline execution was interrupted")
-
+                    error("❌ Enhanced Full Pipeline failed")
+                    
                 return True
-
-            else:
-                # Fallback to regular execution
-                return self._execute_regular_pipeline()
-
+                
+            except ImportError as enhanced_error:
+                warning(f"Enhanced pipeline not available: {enhanced_error}")
+                warning("Falling back to basic pipeline with progress...")
+                
+                # Fallback to basic pipeline with enhanced progress
+                if ENHANCED_PROGRESS_AVAILABLE and enhanced_processor:
+                    return self._run_basic_pipeline_with_progress()
+                else:
+                    warning("Enhanced progress not available, using simple execution")
+                    return self._execute_regular_pipeline()
+                    
         except Exception as e:
             error(f"❌ Pipeline execution failed: {str(e)}")
             return True
+
+    def _run_basic_pipeline_with_progress(self) -> bool:
+        """Run basic pipeline with enhanced progress bars"""
+        try:
+            # Use beautiful progress system
+            steps = [
+                {
+                    'name': 'Loading Configuration',
+                    'duration': 0.5,
+                    'spinner': 'dots'
+                },
+                {
+                    'name': 'Initializing Data Pipeline',
+                    'duration': 1.0,
+                    'spinner': 'bars'
+                },
+                {
+                    'name': 'Loading Market Data',
+                    'duration': 1.5,
+                    'spinner': 'circles'
+                },
+                {
+                    'name': 'Feature Engineering',
+                    'duration': 2.0,
+                    'spinner': 'arrows'
+                },
+                {
+                    'name': 'Data Preprocessing',
+                    'duration': 1.5,
+                    'spinner': 'squares'
+                },
+                {
+                    'name': 'Splitting Train/Test Data',
+                    'duration': 0.5,
+                    'spinner': 'dots'
+                },
+                {
+                    'name': 'Training Models (Optimized)',
+                    'function': simulate_model_training,
+                    'duration': 3.0,  # Much faster
+                    'spinner': 'bars'
+                },
+                {
+                    'name': 'Model Evaluation',
+                    'duration': 1.0,
+                    'spinner': 'circles'
+                },
+                {
+                    'name': 'Generating Predictions',
+                    'duration': 1.0,
+                    'spinner': 'arrows'
+                },
+                {
+                    'name': 'Performance Analysis',
+                    'duration': 1.0,
+                    'spinner': 'squares'
+                },
+                {
+                    'name': 'Saving Results',
+                    'duration': 0.5,
+                    'spinner': 'dots'
+                }
+            ]
+
+            # Process with enhanced progress
+            pipeline_success = enhanced_processor.process_with_progress(
+                steps, "🚀 NICEGOLD Full ML Pipeline")
+
+            if pipeline_success:
+                # Quick actual execution of core logic
+                self._execute_actual_pipeline()
+                success("✅ Full pipeline completed successfully!")
+            else:
+                warning("⚠️ Pipeline execution was interrupted")
+
+            return True
+            
+        except Exception as e:
+            error(f"❌ Basic pipeline with progress failed: {str(e)}")
+            return self._execute_regular_pipeline()
 
     def _execute_actual_pipeline(self):
         """Execute actual pipeline logic quickly"""

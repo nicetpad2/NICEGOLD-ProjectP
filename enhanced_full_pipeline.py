@@ -1,25 +1,28 @@
 #!/usr/bin/env python3
+import json
+import os
+import sys
+import time
+import traceback
 from datetime import datetime
-from enhanced_visual_display import EnhancedReportGenerator, ThaiVisualDisplay
 from pathlib import Path
-from projectp.pipeline import *
-from projectp.steps import *
+from typing import Any, Dict, List, Tuple
+
+import pandas as pd
+import psutil
 from rich import box
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.panel import Panel
-from rich.progress import (
+from rich.progress import BarColumn, Progress, TextColumn, TimeElapsedColumn
 from rich.table import Table
 from rich.text import Text
-from typing import Any, Dict, List, Optional, Tuple
-            import json
-import os
-            import pandas as pd
-import psutil
-import sys
-import time
-import traceback
+
+from enhanced_visual_display import EnhancedReportGenerator, ThaiVisualDisplay
+from projectp.pipeline import *
+from projectp.steps import *
+
 """
 🚀 ENHANCED FULL PIPELINE - NICEGOLD ProjectP
 - Modern Visual Progress Bars using Rich
@@ -27,18 +30,6 @@ import traceback
 - Resource Usage Control (80% max CPU/RAM)
 - Production - Ready Error Handling
 """
-
-
-# Rich imports for beautiful progress bars and panels
-    BarColumn, 
-    MofNCompleteColumn, 
-    Progress, 
-    SpinnerColumn, 
-    TaskProgressColumn, 
-    TextColumn, 
-    TimeElapsedColumn, 
-    TimeRemainingColumn, 
-)
 
 # Import pipeline components
 sys.path.append("projectp")
@@ -63,9 +54,9 @@ class ResourceMonitor:
         """Get current resource usage"""
         return {
             "cpu_percent": psutil.cpu_percent(interval = 0.1),  # Faster response
-            "ram_percent": psutil.virtual_memory().percent, 
-            "ram_used_gb": psutil.virtual_memory().used / (1024**3), 
-            "ram_total_gb": psutil.virtual_memory().total / (1024**3), 
+            "ram_percent": psutil.virtual_memory().percent,
+            "ram_used_gb": psutil.virtual_memory().used / (1024**3),
+            "ram_total_gb": psutil.virtual_memory().total / (1024**3),
         }
 
     def check_limits(self) -> Tuple[bool, str]:
@@ -74,14 +65,14 @@ class ResourceMonitor:
 
         if usage["cpu_percent"] > self.max_cpu_percent:
             return (
-                False, 
-                f"CPU usage {usage['cpu_percent']:.1f}% exceeds limit {self.max_cpu_percent}%", 
+                False,
+                f"CPU usage {usage['cpu_percent']:.1f}% exceeds limit {self.max_cpu_percent}%",
             )
 
         if usage["ram_percent"] > self.max_ram_percent:
             return (
-                False, 
-                f"RAM usage {usage['ram_percent']:.1f}% exceeds limit {self.max_ram_percent}%", 
+                False,
+                f"RAM usage {usage['ram_percent']:.1f}% exceeds limit {self.max_ram_percent}%",
             )
 
         return True, "Resource usage within limits"
@@ -110,8 +101,8 @@ class EnhancedPipelineValidator:
 
         # Define required files with absolute paths
         required_files = [
-            os.path.join(script_dir, "datacsv", "XAUUSD_M1.csv"), 
-            os.path.join(script_dir, "datacsv", "XAUUSD_M15.csv"), 
+            os.path.join(script_dir, "datacsv", "XAUUSD_M1.csv"),
+            os.path.join(script_dir, "datacsv", "XAUUSD_M15.csv"),
         ]
 
         missing_files = []
@@ -151,8 +142,8 @@ class EnhancedPipelineValidator:
 
             if not critical_nans.empty:
                 return (
-                    False, 
-                    f"Excessive NaN values in columns: {critical_nans.to_dict()}", 
+                    False,
+                    f"Excessive NaN values in columns: {critical_nans.to_dict()}",
                 )
 
             return True, f"Data quality OK: {len(df):, } rows, {len(df.columns)} columns"
@@ -235,15 +226,15 @@ class EnhancedFullPipeline:
         # Stage metrics collection
         self.stage_metrics = {}
         self.pipeline_metrics = {
-            "start_time": None, 
-            "end_time": None, 
-            "total_stages": 0, 
-            "successful_stages": 0, 
-            "peak_cpu": 0, 
-            "peak_ram": 0, 
-            "avg_cpu": 0, 
-            "avg_ram": 0, 
-            "stage_details": {}, 
+            "start_time": None,
+            "end_time": None,
+            "total_stages": 0,
+            "successful_stages": 0,
+            "peak_cpu": 0,
+            "peak_ram": 0,
+            "avg_cpu": 0,
+            "avg_ram": 0,
+            "stage_details": {},
         }
 
     def create_pipeline_layout(self) -> Layout:
@@ -251,10 +242,10 @@ class EnhancedFullPipeline:
         layout = Layout()
 
         layout.split_column(
-            Layout(name = "header", size = 3), 
-            Layout(name = "progress", size = 8), 
-            Layout(name = "status", size = 10), 
-            Layout(name = "footer", size = 3), 
+            Layout(name = "header", size = 3),
+            Layout(name = "progress", size = 8),
+            Layout(name = "status", size = 10),
+            Layout(name = "footer", size = 3),
         )
 
         return layout
@@ -326,8 +317,8 @@ class EnhancedFullPipeline:
                 warning_msg = "Resource limits exceeded, proceeding with caution"
                 self.warnings.append(warning_msg)
                 progress.update(
-                    progress_task, 
-                    description = f"[yellow]⚠️ {stage_name} (Resource Warning)", 
+                    progress_task,
+                    description = f"[yellow]⚠️ {stage_name} (Resource Warning)",
                 )
             else:
                 progress.update(progress_task, description = f"[cyan]🔄 {stage_name}")
@@ -362,14 +353,14 @@ class EnhancedFullPipeline:
             stage_duration = time.time() - stage_start_time
             self.stage_times[stage_name] = stage_duration
             self.stage_results[stage_name] = {
-                "success": True, 
-                "duration": stage_duration, 
-                "validation": validation_msg, 
+                "success": True,
+                "duration": stage_duration,
+                "validation": validation_msg,
             }
 
             progress.update(
-                progress_task, 
-                description = f"[green]✅ {stage_name} ({stage_duration:.1f}s)", 
+                progress_task,
+                description = f"[green]✅ {stage_name} ({stage_duration:.1f}s)",
             )
 
             return True, validation_msg
@@ -398,38 +389,38 @@ class EnhancedFullPipeline:
 
         # Pipeline stages definition with Thai names
         pipeline_stages = [
-            ("🏗️ ขั้นตอนประมวลผลข้อมูล - Preprocess", run_preprocess), 
+            ("🏗️ ขั้นตอนประมวลผลข้อมูล - Preprocess", run_preprocess),
             (
-                "🔍 แก้ไข AUC เร่งด่วน - AUC Emergency Fix", 
+                "🔍 แก้ไข AUC เร่งด่วน - AUC Emergency Fix",
                 lambda: (
                     run_auc_emergency_fix()
                     if AUC_IMPROVEMENT_AVAILABLE
                     else print("AUC improvement skipped")
-                ), 
-            ), 
+                ),
+            ),
             (
-                "🧠 สร้างฟีเจอร์ขั้นสูง - Advanced Features", 
+                "🧠 สร้างฟีเจอร์ขั้นสูง - Advanced Features",
                 lambda: (
                     run_advanced_feature_engineering()
                     if AUC_IMPROVEMENT_AVAILABLE
                     else print("Advanced features skipped")
-                ), 
-            ), 
-            ("🤖 ฝึกสอนโมเดล - Train Models", run_train), 
+                ),
+            ),
+            ("🤖 ฝึกสอนโมเดล - Train Models", run_train),
             (
-                "🚀 ระบบโมเดลรวม - Model Ensemble", 
+                "🚀 ระบบโมเดลรวม - Model Ensemble",
                 lambda: (
                     run_model_ensemble_boost()
                     if AUC_IMPROVEMENT_AVAILABLE
                     else print("Ensemble boost skipped")
-                ), 
-            ), 
-            ("🔧 ปรับจูนพารามิเตอร์ - Hyperparameter Sweep", run_sweep), 
-            ("🎯 ปรับแต่งเกณฑ์ - Threshold Optimization", run_threshold), 
-            ("🏃 ทดสอบแบบไปข้างหน้า - Walk - Forward Validation", run_walkforward), 
-            ("🔮 ทำนายผล - Prediction", run_predict), 
-            ("📊 ทดสอบย้อนหลัง - Backtest", run_backtest), 
-            ("📈 สร้างรายงาน - Report Generation", run_report), 
+                ),
+            ),
+            ("🔧 ปรับจูนพารามิเตอร์ - Hyperparameter Sweep", run_sweep),
+            ("🎯 ปรับแต่งเกณฑ์ - Threshold Optimization", run_threshold),
+            ("🏃 ทดสอบแบบไปข้างหน้า - Walk - Forward Validation", run_walkforward),
+            ("🔮 ทำนายผล - Prediction", run_predict),
+            ("📊 ทดสอบย้อนหลัง - Backtest", run_backtest),
+            ("📈 สร้างรายงาน - Report Generation", run_report),
         ]
 
         # Initialize progress tracking with Thai display
@@ -454,8 +445,8 @@ class EnhancedFullPipeline:
                 if i % 3 == 0:  # Show every 3rd stage to reduce CPU monitoring overhead
                     usage = self.resource_monitor.get_usage()
                     self.visual_display.show_system_status(
-                        cpu_percent = usage["cpu_percent"], 
-                        ram_percent = usage["ram_percent"], 
+                        cpu_percent = usage["cpu_percent"],
+                        ram_percent = usage["ram_percent"],
                     )
 
                 # Run stage with validation
@@ -474,18 +465,18 @@ class EnhancedFullPipeline:
 
                     # Show successful stage summary
                     self.visual_display.show_stage_summary(
-                        stage_name = stage_name, 
-                        duration = stage_duration, 
-                        status = "SUCCESS", 
-                        details = {"validation": validation_msg}, 
+                        stage_name = stage_name,
+                        duration = stage_duration,
+                        status = "SUCCESS",
+                        details = {"validation": validation_msg},
                     )
                 else:
                     # Show failed stage summary
                     self.visual_display.show_stage_summary(
-                        stage_name = stage_name, 
-                        duration = stage_duration, 
-                        status = "FAILED", 
-                        details = {"error": validation_msg}, 
+                        stage_name = stage_name,
+                        duration = stage_duration,
+                        status = "FAILED",
+                        details = {"error": validation_msg},
                     )
                     self.errors.append(f"{stage_name}: {validation_msg}")
 
@@ -502,25 +493,25 @@ class EnhancedFullPipeline:
         # Show final report with Thai display
         self.visual_display.show_final_results(
             {
-                "total_time": total_time, 
-                "successful_stages": successful_stages, 
-                "total_stages": len(pipeline_stages), 
+                "total_time": total_time,
+                "successful_stages": successful_stages,
+                "total_stages": len(pipeline_stages),
                 "peak_cpu": max(
                     [
                         usage["cpu_percent"]
                         for usage in [self.resource_monitor.get_usage()]
                     ]
-                ), 
+                ),
                 "peak_ram": max(
                     [
                         usage["ram_percent"]
                         for usage in [self.resource_monitor.get_usage()]
                     ]
-                ), 
-                "errors": self.errors, 
-                "warnings": self.warnings if hasattr(self, "warnings") else [], 
-                "accuracy": "95.2%", 
-                "status": "เสร็จสมบูรณ์", 
+                ),
+                "errors": self.errors,
+                "warnings": self.warnings if hasattr(self, "warnings") else [],
+                "accuracy": "95.2%",
+                "status": "เสร็จสมบูรณ์",
             }
         )
 
@@ -528,23 +519,23 @@ class EnhancedFullPipeline:
         all_reports = {
             "performance": self.report_generator.generate_performance_report(
                 {
-                    "total_time": total_time, 
-                    "successful_stages": successful_stages, 
-                    "total_stages": len(pipeline_stages), 
-                    "stage_times": self.stage_times, 
-                    "peak_cpu": usage["cpu_percent"], 
-                    "peak_ram": usage["ram_percent"], 
-                    "errors": self.errors, 
-                    "warnings": self.warnings, 
+                    "total_time": total_time,
+                    "successful_stages": successful_stages,
+                    "total_stages": len(pipeline_stages),
+                    "stage_times": self.stage_times,
+                    "peak_cpu": usage["cpu_percent"],
+                    "peak_ram": usage["ram_percent"],
+                    "errors": self.errors,
+                    "warnings": self.warnings,
                 }
-            ), 
+            ),
             "data_quality": self.report_generator.generate_data_quality_report(
                 {
-                    "data_validation": "passed" if successful_stages > 0 else "failed", 
+                    "data_validation": "passed" if successful_stages > 0 else "failed",
                     "missing_values": 0,  # Would be filled by actual data analysis
-                    "data_integrity": "high", 
+                    "data_integrity": "high",
                 }
-            ), 
+            ),
         }
 
         dashboard_path = self.report_generator.generate_html_dashboard(all_reports)
@@ -553,9 +544,9 @@ class EnhancedFullPipeline:
             Panel(
                 f"[bold green]🎉 รายงานสมบูรณ์ถูกสร้างเรียบร้อยแล้ว[/bold green]\n"
                 f"[cyan]📊 ดาวน์โหลดที่: {dashboard_path}[/cyan]\n"
-                f"[yellow]💡 เปิดไฟล์ในเว็บเบราว์เซอร์เพื่อดูรายงานแบบโต้ตอบ[/yellow]", 
-                title = "📈 รายงานผลการดำเนินงาน", 
-                border_style = "green", 
+                f"[yellow]💡 เปิดไฟล์ในเว็บเบราว์เซอร์เพื่อดูรายงานแบบโต้ตอบ[/yellow]",
+                title = "📈 รายงานผลการดำเนินงาน",
+                border_style = "green",
             )
         )
 
@@ -564,16 +555,16 @@ class EnhancedFullPipeline:
                 "SUCCESS"
                 if successful_stages == len(pipeline_stages)
                 else "PARTIAL" if successful_stages > 0 else "FAILED"
-            ), 
-            "total_execution_time": total_time, 
-            "successful_stages": successful_stages, 
-            "total_stages": len(pipeline_stages), 
-            "stage_results": self.stage_results, 
-            "stage_times": self.stage_times, 
-            "errors": self.errors, 
-            "warnings": self.warnings, 
-            "dashboard_path": dashboard_path, 
-            "final_resource_usage": self.resource_monitor.get_usage(), 
+            ),
+            "total_execution_time": total_time,
+            "successful_stages": successful_stages,
+            "total_stages": len(pipeline_stages),
+            "stage_results": self.stage_results,
+            "stage_times": self.stage_times,
+            "errors": self.errors,
+            "warnings": self.warnings,
+            "dashboard_path": dashboard_path,
+            "final_resource_usage": self.resource_monitor.get_usage(),
         }
 
         # Display final summary
@@ -609,8 +600,8 @@ class EnhancedFullPipeline:
             "Execution Time", f"{results['total_execution_time']:.1f} seconds"
         )
         summary_table.add_row(
-            "Successful Stages", 
-            f"{results['successful_stages']}/{results['total_stages']}", 
+            "Successful Stages",
+            f"{results['successful_stages']}/{results['total_stages']}",
         )
         summary_table.add_row("Errors", str(len(results["errors"])))
         summary_table.add_row("Warnings", str(len(results["warnings"])))
@@ -645,9 +636,9 @@ class EnhancedFullPipeline:
 
         if results["warnings"]:
             warning_panel = Panel(
-                "\n".join(results["warnings"]), 
-                title = "⚠️ Warnings", 
-                border_style = "yellow", 
+                "\n".join(results["warnings"]),
+                title = "⚠️ Warnings",
+                border_style = "yellow",
             )
             self.console.print(warning_panel)
 
@@ -668,9 +659,9 @@ def main():
             "[cyan]• สวยงามด้วยภาษาไทย - Modern Thai Visual Display[/cyan]\n"
             "[cyan]• ตรวจสอบความถูกต้องแบบครบถ้วน - Comprehensive Validation[/cyan]\n"
             "[cyan]• ควบคุมการใช้ทรัพยากร 80% สูงสุด - Resource Usage Control[/cyan]\n"
-            "[cyan]• พร้อมใช้งานระดับโปรดักชัน - Production - Ready Error Handling[/cyan]", 
-            title = "🎯 คุณสมบัติของไปป์ไลน์", 
-            border_style = "gold1", 
+            "[cyan]• พร้อมใช้งานระดับโปรดักชัน - Production - Ready Error Handling[/cyan]",
+            title = "🎯 คุณสมบัติของไปป์ไลน์",
+            border_style = "gold1",
         )
     )
 
@@ -721,9 +712,9 @@ def main():
             Panel(
                 f"[bold red]❌ ข้อผิดพลาดร้ายแรงของไปป์ไลน์[/bold red]\n"
                 f"ข้อผิดพลาด: {str(e)}\n"
-                f"รายละเอียด: {traceback.format_exc()}", 
-                title = "ข้อผิดพลาดร้ายแรง", 
-                border_style = "red", 
+                f"รายละเอียด: {traceback.format_exc()}",
+                title = "ข้อผิดพลาดร้ายแรง",
+                border_style = "red",
             )
         )
         return False
