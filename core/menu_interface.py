@@ -1,13 +1,44 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Main menu interface for NICEGOLD ProjectP
-Handles menu display and user interaction with modern logging
+🎨 Enhanced Modern Menu Interface for NICEGOLD ProjectP
+Beautiful UI with animations, progress bars, and modern design
+Handles menu display and user interaction with enhanced logging
 """
 
+import os
+import sys
 import time
 from datetime import datetime
 from typing import Optional
+
+# Import new beautiful UI components
+try:
+    from utils.welcome_ui_final import (
+        menu_ui,
+        show_enhanced_menu,
+        show_welcome_screen,
+        welcome_ui,
+    )
+
+    WELCOME_UI_AVAILABLE = True
+except ImportError:
+    WELCOME_UI_AVAILABLE = False
+    show_welcome_screen = None
+    show_enhanced_menu = None
+
+# Import enhanced progress processor
+try:
+    from utils.enhanced_progress import (
+        enhanced_processor,
+        process_with_beautiful_progress,
+        show_pipeline_progress,
+    )
+
+    ENHANCED_PROGRESS_AVAILABLE = True
+except ImportError:
+    ENHANCED_PROGRESS_AVAILABLE = False
+    enhanced_processor = None
 
 # Initialize modern logger
 try:
@@ -469,57 +500,76 @@ class MenuInterface:
         print(f"{colorize('=' * 50, Colors.BRIGHT_CYAN)}")
 
     def run(self):
-        """Main application loop with modern logging and progress bars"""
+        """Main application loop with beautiful modern UI"""
         try:
-            info("🚀 Starting NICEGOLD ProjectP Enterprise System")
-
-            # Setup environment with progress
-            if MODERN_LOGGER_AVAILABLE and logger:
-                with logger.progress_bar("Setting up environment", total=3) as update:
-                    self.config.ensure_folders()
-                    update()
-
-                    clear_screen()
-                    update()
-
-                    self.print_logo()
-                    update()
+            # Show beautiful welcome screen first
+            if WELCOME_UI_AVAILABLE and show_welcome_screen:
+                show_welcome_screen()
             else:
-                # Fallback setup
-                progress("Setting up environment...")
+                # Fallback to old system
+                info("🚀 Starting NICEGOLD ProjectP Enterprise System")
                 self.config.ensure_folders()
                 clear_screen()
                 self.print_logo()
 
-            success("System initialization completed")
-
-            # Show system status
-            self.system.display_system_status()
-
-            # Main menu loop with modern logging
+            # Main menu loop with enhanced UI
             while True:
                 try:
-                    self.print_status_bar()
-                    choice = self.print_main_menu()
+                    # Show enhanced menu
+                    if WELCOME_UI_AVAILABLE and show_enhanced_menu:
+                        choice = show_enhanced_menu()
+                    else:
+                        # Fallback to old menu
+                        self.print_status_bar()
+                        choice = self.print_main_menu()
 
                     if not choice:
-                        warning("No option selected, please choose a valid option")
+                        print("⚠️ No option selected, please choose a valid option")
                         time.sleep(1)
                         continue
 
                     # Log user selection
                     info(f"User selected option: {choice}")
 
-                    # Show processing status
-                    if MODERN_LOGGER_AVAILABLE and logger:
-                        logger.simple_status(f"Processing option {choice}...")
-                        continue_loop = self.handle_menu_choice(choice)
+                    # Process with enhanced progress if available
+                    if (
+                        ENHANCED_PROGRESS_AVAILABLE
+                        and enhanced_processor
+                        and show_pipeline_progress
+                    ):
+                        # Handle special pipeline options with progress
+                        if choice == "1":  # Full Pipeline
+                            enhanced_processor.is_running = True
+                            pipeline_success = show_pipeline_progress("full")
+                            if pipeline_success:
+                                # Call actual full pipeline after progress
+                                continue_loop = self.handle_menu_choice(choice)
+                            else:
+                                continue_loop = True
+                        elif choice == "3":  # Quick Test
+                            enhanced_processor.is_running = True
+                            pipeline_success = show_pipeline_progress("quick")
+                            if pipeline_success:
+                                continue_loop = self.handle_menu_choice(choice)
+                            else:
+                                continue_loop = True
+                        elif choice == "2":  # Data Analysis
+                            enhanced_processor.is_running = True
+                            pipeline_success = show_pipeline_progress("analysis")
+                            if pipeline_success:
+                                continue_loop = self.handle_menu_choice(choice)
+                            else:
+                                continue_loop = True
+                        else:
+                            # Regular menu option
+                            continue_loop = self.handle_menu_choice(choice)
                     else:
-                        progress(f"Processing option {choice}...")
+                        # Fallback to regular processing
+                        print(f"Processing option {choice}...")
                         continue_loop = self.handle_menu_choice(choice)
 
                     if not continue_loop:
-                        success("Application shutdown requested")
+                        print("✅ Application shutdown requested")
                         break
 
                     # Show completion notification
@@ -532,21 +582,23 @@ class MenuInterface:
                             title="NICEGOLD ProjectP",
                         )
                     else:
-                        success("Operation completed successfully!")
-
-                    self.display_session_summary()
+                        print("✅ Operation completed successfully!")
 
                     # Wait for user input to continue
                     if MODERN_LOGGER_AVAILABLE and logger:
                         logger.ask_input("Press Enter to continue...", "")
                     else:
-                        safe_input(
-                            "💡 Press Enter to return to main menu...", default=""
-                        )
+                        print("\n💡 Press Enter to continue...")
+                        input()
 
-                    # Reload interface
-                    clear_screen()
-                    self.print_logo()
+                except KeyboardInterrupt:
+                    print("⚡ User interrupted the process")
+                    if ENHANCED_PROGRESS_AVAILABLE and enhanced_processor:
+                        enhanced_processor.stop()
+                    continue
+                except Exception as e:
+                    print(f"⚠️ Error in menu loop: {str(e)}")
+                    continue
 
                 except KeyboardInterrupt:
                     warning("Operation interrupted by user")
